@@ -15,7 +15,7 @@ target/
 .DS_Store
 Thumbs.db
 
-#H2 database files (nếu bạn dùng file mode)
+#H2 database files
 *.mv.db
 *.h2.db
 
