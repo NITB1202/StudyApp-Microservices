@@ -1,0 +1,22 @@
+#IntelliJ IDEA
+.idea/
+*.iml
+
+#Maven
+target/
+!.mvn/wrapper/maven-wrapper.jar
+
+#Logs
+*.log
+
+#OS files
+.DS_Store
+Thumbs.db
+
+#H2 database files (nếu bạn dùng file mode)
+*.mv.db
+*.h2.db
+
+#Temporary files
+*.tmp
+*.swp
