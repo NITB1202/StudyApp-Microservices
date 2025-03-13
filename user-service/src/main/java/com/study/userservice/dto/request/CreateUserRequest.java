@@ -1,4 +1,4 @@
-package com.study.userservice.dto;
+package com.study.userservice.dto.request;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.study.userservice.enums.Gender;
@@ -12,18 +12,14 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
-import java.util.UUID;
 
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class CreateUserRequest {
-    @NotNull(message = "Account id is required.")
-    private UUID accountId;
-
     @NotBlank(message = "Username is required.")
-    @Size(min =3, max = 20, message = "Username must be between 3 and 20 characters.")
+    @Size(min = 3, max = 20, message = "Username must be between 3 and 20 characters.")
     private String username;
 
     @NotNull(message = "Date of birth is required.")

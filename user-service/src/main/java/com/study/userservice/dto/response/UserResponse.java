@@ -1,4 +1,4 @@
-package com.study.userservice.dto;
+package com.study.userservice.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.AllArgsConstructor;
@@ -16,9 +16,7 @@ import java.util.UUID;
 public class UserResponse {
     private UUID id;
 
-    private UUID accountId;
-
-    private String name;
+    private String username;
 
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
     private LocalDate dateOfBirth;

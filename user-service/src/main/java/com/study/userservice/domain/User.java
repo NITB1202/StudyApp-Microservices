@@ -19,9 +19,6 @@ public class User {
     @Column(name = "id", nullable = false)
     private UUID id;
 
-    @Column(name = "account_id", nullable = false)
-    private UUID accountId;
-
     @Column(name = "username", nullable = false)
     private String username;
 
@@ -34,10 +31,4 @@ public class User {
 
     @Column(name = "avatar_url")
     private String avatarUrl;
-
-    @Column(name = "usage")
-    private float usage;
-
-    @Column(name = "limit_usage")
-    private float limitUsage;
 }

@@ -1,4 +1,4 @@
-package com.study.userservice.dto;
+package com.study.userservice.dto.request;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.study.userservice.enums.Gender;
