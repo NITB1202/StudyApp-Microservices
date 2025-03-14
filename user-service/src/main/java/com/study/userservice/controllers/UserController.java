@@ -13,6 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.UUID;
 
@@ -46,7 +47,7 @@ public class UserController {
     @PutMapping(value = "/{id}", consumes = "multipart/form-data")
     public ResponseEntity<UserResponse> updateUser(@PathVariable UUID id,
                                                    @Valid @RequestPart("request") UpdateUserRequest request,
-                                                   @RequestPart(value = "file", required = false) MultipartFile newAvatar) {
+                                                   @RequestPart(value = "file", required = false) MultipartFile newAvatar) throws IOException {
         return ResponseEntity.ok(userService.updateUser(id, request, newAvatar));
     }
 }

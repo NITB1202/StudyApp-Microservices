@@ -1,5 +1,7 @@
 package com.study.userservice.services;
 
+import com.cloudinary.Cloudinary;
+import com.cloudinary.utils.ObjectUtils;
 import com.study.userservice.dto.request.CreateUserRequest;
 import com.study.userservice.models.User;
 import com.study.userservice.dto.request.UpdateUserRequest;
@@ -15,7 +17,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 @Service
@@ -23,6 +27,7 @@ import java.util.UUID;
 public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final ModelMapper modelMapper;
+    private final Cloudinary cloudinary;
 
     @Override
     public UserResponse createUser(CreateUserRequest request) {
@@ -50,7 +55,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserResponse updateUser(UUID id, UpdateUserRequest request, MultipartFile newAvatar) {
+    public UserResponse updateUser(UUID id, UpdateUserRequest request, MultipartFile newAvatar) throws IOException {
         User user = userRepository.findById(id).orElseThrow(
                 () -> new NotFoundException("User with id " + id + " not found")
         );
@@ -70,7 +75,16 @@ public class UserServiceImpl implements UserService {
                 throw new BusinessException("New avatar is not an image");
             else {
                 //Upload the new avatar to the Cloudinary
-                String newAvatarUrl = "";
+                Map params = ObjectUtils.asMap(
+                        "resource_type", "auto",
+                        "asset_folder", "avatars",
+                        "public_id", id.toString(),
+                        "overwrite", true
+                );
+
+                Map result = cloudinary.uploader().upload(newAvatar.getBytes(),params);
+
+                String newAvatarUrl = result.get("secure_url").toString();
                 user.setAvatarUrl(newAvatarUrl);
             }
         }
