@@ -1,6 +1,6 @@
 package com.study.userservice.services;
 
-import com.study.userservice.domain.User;
+import com.study.userservice.models.User;
 import com.study.userservice.dto.request.CreateUserRequest;
 import com.study.userservice.dto.request.UpdateUserRequest;
 import com.study.userservice.dto.response.UserResponse;

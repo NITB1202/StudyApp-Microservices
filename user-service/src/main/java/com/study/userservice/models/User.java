@@ -1,4 +1,4 @@
-package com.study.userservice.domain;
+package com.study.userservice.models;
 
 import com.study.userservice.enums.Gender;
 import jakarta.persistence.*;
