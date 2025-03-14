@@ -2,12 +2,10 @@ package com.study.userservice.exceptions;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-
-import java.util.HashMap;
-import java.util.Map;
 
 @ControllerAdvice
 public class GlobalExceptionHandler {
@@ -15,7 +13,7 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorResponse> handleException(Exception e) {
         ErrorResponse response = new ErrorResponse(
                 HttpStatus.BAD_REQUEST.value(),
-                "Unexpected exception",
+                "Unexpected error",
                 e.getMessage()
         );
         return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
@@ -25,7 +23,7 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorResponse> handleBusinessException(BusinessException e) {
         ErrorResponse response = new ErrorResponse(
                 HttpStatus.BAD_REQUEST.value(),
-                "Business exception",
+                "Business error",
                 e.getMessage()
         );
         return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
@@ -35,7 +33,7 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorResponse> handleNotFoundException(NotFoundException e) {
         ErrorResponse response = new ErrorResponse(
                 HttpStatus.NOT_FOUND.value(),
-                "Not found exception",
+                "Not found error",
                 e.getMessage()
         );
         return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
@@ -43,15 +41,25 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(value = MethodArgumentNotValidException.class)
     public ResponseEntity<ErrorResponse> handleMethodArgumentNotValidException(MethodArgumentNotValidException e) {
-        Map<String, String> errors = new HashMap<>();
+        StringBuilder errors = new StringBuilder();
         e.getBindingResult().getFieldErrors().forEach(error ->
-                errors.put(error.getField(), error.getDefaultMessage())
+                errors.append(String.format("[%s: %s] ", error.getField(), error.getDefaultMessage()))
         );
 
         ErrorResponse response = new ErrorResponse(
                 HttpStatus.BAD_REQUEST.value(),
-                "Validation exception",
+                "Validation error",
                 errors.toString()
+        );
+        return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(value = HttpMessageNotReadableException.class)
+    public ResponseEntity<ErrorResponse> handleHttpMessageNotReadableException(HttpMessageNotReadableException e) {
+        ErrorResponse response = new ErrorResponse(
+                HttpStatus.BAD_REQUEST.value(),
+                "Json parse error",
+                e.getMessage()
         );
         return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
     }
