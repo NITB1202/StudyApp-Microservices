@@ -1,13 +1,13 @@
 package com.study.userservice.services;
 
-import com.study.userservice.models.User;
 import com.study.userservice.dto.request.CreateUserRequest;
+import com.study.userservice.models.User;
 import com.study.userservice.dto.request.UpdateUserRequest;
 import com.study.userservice.dto.response.UserResponse;
 import com.study.userservice.exceptions.BusinessException;
 import com.study.userservice.exceptions.NotFoundException;
 import com.study.userservice.repositories.UserRepository;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
 import org.springframework.data.domain.Page;
@@ -18,7 +18,7 @@ import java.util.List;
 import java.util.UUID;
 
 @Service
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final ModelMapper modelMapper;
