@@ -13,6 +13,7 @@ import org.modelmapper.TypeToken;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.UUID;
@@ -49,7 +50,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserResponse updateUser(UUID id, UpdateUserRequest request) {
+    public UserResponse updateUser(UUID id, UpdateUserRequest request, MultipartFile newAvatar) {
         User user = userRepository.findById(id).orElseThrow(
                 () -> new NotFoundException("User with id " + id + " not found")
         );
@@ -61,6 +62,18 @@ public class UserServiceImpl implements UserService {
            throw new BusinessException("Username already exists");
 
        modelMapper.map(request, user);
+
+        //Check if the client upload an image file
+        if(newAvatar != null && !newAvatar.isEmpty()){
+            String fileType = newAvatar.getContentType();
+            if(fileType == null || !fileType.startsWith("image/"))
+                throw new BusinessException("New avatar is not an image");
+            else {
+                //Upload the new avatar to the Cloudinary
+                String newAvatarUrl = "";
+                user.setAvatarUrl(newAvatarUrl);
+            }
+        }
 
        userRepository.save(user);
 

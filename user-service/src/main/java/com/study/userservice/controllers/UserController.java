@@ -11,6 +11,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.UUID;
@@ -42,9 +43,10 @@ public class UserController {
         return ResponseEntity.ok(userService.searchUserByUsername(keyword, pageable));
     }
 
-    @PutMapping("/{id}")
+    @PutMapping(value = "/{id}", consumes = "multipart/form-data")
     public ResponseEntity<UserResponse> updateUser(@PathVariable UUID id,
-                                                   @Valid @RequestBody UpdateUserRequest request) {
-        return ResponseEntity.ok(userService.updateUser(id, request));
+                                                   @Valid @RequestPart("request") UpdateUserRequest request,
+                                                   @RequestPart(value = "file", required = false) MultipartFile newAvatar) {
+        return ResponseEntity.ok(userService.updateUser(id, request, newAvatar));
     }
 }
