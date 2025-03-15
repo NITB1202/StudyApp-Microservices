@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -44,9 +45,9 @@ public class UserController {
         return ResponseEntity.ok(userService.searchUserByUsername(keyword, pageable));
     }
 
-    @PutMapping(value = "/{id}", consumes = "multipart/form-data")
+    @PutMapping(value = "/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<UserResponse> updateUser(@PathVariable UUID id,
-                                                   @Valid @RequestPart("request") UpdateUserRequest request,
+                                                   @Valid @RequestPart(value = "request", required = false) UpdateUserRequest request,
                                                    @RequestPart(value = "file", required = false) MultipartFile newAvatar) throws IOException {
         return ResponseEntity.ok(userService.updateUser(id, request, newAvatar));
     }
