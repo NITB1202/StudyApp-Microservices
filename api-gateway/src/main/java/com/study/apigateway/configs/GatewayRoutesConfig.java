@@ -11,8 +11,11 @@ public class GatewayRoutesConfig {
     public RouteLocator gatewayRoutes(RouteLocatorBuilder builder) {
         return builder.routes()
 
-                .route("user-service", r -> r.path("/user-service/**")
+                .route("user-service", r -> r.path("/user-service/api/**")
                         .filters(f -> f.rewritePath("/user-service/(?<segment>.*)", "/${segment}"))
+                        .uri("lb://user-service"))
+
+                .route("user-service-api-doc", r -> r.path("/user-service/swagger/**")
                         .uri("lb://user-service"))
 
                 .build();
