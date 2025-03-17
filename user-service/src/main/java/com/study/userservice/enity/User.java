@@ -1,4 +1,4 @@
-package com.study.userservice.models;
+package com.study.userservice.enity;
 
 import com.study.userservice.enums.Gender;
 import jakarta.persistence.*;
@@ -19,7 +19,7 @@ public class User {
     @Column(name = "id", nullable = false)
     private UUID id;
 
-    @Column(name = "username", nullable = false)
+    @Column(name = "username", unique = true, nullable = false)
     private String username;
 
     @Column(name = "dob", nullable = false)

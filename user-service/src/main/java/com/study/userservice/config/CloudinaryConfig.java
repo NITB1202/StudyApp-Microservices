@@ -1,4 +1,4 @@
-package com.study.userservice.configs;
+package com.study.userservice.config;
 
 import com.cloudinary.Cloudinary;
 import io.github.cdimascio.dotenv.Dotenv;

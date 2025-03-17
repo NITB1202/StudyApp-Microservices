@@ -1,4 +1,4 @@
-package com.study.userservice.configs;
+package com.study.userservice.config;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.context.annotation.Bean;
