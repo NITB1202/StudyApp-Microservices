@@ -15,7 +15,7 @@
     <artifactId>common</artifactId>
     <packaging>jar</packaging>
 
-    <name>Common Library</name>
+    <name>common-library</name>
     <description>Shared components and utilities for StudyPal microservices</description>
 
     <properties>

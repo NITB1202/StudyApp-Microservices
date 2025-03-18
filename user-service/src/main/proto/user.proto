@@ -7,9 +7,10 @@ option java_package = "com.study.userservice.grpc";
 option java_outer_classname = "UserProto";
 
 enum Gender {
-  FEMALE = 0;
-  MALE = 1;
-  OTHER = 2;
+  UNSPECIFIED = 0;
+  FEMALE = 1;
+  MALE = 2;
+  OTHER = 3;
 }
 
 message CreateUserRequest {
@@ -32,34 +33,33 @@ message GetUserByIdRequest {
 
 message GetUsersByListOfIdsRequest {
   repeated string ids = 1;
-  int32 page = 2;
+  string cursor = 2;
   int32 size = 3;
 }
 
 message GetUsersByListOfIdsResponse {
   repeated UserResponse users = 1;
-  int32 total = 2;
-  int32 page = 3;
-  int32 size = 4;
+  int64 total = 2;
+  int32 size = 3;
+  string nextCursor = 4;
 }
 
 message SearchUserRequest {
   string keyword = 1;
-  int32 total = 2;
-  int32 page = 3;
-  int32 size = 4;
+  string cursor = 2;
+  int32 size = 3;
 }
 
 message SearchUserResponse {
   repeated UserResponse users = 1;
-  int32 total = 2;
+  string nextCursor = 2;
 }
 
 message UpdateUserRequest {
   string id = 1;
   string username = 2;
   string dateOfBirth = 3;
-  string gender = 4;
+  Gender gender = 4;
   string avatarUrl = 5;
 }
 
