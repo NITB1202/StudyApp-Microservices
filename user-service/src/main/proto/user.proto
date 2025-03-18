@@ -1,0 +1,73 @@
+syntax = "proto3";
+
+package user;
+
+option java_multiple_files = true;
+option java_package = "com.study.userservice.grpc";
+option java_outer_classname = "UserProto";
+
+enum Gender {
+  FEMALE = 0;
+  MALE = 1;
+  OTHER = 2;
+}
+
+message CreateUserRequest {
+  string username = 1;
+  string dateOfBirth = 2;
+  Gender gender = 3;
+}
+
+message UserResponse {
+  string id = 1;
+  string username = 2;
+  string dateOfBirth = 3;
+  Gender gender = 4;
+  string avatarUrl = 5;
+}
+
+message GetUserByIdRequest {
+  string id = 1;
+}
+
+message GetUsersByListOfIdsRequest {
+  repeated string ids = 1;
+  int32 page = 2;
+  int32 size = 3;
+}
+
+message GetUsersByListOfIdsResponse {
+  repeated UserResponse users = 1;
+  int32 total = 2;
+  int32 page = 3;
+  int32 size = 4;
+}
+
+message SearchUserRequest {
+  string keyword = 1;
+  int32 total = 2;
+  int32 page = 3;
+  int32 size = 4;
+}
+
+message SearchUserResponse {
+  repeated UserResponse users = 1;
+  int32 total = 2;
+}
+
+message UpdateUserRequest {
+  string id = 1;
+  string username = 2;
+  string dateOfBirth = 3;
+  string gender = 4;
+  string avatarUrl = 5;
+}
+
+// gRPC Service
+service UserService {
+  rpc CreateUser(CreateUserRequest) returns (UserResponse);
+  rpc GetUserById(GetUserByIdRequest) returns (UserResponse);
+  rpc GetUsersByListOfIds(GetUsersByListOfIdsRequest) returns (GetUsersByListOfIdsResponse);
+  rpc SearchUserByUsername(SearchUserRequest) returns (SearchUserResponse);
+  rpc UpdateUser(UpdateUserRequest) returns (UserResponse);
+}
