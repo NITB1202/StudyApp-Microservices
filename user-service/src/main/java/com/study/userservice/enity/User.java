@@ -1,5 +1,6 @@
 package com.study.userservice.enity;
 
+import com.study.common.enums.Gender;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -24,9 +25,9 @@ public class User {
     @Column(name = "dob", nullable = false)
     private LocalDate dateOfBirth;
 
-//    @Enumerated(EnumType.STRING)
+    @Enumerated(EnumType.STRING)
     @Column(name = "gender", nullable = false)
-    private String gender;
+    private Gender gender;
 
     @Column(name = "avatar_url")
     private String avatarUrl;

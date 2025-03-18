@@ -14,9 +14,10 @@
 
     <!-- MODULES-->
     <modules>
+        <module>common</module>
+        <module>eureka-server</module>
         <module>user-service</module>
         <module>api-gateway</module>
-        <module>eureka-server</module>
     </modules>
 
     <!-- DEPENDENCIES -->
