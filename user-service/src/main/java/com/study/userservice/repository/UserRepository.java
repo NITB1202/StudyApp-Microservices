@@ -33,4 +33,11 @@ public interface UserRepository extends JpaRepository<User, UUID> {
     List<User> searchByUsernameWithCursor(@Param("keyword") String keyword,
                                           @Param("cursor") UUID cursor,
                                           Pageable pageable);
+
+    @Query("""
+    SELECT COUNT(u)
+    FROM User u
+    WHERE LOWER(u.username) LIKE LOWER(CONCAT('%', :keyword, '%'))
+    """)
+    long countByUsername(@Param("keyword") String keyword);
 }
