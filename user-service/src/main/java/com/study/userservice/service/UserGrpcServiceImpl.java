@@ -14,6 +14,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 
 import java.time.LocalDate;
+import java.time.format.DateTimeParseException;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
@@ -28,9 +29,16 @@ public class UserGrpcServiceImpl extends UserServiceGrpc.UserServiceImplBase{
         if(userRepository.existsByUsernameIgnoreCase(request.getUsername()))
             throw new BusinessException("Username already exists");
 
+        LocalDate dateOfBirth;
+        try {
+            dateOfBirth = LocalDate.parse(request.getDateOfBirth());
+        } catch (DateTimeParseException e) {
+            throw new BusinessException("Invalid date format. Expected yyyy-MM-dd");
+        }
+
         User user = User.builder()
                 .username(request.getUsername())
-                .dateOfBirth(LocalDate.parse(request.getDateOfBirth()))
+                .dateOfBirth(dateOfBirth)
                 .gender(protoEnumToEnum(request.getGender()))
                 .build();
 
@@ -128,8 +136,14 @@ public class UserGrpcServiceImpl extends UserServiceGrpc.UserServiceImplBase{
                 user.setUsername(request.getUsername());
         }
 
-        if(!request.getDateOfBirth().isBlank())
-            user.setDateOfBirth(LocalDate.parse(request.getDateOfBirth()));
+        if(!request.getDateOfBirth().isBlank()){
+            try {
+                LocalDate dateOfBirth = LocalDate.parse(request.getDateOfBirth());
+                user.setDateOfBirth(dateOfBirth);
+            } catch (DateTimeParseException e) {
+                throw new BusinessException("Invalid date format. Expected yyyy-MM-dd");
+            }
+        }
 
         if(request.getGender() != com.study.userservice.grpc.Gender.UNSPECIFIED)
             user.setGender(protoEnumToEnum(request.getGender()));
