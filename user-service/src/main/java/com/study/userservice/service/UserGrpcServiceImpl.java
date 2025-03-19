@@ -15,6 +15,7 @@ import org.springframework.data.domain.Sort;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 
 @GrpcService
@@ -166,7 +167,7 @@ public class UserGrpcServiceImpl extends UserServiceGrpc.UserServiceImplBase{
                 .setUsername(user.getUsername())
                 .setDateOfBirth(user.getDateOfBirth().toString())
                 .setGender(enumToProtoEnum(user.getGender()))
-                .setAvatarUrl(user.getAvatarUrl())
+                .setAvatarUrl(Objects.requireNonNullElse(user.getAvatarUrl(), ""))
                 .build();
     }
 }

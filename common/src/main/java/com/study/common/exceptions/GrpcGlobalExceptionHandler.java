@@ -28,6 +28,11 @@ public class GrpcGlobalExceptionHandler {
         return Status.NOT_FOUND.withDescription(ex.getMessage()).asRuntimeException();
     }
 
+    @GrpcExceptionHandler(IllegalArgumentException.class)
+    public StatusRuntimeException handleIllegalArgumentException(IllegalArgumentException ex) {
+        return Status.INVALID_ARGUMENT.withDescription(ex.getMessage()).asRuntimeException();
+    }
+
     @GrpcExceptionHandler(ConstraintViolationException.class)
     public StatusRuntimeException handleConstraintViolationException(ConstraintViolationException ex) {
         String errors = ex.getConstraintViolations().stream()
