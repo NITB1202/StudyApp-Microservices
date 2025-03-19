@@ -16,7 +16,7 @@ public interface UserRepository extends JpaRepository<User, UUID> {
     SELECT u 
     FROM User u
     WHERE u.id IN :ids
-      AND (:cursor IS NULL OR u.username > :cursor)
+      AND (:cursor IS NULL OR u.id > :cursor)
     ORDER BY u.id ASC
     """)
     List<User> findByIdsWithCursor(@Param("ids") List<UUID> ids,
