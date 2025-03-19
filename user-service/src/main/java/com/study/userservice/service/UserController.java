@@ -4,6 +4,8 @@ import com.study.common.enums.Gender;
 import com.study.userservice.controller.UserService;
 import com.study.userservice.enity.User;
 import com.study.userservice.grpc.*;
+import com.study.userservice.mapper.GenderMapper;
+import com.study.userservice.mapper.UserMapper;
 import io.grpc.stub.StreamObserver;
 import lombok.RequiredArgsConstructor;
 import net.devh.boot.grpc.server.service.GrpcService;
@@ -20,7 +22,7 @@ public class UserController extends UserServiceGrpc.UserServiceImplBase{
     @Override
     public void createUser(CreateUserRequest request, StreamObserver<UserResponse> responseObserver){
         User user = userService.createUser(request);
-        UserResponse response = buildUserResponse(user);
+        UserResponse response = UserMapper.toUserResponse(user);
         responseObserver.onNext(response);
         responseObserver.onCompleted();
     }
@@ -28,7 +30,7 @@ public class UserController extends UserServiceGrpc.UserServiceImplBase{
     @Override
     public void getUserById(GetUserByIdRequest request, StreamObserver<UserResponse> responseObserver){
         User user = userService.getUserById(request);
-        UserResponse response = buildUserResponse(user);
+        UserResponse response = UserMapper.toUserResponse(user);
         responseObserver.onNext(response);
         responseObserver.onCompleted();
     }
@@ -42,10 +44,7 @@ public class UserController extends UserServiceGrpc.UserServiceImplBase{
         int size = request.getSize() > 0 ? request.getSize() : 10;
 
         List<User> users = userService.getUsersByListOfIds(ids, cursor, size);
-
-        List<UserResponse> userResponses = users.stream()
-                .map(this::buildUserResponse)
-                .toList();
+        List<UserResponse> userResponses = UserMapper.toUserResponseList(users);
 
         // Determine next cursor
         String nextCursor = !users.isEmpty() && users.size() == size ? users.get(users.size() - 1).getId().toString() : "";
@@ -64,10 +63,7 @@ public class UserController extends UserServiceGrpc.UserServiceImplBase{
     @Override
     public void searchUserByUsername(SearchUserRequest request, StreamObserver<SearchUserResponse> responseObserver){
         List<User> users = userService.searchUsersByUsername(request);
-
-        List<UserResponse> userResponses = users.stream()
-                .map(this::buildUserResponse)
-                .toList();
+        List<UserResponse> userResponses = UserMapper.toUserResponseList(users);
 
         long total = userService.countUsersByUsername(request.getKeyword());
         String nextCursor = users.isEmpty() ? "" : users.get(users.size() - 1).getId().toString();
@@ -85,26 +81,8 @@ public class UserController extends UserServiceGrpc.UserServiceImplBase{
     @Override
     public void updateUser(UpdateUserRequest request, StreamObserver<UserResponse> responseObserver){
         User user = userService.updateUser(request);
-        UserResponse response = buildUserResponse(user);
+        UserResponse response = UserMapper.toUserResponse(user);
         responseObserver.onNext(response);
         responseObserver.onCompleted();
-    }
-
-    private com.study.userservice.grpc.Gender enumToProtoEnum(Gender genderEnum){
-        return switch(genderEnum) {
-            case MALE -> com.study.userservice.grpc.Gender.MALE;
-            case FEMALE -> com.study.userservice.grpc.Gender.FEMALE;
-            default -> com.study.userservice.grpc.Gender.OTHER;
-        };
-    }
-
-    private UserResponse buildUserResponse(User user){
-        return UserResponse.newBuilder()
-                .setId(user.getId().toString())
-                .setUsername(user.getUsername())
-                .setDateOfBirth(user.getDateOfBirth().toString())
-                .setGender(enumToProtoEnum(user.getGender()))
-                .setAvatarUrl(Objects.requireNonNullElse(user.getAvatarUrl(), ""))
-                .build();
     }
 }

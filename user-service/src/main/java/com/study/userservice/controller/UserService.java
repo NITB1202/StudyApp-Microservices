@@ -8,6 +8,7 @@ import com.study.userservice.grpc.CreateUserRequest;
 import com.study.userservice.grpc.GetUserByIdRequest;
 import com.study.userservice.grpc.SearchUserRequest;
 import com.study.userservice.grpc.UpdateUserRequest;
+import com.study.userservice.mapper.GenderMapper;
 import com.study.userservice.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
@@ -39,7 +40,7 @@ public class UserService {
         User user = User.builder()
                 .username(request.getUsername())
                 .dateOfBirth(dateOfBirth)
-                .gender(protoEnumToEnum(request.getGender()))
+                .gender(GenderMapper.toEnum(request.getGender()))
                 .build();
 
         return userRepository.save(user);
@@ -93,19 +94,11 @@ public class UserService {
         }
 
         if(request.getGender() != com.study.userservice.grpc.Gender.UNSPECIFIED)
-            user.setGender(protoEnumToEnum(request.getGender()));
+            user.setGender(GenderMapper.toEnum(request.getGender()));
 
         if(!request.getAvatarUrl().isBlank())
             user.setAvatarUrl(request.getAvatarUrl());
 
         return userRepository.save(user);
-    }
-
-    private Gender protoEnumToEnum(com.study.userservice.grpc.Gender protoGenderEnum){
-        return switch (protoGenderEnum) {
-            case MALE -> Gender.MALE;
-            case FEMALE -> Gender.FEMALE;
-            default -> Gender.OTHER;
-        };
     }
 }
