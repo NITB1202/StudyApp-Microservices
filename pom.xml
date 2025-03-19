@@ -7,16 +7,17 @@
     <groupId>com.study</groupId>
     <artifactId>study-microservices</artifactId>
     <version>1.0.0-SNAPSHOT</version>
-    <packaging>pom</packaging> <!-- BẮT BUỘC là pom -->
+    <packaging>pom</packaging>
 
     <name>StudyPal Microservices Parent</name>
     <description>Parent project for StudyPal microservices</description>
 
     <!-- MODULES-->
     <modules>
+        <module>common</module>
+        <module>eureka-server</module>
         <module>user-service</module>
         <module>api-gateway</module>
-        <module>eureka-server</module>
     </modules>
 
     <!-- DEPENDENCIES -->
