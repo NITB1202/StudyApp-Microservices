@@ -2,12 +2,12 @@ package com.study.userservice.service;
 
 import com.study.common.exceptions.BusinessException;
 import com.study.common.exceptions.NotFoundException;
+import com.study.common.mappers.GenderMapper;
 import com.study.userservice.enity.User;
 import com.study.userservice.grpc.CreateUserRequest;
 import com.study.userservice.grpc.GetUserByIdRequest;
 import com.study.userservice.grpc.SearchUserRequest;
 import com.study.userservice.grpc.UpdateUserRequest;
-import com.study.userservice.mapper.GenderMapper;
 import com.study.userservice.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
