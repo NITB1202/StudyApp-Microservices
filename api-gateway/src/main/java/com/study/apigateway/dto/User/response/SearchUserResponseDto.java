@@ -12,12 +12,10 @@ import java.util.UUID;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class GetUsersByListOfIdsResponseDto {
+public class SearchUserResponseDto {
     private List<UserResponseDto> users;
 
     private Long total;
-
-    private Integer size;
 
     private UUID nextCursor;
 }

@@ -3,6 +3,7 @@ package com.study.apigateway.controller;
 import com.study.apigateway.dto.User.request.CreateUserRequestDto;
 import com.study.apigateway.dto.User.request.UpdateUserRequestDto;
 import com.study.apigateway.dto.User.response.GetUsersByListOfIdsResponseDto;
+import com.study.apigateway.dto.User.response.SearchUserResponseDto;
 import com.study.apigateway.dto.User.response.UserResponseDto;
 import com.study.apigateway.service.User.UserService;
 import jakarta.validation.Valid;
@@ -40,7 +41,7 @@ public class UserController {
     }
 
     @GetMapping("/search")
-    public ResponseEntity<List<UserResponseDto>> searchUsersByUsername(@RequestParam String keyword,
+    public ResponseEntity<SearchUserResponseDto> searchUsersByUsername(@RequestParam String keyword,
                                                                        @RequestParam(required = false) UUID cursor,
                                                                        @RequestParam(defaultValue = "10") int size) {
         return ResponseEntity.ok(userService.searchUserByUsername(keyword, cursor, size));
