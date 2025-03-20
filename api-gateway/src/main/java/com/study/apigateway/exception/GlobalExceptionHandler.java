@@ -1,7 +1,6 @@
 package com.study.apigateway.exception;
 
-import com.study.common.exceptions.BusinessException;
-import com.study.common.exceptions.NotFoundException;
+import io.grpc.StatusRuntimeException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
@@ -21,26 +20,6 @@ public class GlobalExceptionHandler {
                 e.getMessage()
         );
         return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
-    }
-
-    @ExceptionHandler(value = BusinessException.class)
-    public ResponseEntity<ErrorResponse> handleBusinessException(BusinessException e) {
-        ErrorResponse response = new ErrorResponse(
-                HttpStatus.BAD_REQUEST.value(),
-                "Business error",
-                e.getMessage()
-        );
-        return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
-    }
-
-    @ExceptionHandler(value = NotFoundException.class)
-    public ResponseEntity<ErrorResponse> handleNotFoundException(NotFoundException e) {
-        ErrorResponse response = new ErrorResponse(
-                HttpStatus.NOT_FOUND.value(),
-                "Not found error",
-                e.getMessage()
-        );
-        return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
     }
 
     @ExceptionHandler(value = MethodArgumentNotValidException.class)
@@ -76,5 +55,37 @@ public class GlobalExceptionHandler {
                 e.getMessage()
         );
         return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    @ExceptionHandler(value = StatusRuntimeException.class)
+    public ResponseEntity<ErrorResponse> handleStatusRuntimeException(StatusRuntimeException e) {
+        int statusCode;
+        HttpStatus httpStatus;
+
+        switch (e.getStatus().getCode()) {
+            case INVALID_ARGUMENT: {
+                statusCode = HttpStatus.BAD_REQUEST.value();
+                httpStatus = HttpStatus.BAD_REQUEST;
+                break;
+            }
+            case NOT_FOUND: {
+                statusCode = HttpStatus.NOT_FOUND.value();
+                httpStatus = HttpStatus.NOT_FOUND;
+                break;
+            }
+            default: {
+                statusCode = HttpStatus.INTERNAL_SERVER_ERROR.value();
+                httpStatus = HttpStatus.INTERNAL_SERVER_ERROR;
+                break;
+            }
+        }
+
+        ErrorResponse response = new ErrorResponse(
+                statusCode,
+                "GRPC error",
+                e.getMessage()
+        );
+
+        return new ResponseEntity<>(response, httpStatus);
     }
 }

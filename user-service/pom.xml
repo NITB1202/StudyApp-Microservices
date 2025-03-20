@@ -23,9 +23,6 @@
 		<spring-cloud.version>2024.0.0</spring-cloud.version>
 		<grpc.version>1.61.0</grpc.version>
 		<protobuf.version>3.25.3</protobuf.version>
-		<protoc.version>3.25.3</protoc.version>
-		<grpc-plugin.version>1.61.0</grpc-plugin.version>
-		<os.detected.classifier>windows-x86_64</os.detected.classifier>
 	</properties>
 
 	<dependencies>
@@ -144,41 +141,6 @@
 	<!-- Build Plugins -->
 	<build>
 		<plugins>
-			<!-- OS-Maven Plugin (Detect OS) -->
-			<plugin>
-				<groupId>kr.motd.maven</groupId>
-				<artifactId>os-maven-plugin</artifactId>
-				<version>1.7.0</version>
-				<executions>
-					<execution>
-						<goals>
-							<goal>detect</goal>
-						</goals>
-						<phase>initialize</phase>
-					</execution>
-				</executions>
-			</plugin>
-
-			<!-- Protobuf Maven Plugin -->
-			<plugin>
-				<groupId>org.xolstice.maven.plugins</groupId>
-				<artifactId>protobuf-maven-plugin</artifactId>
-				<version>0.6.1</version>
-				<configuration>
-					<protocArtifact>com.google.protobuf:protoc:${protoc.version}:exe:${os.detected.classifier}</protocArtifact>
-					<pluginId>grpc-java</pluginId>
-					<pluginArtifact>io.grpc:protoc-gen-grpc-java:${grpc-plugin.version}:exe:${os.detected.classifier}</pluginArtifact>
-				</configuration>
-				<executions>
-					<execution>
-						<goals>
-							<goal>compile</goal>
-							<goal>compile-custom</goal>
-						</goals>
-					</execution>
-				</executions>
-			</plugin>
-
 			<!-- Maven Compiler Plugin -->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
