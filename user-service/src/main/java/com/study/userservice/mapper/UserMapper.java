@@ -1,5 +1,6 @@
 package com.study.userservice.mapper;
 
+import com.study.common.mappers.GenderMapper;
 import com.study.userservice.enity.User;
 import com.study.userservice.grpc.UserResponse;
 

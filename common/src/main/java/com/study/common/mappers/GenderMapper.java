@@ -1,4 +1,4 @@
-package com.study.userservice.mapper;
+package com.study.common.mappers;
 
 import com.study.common.enums.Gender;
 
