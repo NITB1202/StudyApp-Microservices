@@ -3,7 +3,7 @@ package com.study.userservice.mapper;
 import com.study.common.enums.Gender;
 
 public class GenderMapper {
-
+    //Private constructor to prevent initializing object
     private GenderMapper() {}
 
     public static Gender toEnum(com.study.userservice.grpc.Gender protoGender) {
