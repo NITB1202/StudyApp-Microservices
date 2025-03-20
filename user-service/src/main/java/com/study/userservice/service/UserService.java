@@ -1,6 +1,5 @@
-package com.study.userservice.controller;
+package com.study.userservice.service;
 
-import com.study.common.enums.Gender;
 import com.study.common.exceptions.BusinessException;
 import com.study.common.exceptions.NotFoundException;
 import com.study.userservice.enity.User;

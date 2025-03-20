@@ -1,17 +1,14 @@
-package com.study.userservice.service;
+package com.study.userservice.controller;
 
-import com.study.common.enums.Gender;
-import com.study.userservice.controller.UserService;
 import com.study.userservice.enity.User;
 import com.study.userservice.grpc.*;
-import com.study.userservice.mapper.GenderMapper;
 import com.study.userservice.mapper.UserMapper;
+import com.study.userservice.service.UserService;
 import io.grpc.stub.StreamObserver;
 import lombok.RequiredArgsConstructor;
 import net.devh.boot.grpc.server.service.GrpcService;
 
 import java.util.List;
-import java.util.Objects;
 import java.util.UUID;
 
 @GrpcService
