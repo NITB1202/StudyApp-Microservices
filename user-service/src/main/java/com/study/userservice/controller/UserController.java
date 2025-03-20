@@ -48,7 +48,7 @@ public class UserController extends UserServiceGrpc.UserServiceImplBase{
 
         GetUsersByListOfIdsResponse response = GetUsersByListOfIdsResponse.newBuilder()
                 .addAllUsers(userResponses)
-                .setTotal(userResponses.size())
+                .setTotal(ids.size())
                 .setSize(size)
                 .setNextCursor(nextCursor)
                 .build();
