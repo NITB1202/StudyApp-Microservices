@@ -52,7 +52,8 @@ message SearchUserRequest {
 
 message SearchUserResponse {
   repeated UserResponse users = 1;
-  string nextCursor = 2;
+  int64 total = 2;
+  string nextCursor = 3;
 }
 
 message UpdateUserRequest {
