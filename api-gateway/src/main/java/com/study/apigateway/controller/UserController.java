@@ -10,10 +10,10 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.codec.multipart.FilePart;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
+import reactor.core.publisher.Mono;
 
-import java.io.IOException;
 import java.util.List;
 import java.util.UUID;
 
@@ -24,33 +24,40 @@ public class UserController {
     private final UserService userService;
 
     @PostMapping
-    public ResponseEntity<UserResponseDto> createUser(@Valid @RequestBody CreateUserRequestDto request) {
-        return ResponseEntity.ok(userService.createUser(request));
+    public Mono<ResponseEntity<UserResponseDto>> createUser(@Valid @RequestBody CreateUserRequestDto request) {
+        return userService.createUser(request)
+                .map(ResponseEntity::ok);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<UserResponseDto> getUserById(@PathVariable UUID id) {
-        return ResponseEntity.ok(userService.getUserById(id));
+    public Mono<ResponseEntity<UserResponseDto>> getUserById(@PathVariable UUID id) {
+        return userService.getUserById(id)
+                .map(ResponseEntity::ok);
     }
 
     @PostMapping("/list")
-    public ResponseEntity<GetUsersByListOfIdsResponseDto> getUsersByListOfIds(@Valid @RequestBody List<UUID> ids,
-                                                                              @RequestParam(required = false) UUID cursor,
-                                                                              @RequestParam(defaultValue = "10") int size) {
-        return ResponseEntity.ok(userService.getUsersByListOfIds(ids, cursor, size));
+    public Mono<ResponseEntity<GetUsersByListOfIdsResponseDto>> getUsersByListOfIds(@Valid @RequestBody List<UUID> ids,
+                                                                                    @RequestParam(required = false) UUID cursor,
+                                                                                    @RequestParam(defaultValue = "10") int size) {
+        return userService.getUsersByListOfIds(ids, cursor, size)
+                .map(ResponseEntity::ok);
     }
 
     @GetMapping("/search")
-    public ResponseEntity<SearchUserResponseDto> searchUsersByUsername(@RequestParam String keyword,
-                                                                       @RequestParam(required = false) UUID cursor,
-                                                                       @RequestParam(defaultValue = "10") int size) {
-        return ResponseEntity.ok(userService.searchUserByUsername(keyword, cursor, size));
+    public Mono<ResponseEntity<SearchUserResponseDto>> searchUsersByUsername(@RequestParam String keyword,
+                                                                             @RequestParam(required = false) UUID cursor,
+                                                                             @RequestParam(defaultValue = "10") int size) {
+        return userService.searchUserByUsername(keyword, cursor, size)
+                .map(ResponseEntity::ok);
     }
 
     @PutMapping(value = "/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<UserResponseDto> updateUser(@PathVariable UUID id,
-                                                      @Valid @RequestPart(value = "request", required = false) UpdateUserRequestDto request,
-                                                      @RequestPart(value = "file", required = false) MultipartFile newAvatar) throws IOException {
-        return ResponseEntity.ok(userService.updateUser(id, request, newAvatar));
+    public Mono<ResponseEntity<UserResponseDto>> updateUser(
+            @PathVariable UUID id,
+            @RequestPart(value = "request", required = false) UpdateUserRequestDto request,
+            @RequestPart(value = "file", required = false) FilePart newAvatar) {
+
+        return userService.updateUser(id, request, newAvatar)
+                .map(ResponseEntity::ok);
     }
 }
