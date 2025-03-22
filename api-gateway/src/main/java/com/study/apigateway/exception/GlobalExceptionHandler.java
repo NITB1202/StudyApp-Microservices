@@ -1,64 +1,69 @@
 package com.study.apigateway.exception;
 
 import io.grpc.StatusRuntimeException;
+import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.support.WebExchangeBindException;
 import org.springframework.web.server.ServerWebInputException;
+import reactor.core.publisher.Mono;
 
 import java.io.IOException;
 
 @ControllerAdvice
 public class GlobalExceptionHandler {
     @ExceptionHandler(value = Exception.class)
-    public ResponseEntity<ErrorResponse> handleException(Exception e) {
+    public Mono<ResponseEntity<ErrorResponse>> handleException(Exception e) {
         ErrorResponse response = new ErrorResponse(
                 HttpStatus.BAD_REQUEST.value(),
                 "Unexpected error",
                 e.getMessage()
         );
-        return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+
+        return Mono.just(new ResponseEntity<>(response, HttpStatus.BAD_REQUEST));
     }
 
-    @ExceptionHandler(value = MethodArgumentNotValidException.class)
-    public ResponseEntity<ErrorResponse> handleMethodArgumentNotValidException(MethodArgumentNotValidException e) {
-        StringBuilder errors = new StringBuilder();
-        e.getBindingResult().getFieldErrors().forEach(error ->
-                errors.append(String.format("[%s: %s] ", error.getField(), error.getDefaultMessage()))
-        );
+   @ExceptionHandler(WebExchangeBindException.class)
+   public Mono<ResponseEntity<ErrorResponse>> handleException(WebExchangeBindException e) {
+       String errorMessage = e.getFieldErrors()
+               .stream()
+               .findFirst()
+               .map(DefaultMessageSourceResolvable::getDefaultMessage)
+               .orElse("Validation error");
 
-        ErrorResponse response = new ErrorResponse(
-                HttpStatus.BAD_REQUEST.value(),
-                "Validation error",
-                errors.toString()
-        );
-        return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
-    }
+       ErrorResponse errorResponse = new ErrorResponse(
+               HttpStatus.BAD_REQUEST.value(),
+               "Validation error",
+               errorMessage
+       );
+
+       return Mono.just(ResponseEntity.badRequest().body(errorResponse));
+   }
 
     @ExceptionHandler(value = ServerWebInputException.class)
-    public ResponseEntity<ErrorResponse> handleServerWebInputException(ServerWebInputException e) {
+    public Mono<ResponseEntity<ErrorResponse>> handleServerWebInputException(ServerWebInputException e) {
         ErrorResponse response = new ErrorResponse(
                 HttpStatus.BAD_REQUEST.value(),
                 "Json parse error",
                 e.getMessage()
         );
-        return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+        return Mono.just(new ResponseEntity<>(response, HttpStatus.BAD_REQUEST));
     }
 
     @ExceptionHandler(value = IOException.class)
-    public ResponseEntity<ErrorResponse> handleIOException(IOException e) {
+    public Mono<ResponseEntity<ErrorResponse>> handleIOException(IOException e) {
         ErrorResponse response = new ErrorResponse(
                 HttpStatus.INTERNAL_SERVER_ERROR.value(),
                 "I/O error",
                 e.getMessage()
         );
-        return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+        return Mono.just(new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR));
     }
 
     @ExceptionHandler(value = StatusRuntimeException.class)
-    public ResponseEntity<ErrorResponse> handleStatusRuntimeException(StatusRuntimeException e) {
+    public Mono<ResponseEntity<ErrorResponse>> handleStatusRuntimeException(StatusRuntimeException e) {
         int statusCode;
         HttpStatus httpStatus;
 
@@ -86,6 +91,6 @@ public class GlobalExceptionHandler {
                 e.getMessage()
         );
 
-        return new ResponseEntity<>(response, httpStatus);
+        return Mono.just(new ResponseEntity<>(response, httpStatus));
     }
 }

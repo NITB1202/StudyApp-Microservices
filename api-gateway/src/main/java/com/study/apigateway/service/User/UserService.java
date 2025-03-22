@@ -14,7 +14,9 @@ import java.util.UUID;
 public interface UserService {
     Mono<UserResponseDto> createUser(CreateUserRequestDto user);
     Mono<UserResponseDto> getUserById(UUID id);
-    Mono<GetUsersByListOfIdsResponseDto> getUsersByListOfIds(List<UUID> ids, UUID cursor, int size);
     Mono<SearchUserResponseDto> searchUserByUsername(String keyword, UUID cursor, int size);
     Mono<UserResponseDto> updateUser(UUID id, UpdateUserRequestDto user, FilePart newAvatar);
+
+    //internal -> Used by another service
+    GetUsersByListOfIdsResponseDto getUsersByListOfIds(List<UUID> ids, UUID cursor, int size);
 }

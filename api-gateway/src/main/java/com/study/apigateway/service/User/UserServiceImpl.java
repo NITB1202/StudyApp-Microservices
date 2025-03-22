@@ -47,19 +47,17 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public Mono<GetUsersByListOfIdsResponseDto> getUsersByListOfIds(List<UUID> ids, UUID cursor, int size) {
-        return Mono.fromCallable(() -> {
-            GetUsersByListOfIdsResponse response = userServiceGrpcClient.getUsersByListOfIds(ids, cursor, size);
-            UUID nextCursor = response.getNextCursor().isEmpty() ? null : UUID.fromString(response.getNextCursor());
-            List<UserResponseDto> users = UserMapper.toResponseDtoList(response.getUsersList());
+    public GetUsersByListOfIdsResponseDto getUsersByListOfIds(List<UUID> ids, UUID cursor, int size) {
+        GetUsersByListOfIdsResponse response = userServiceGrpcClient.getUsersByListOfIds(ids, cursor, size);
+        UUID nextCursor = response.getNextCursor().isEmpty() ? null : UUID.fromString(response.getNextCursor());
+        List<UserResponseDto> users = UserMapper.toResponseDtoList(response.getUsersList());
 
-            return GetUsersByListOfIdsResponseDto.builder()
-                    .users(users)
-                    .total(response.getTotal())
-                    .size(response.getSize())
-                    .nextCursor(nextCursor)
-                    .build();
-        }).subscribeOn(Schedulers.boundedElastic());
+        return GetUsersByListOfIdsResponseDto.builder()
+                .users(users)
+                .total(response.getTotal())
+                .size(response.getSize())
+                .nextCursor(nextCursor)
+                .build();
     }
 
     @Override

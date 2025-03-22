@@ -112,6 +112,13 @@
 			<version>${grpc.version}</version>
 		</dependency>
 
+		<!-- Open API-->
+		<dependency>
+			<groupId>org.springdoc</groupId>
+			<artifactId>springdoc-openapi-starter-webflux-ui</artifactId>
+			<version>2.7.0</version>
+		</dependency>
+
 	</dependencies>
 	<dependencyManagement>
 		<dependencies>
