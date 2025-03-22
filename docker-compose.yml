@@ -1,0 +1,63 @@
+services:
+  eureka-server:
+    build:
+      context: ./server-registry
+    container_name: server-registry
+    ports:
+      - "8761:8761"
+    networks:
+      - backend
+
+  user-db:
+    image: postgres:15
+    container_name: user-db
+    restart: always
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      - user-db-data:/var/lib/postgresql/data
+    networks:
+      - backend
+
+  user-service:
+    build:
+      context: ./user-service
+    container_name: user-service
+    restart: always
+    depends_on:
+      - user-db
+      - eureka-server
+    environment:
+      SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE}
+      USER_SERVICE_DB_HOST: ${USER_SERVICE_DB_HOST}
+      USER_SERVICE_DB_PORT: ${USER_SERVICE_DB_PORT}
+      USER_SERVICE_DB_NAME: ${USER_SERVICE_DB_NAME}
+      USER_SERVICE_DB_USERNAME: ${USER_SERVICE_DB_USERNAME}
+      USER_SERVICE_DB_PASSWORD: ${USER_SERVICE_DB_PASSWORD}
+    networks:
+      - backend
+
+  api-gateway:
+    build:
+      context: ./api-gateway
+    container_name: api-gateway
+    restart: always
+    ports:
+      - "8080:8080"
+    depends_on:
+      - user-service
+      - eureka-server
+    environment:
+      SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE}
+    networks:
+      - backend
+
+volumes:
+  user-db-data:
+
+networks:
+  backend:
