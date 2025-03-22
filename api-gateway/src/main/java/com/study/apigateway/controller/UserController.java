@@ -67,7 +67,6 @@ public class UserController {
             @PathVariable UUID id,
             @RequestPart(value = "request", required = false) UpdateUserRequestDto request,
             @RequestPart(value = "file", required = false) FilePart newAvatar) {
-
         return userService.updateUser(id, request, newAvatar)
                 .map(ResponseEntity::ok);
     }
