@@ -5,16 +5,18 @@ import com.study.apigateway.dto.User.request.UpdateUserRequestDto;
 import com.study.apigateway.dto.User.response.GetUsersByListOfIdsResponseDto;
 import com.study.apigateway.dto.User.response.SearchUserResponseDto;
 import com.study.apigateway.dto.User.response.UserResponseDto;
-import org.springframework.web.multipart.MultipartFile;
+import org.springframework.http.codec.multipart.FilePart;
+import reactor.core.publisher.Mono;
 
-import java.io.IOException;
 import java.util.List;
 import java.util.UUID;
 
 public interface UserService {
-    UserResponseDto createUser(CreateUserRequestDto user);
-    UserResponseDto getUserById(UUID id);
+    Mono<UserResponseDto> createUser(CreateUserRequestDto user);
+    Mono<UserResponseDto> getUserById(UUID id);
+    Mono<SearchUserResponseDto> searchUserByUsername(String keyword, UUID cursor, int size);
+    Mono<UserResponseDto> updateUser(UUID id, UpdateUserRequestDto user, FilePart newAvatar);
+
+    //internal -> Used by another service
     GetUsersByListOfIdsResponseDto getUsersByListOfIds(List<UUID> ids, UUID cursor, int size);
-    SearchUserResponseDto searchUserByUsername(String keyword, UUID cursor, int size);
-    UserResponseDto updateUser(UUID id, UpdateUserRequestDto user, MultipartFile newAvatar) throws IOException;
 }

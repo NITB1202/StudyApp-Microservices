@@ -1,80 +1,96 @@
 package com.study.apigateway.exception;
 
-import com.study.common.exceptions.BusinessException;
-import com.study.common.exceptions.NotFoundException;
+import io.grpc.StatusRuntimeException;
+import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.http.converter.HttpMessageNotReadableException;
-import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.support.WebExchangeBindException;
+import org.springframework.web.server.ServerWebInputException;
+import reactor.core.publisher.Mono;
 
 import java.io.IOException;
 
 @ControllerAdvice
 public class GlobalExceptionHandler {
     @ExceptionHandler(value = Exception.class)
-    public ResponseEntity<ErrorResponse> handleException(Exception e) {
+    public Mono<ResponseEntity<ErrorResponse>> handleException(Exception e) {
         ErrorResponse response = new ErrorResponse(
                 HttpStatus.BAD_REQUEST.value(),
                 "Unexpected error",
                 e.getMessage()
         );
-        return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+
+        return Mono.just(new ResponseEntity<>(response, HttpStatus.BAD_REQUEST));
     }
 
-    @ExceptionHandler(value = BusinessException.class)
-    public ResponseEntity<ErrorResponse> handleBusinessException(BusinessException e) {
-        ErrorResponse response = new ErrorResponse(
-                HttpStatus.BAD_REQUEST.value(),
-                "Business error",
-                e.getMessage()
-        );
-        return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
-    }
+   @ExceptionHandler(WebExchangeBindException.class)
+   public Mono<ResponseEntity<ErrorResponse>> handleException(WebExchangeBindException e) {
+       String errorMessage = e.getFieldErrors()
+               .stream()
+               .findFirst()
+               .map(DefaultMessageSourceResolvable::getDefaultMessage)
+               .orElse("Validation error");
 
-    @ExceptionHandler(value = NotFoundException.class)
-    public ResponseEntity<ErrorResponse> handleNotFoundException(NotFoundException e) {
-        ErrorResponse response = new ErrorResponse(
-                HttpStatus.NOT_FOUND.value(),
-                "Not found error",
-                e.getMessage()
-        );
-        return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
-    }
+       ErrorResponse errorResponse = new ErrorResponse(
+               HttpStatus.BAD_REQUEST.value(),
+               "Validation error",
+               errorMessage
+       );
 
-    @ExceptionHandler(value = MethodArgumentNotValidException.class)
-    public ResponseEntity<ErrorResponse> handleMethodArgumentNotValidException(MethodArgumentNotValidException e) {
-        StringBuilder errors = new StringBuilder();
-        e.getBindingResult().getFieldErrors().forEach(error ->
-                errors.append(String.format("[%s: %s] ", error.getField(), error.getDefaultMessage()))
-        );
+       return Mono.just(ResponseEntity.badRequest().body(errorResponse));
+   }
 
-        ErrorResponse response = new ErrorResponse(
-                HttpStatus.BAD_REQUEST.value(),
-                "Validation error",
-                errors.toString()
-        );
-        return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
-    }
-
-    @ExceptionHandler(value = HttpMessageNotReadableException.class)
-    public ResponseEntity<ErrorResponse> handleHttpMessageNotReadableException(HttpMessageNotReadableException e) {
+    @ExceptionHandler(value = ServerWebInputException.class)
+    public Mono<ResponseEntity<ErrorResponse>> handleServerWebInputException(ServerWebInputException e) {
         ErrorResponse response = new ErrorResponse(
                 HttpStatus.BAD_REQUEST.value(),
                 "Json parse error",
                 e.getMessage()
         );
-        return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+        return Mono.just(new ResponseEntity<>(response, HttpStatus.BAD_REQUEST));
     }
 
     @ExceptionHandler(value = IOException.class)
-    public ResponseEntity<ErrorResponse> handleIOException(IOException e) {
+    public Mono<ResponseEntity<ErrorResponse>> handleIOException(IOException e) {
         ErrorResponse response = new ErrorResponse(
                 HttpStatus.INTERNAL_SERVER_ERROR.value(),
                 "I/O error",
                 e.getMessage()
         );
-        return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+        return Mono.just(new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR));
+    }
+
+    @ExceptionHandler(value = StatusRuntimeException.class)
+    public Mono<ResponseEntity<ErrorResponse>> handleStatusRuntimeException(StatusRuntimeException e) {
+        int statusCode;
+        HttpStatus httpStatus;
+
+        switch (e.getStatus().getCode()) {
+            case INVALID_ARGUMENT: {
+                statusCode = HttpStatus.BAD_REQUEST.value();
+                httpStatus = HttpStatus.BAD_REQUEST;
+                break;
+            }
+            case NOT_FOUND: {
+                statusCode = HttpStatus.NOT_FOUND.value();
+                httpStatus = HttpStatus.NOT_FOUND;
+                break;
+            }
+            default: {
+                statusCode = HttpStatus.INTERNAL_SERVER_ERROR.value();
+                httpStatus = HttpStatus.INTERNAL_SERVER_ERROR;
+                break;
+            }
+        }
+
+        ErrorResponse response = new ErrorResponse(
+                statusCode,
+                "GRPC error",
+                e.getMessage()
+        );
+
+        return Mono.just(new ResponseEntity<>(response, httpStatus));
     }
 }

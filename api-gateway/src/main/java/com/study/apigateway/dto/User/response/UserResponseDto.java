@@ -1,6 +1,7 @@
 package com.study.apigateway.dto.User.response;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.study.userservice.grpc.Gender;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -21,7 +22,8 @@ public class UserResponseDto {
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
     private LocalDate dateOfBirth;
 
-    private String gender;
+    @JsonFormat(shape = JsonFormat.Shape.STRING)
+    private Gender gender;
 
     private String avatarUrl;
 }

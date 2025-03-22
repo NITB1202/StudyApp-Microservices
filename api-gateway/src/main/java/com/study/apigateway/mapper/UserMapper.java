@@ -15,6 +15,7 @@ public class UserMapper {
                 .id(UUID.fromString(user.getId()))
                 .username(user.getUsername())
                 .dateOfBirth(LocalDate.parse(user.getDateOfBirth()))
+                .gender(user.getGender())
                 .avatarUrl(user.getAvatarUrl())
                 .build();
     }

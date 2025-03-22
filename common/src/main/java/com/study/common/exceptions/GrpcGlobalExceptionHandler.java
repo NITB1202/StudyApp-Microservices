@@ -7,7 +7,6 @@ import lombok.extern.slf4j.Slf4j;
 import net.devh.boot.grpc.server.advice.GrpcAdvice;
 import net.devh.boot.grpc.server.advice.GrpcExceptionHandler;
 
-import java.io.IOException;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -40,10 +39,5 @@ public class GrpcGlobalExceptionHandler {
                 .collect(Collectors.joining(" "));
 
         return Status.INVALID_ARGUMENT.withDescription(errors).asRuntimeException();
-    }
-
-    @GrpcExceptionHandler(IOException.class)
-    public StatusRuntimeException handleIOException(IOException ex) {
-        return Status.UNAVAILABLE.withDescription("I/O error").asRuntimeException();
     }
 }

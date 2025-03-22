@@ -14,10 +14,12 @@ import com.study.userservice.grpc.GetUsersByListOfIdsResponse;
 import com.study.userservice.grpc.SearchUserResponse;
 import com.study.userservice.grpc.UserResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.core.io.buffer.DataBufferUtils;
+import org.springframework.http.codec.multipart.FilePart;
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
+import reactor.core.publisher.Mono;
+import reactor.core.scheduler.Schedulers;
 
-import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -29,15 +31,19 @@ public class UserServiceImpl implements UserService {
     private final Cloudinary cloudinary;
 
     @Override
-    public UserResponseDto createUser(CreateUserRequestDto request) {
-        UserResponse user = userServiceGrpcClient.createUser(request);
-        return UserMapper.toResponseDto(user);
+    public Mono<UserResponseDto> createUser(CreateUserRequestDto request) {
+        return Mono.fromCallable(() -> {
+            UserResponse user = userServiceGrpcClient.createUser(request);
+            return UserMapper.toResponseDto(user);
+        }).subscribeOn(Schedulers.boundedElastic());
     }
 
     @Override
-    public UserResponseDto getUserById(UUID id) {
-        UserResponse user = userServiceGrpcClient.getUserById(id);
-        return UserMapper.toResponseDto(user);
+    public Mono<UserResponseDto> getUserById(UUID id) {
+        return Mono.fromCallable(() -> {
+            UserResponse user = userServiceGrpcClient.getUserById(id);
+            return UserMapper.toResponseDto(user);
+        }).subscribeOn(Schedulers.boundedElastic());
     }
 
     @Override
@@ -55,26 +61,37 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public SearchUserResponseDto searchUserByUsername(String keyword, UUID cursor, int size) {
-        SearchUserResponse response = userServiceGrpcClient.searchUserByUsername(keyword, cursor, size);
-        UUID nextCursor = response.getNextCursor().isEmpty() ? null : UUID.fromString(response.getNextCursor());
-        List<UserResponseDto> users = UserMapper.toResponseDtoList(response.getUsersList());
+    public Mono<SearchUserResponseDto> searchUserByUsername(String keyword, UUID cursor, int size) {
+        return Mono.fromCallable(() -> {
+            SearchUserResponse response = userServiceGrpcClient.searchUserByUsername(keyword, cursor, size);
+            UUID nextCursor = response.getNextCursor().isEmpty() ? null : UUID.fromString(response.getNextCursor());
+            List<UserResponseDto> users = UserMapper.toResponseDtoList(response.getUsersList());
 
-        return SearchUserResponseDto.builder()
-                .users(users)
-                .total(response.getTotal())
-                .nextCursor(nextCursor)
-                .build();
+            return SearchUserResponseDto.builder()
+                    .users(users)
+                    .total(response.getTotal())
+                    .nextCursor(nextCursor)
+                    .build();
+        }).subscribeOn(Schedulers.boundedElastic());
     }
 
     @Override
-    public UserResponseDto updateUser(UUID id, UpdateUserRequestDto request, MultipartFile newAvatar) throws IOException {
-        //Check if the client upload an image file
-        if(newAvatar != null && !newAvatar.isEmpty()){
-            String fileType = newAvatar.getContentType();
-            if(fileType == null || !fileType.startsWith("image/"))
-                throw new BusinessException("New avatar is not an image");
-            else {
+    public Mono<UserResponseDto> updateUser(UUID id, UpdateUserRequestDto request, FilePart newAvatar){
+        return Mono.fromCallable(() -> {
+            //In case the request is null
+            UpdateUserRequestDto handledRequest = request != null ? request : new UpdateUserRequestDto();
+
+            if (newAvatar != null) {
+                byte[] bytes = extractBytesBlocking(newAvatar);
+
+                String fileType = newAvatar.headers().getContentType() != null
+                        ? newAvatar.headers().getContentType().toString()
+                        : null;
+
+                if (fileType == null || !fileType.startsWith("image/")) {
+                    throw new BusinessException("New avatar is not an image");
+                }
+
                 //Upload the new avatar to the Cloudinary
                 Map params = ObjectUtils.asMap(
                         "resource_type", "auto",
@@ -83,14 +100,28 @@ public class UserServiceImpl implements UserService {
                         "overwrite", true
                 );
 
-                Map result = cloudinary.uploader().upload(newAvatar.getBytes(),params);
+                Map result = cloudinary.uploader().upload(bytes,params);
 
                 String newAvatarUrl = result.get("secure_url").toString();
-                request.setAvatarUrl(newAvatarUrl);
+                handledRequest.setAvatarUrl(newAvatarUrl);
             }
-        }
 
-        UserResponse user = userServiceGrpcClient.updateUser(id, request);
-        return UserMapper.toResponseDto(user);
+            UserResponse user = userServiceGrpcClient.updateUser(id, handledRequest);
+
+            return UserMapper.toResponseDto(user);
+        }).subscribeOn(Schedulers.boundedElastic());
+    }
+
+    private byte[] extractBytesBlocking(FilePart filePart) {
+        // Collect all DataBuffer into single unit
+        return DataBufferUtils.join(filePart.content())
+                .map(dataBuffer -> {
+                    byte[] bytes = new byte[dataBuffer.readableByteCount()];
+                    dataBuffer.read(bytes);
+                    DataBufferUtils.release(dataBuffer);
+                    return bytes;
+                })
+                // Block and get result
+                .block();
     }
 }
