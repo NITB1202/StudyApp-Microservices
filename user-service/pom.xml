@@ -53,7 +53,7 @@
 			<scope>provided</scope>
 		</dependency>
 
-		<!-- PostgreSQL DB -->
+		<!-- Postgres -->
 		<dependency>
 			<groupId>org.postgresql</groupId>
 			<artifactId>postgresql</artifactId>
