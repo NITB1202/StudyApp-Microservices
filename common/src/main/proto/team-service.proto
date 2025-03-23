@@ -36,24 +36,35 @@ message TeamResponse {
   string avatarUrl = 7;
 }
 
-message GetFirstTeamRequest {
+message GetFirstTeamIdRequest {
   string userId = 1;
+}
+
+message GetFirstTeamIdResponse {
+  string teamId = 1;
 }
 
 message GetTeamByIdRequest {
   string id = 1;
 }
 
-message SearchTeamByNameRequest {
-  string keyword = 1;
+message GetUserTeamsRequest {
+  string userId = 1;
   string cursor = 2;
-  int32 size = 3;
+  int32 size =  3;
 }
 
-message SearchTeamByNameResponse {
+message ListTeamResponse {
   repeated TeamResponse teams = 1;
   int64 total = 2;
   string nextCursor = 3;
+}
+
+message SearchUserTeamByNameRequest {
+  string userId = 1;
+  string keyword = 2;
+  string cursor = 3;
+  int32 size = 4;
 }
 
 message UpdateTeamRequest {
@@ -68,7 +79,7 @@ message RemoveTeamRequest {
   string userId = 2;
 }
 
-message RemoveTeamResponse {
+message ActionResponse {
   bool success = 1;
   string message = 2;
 }
@@ -92,10 +103,6 @@ message InvitationResponse {
 message ReplyToInvitationRequest {
   string id = 1;
   bool accept = 2;
-}
-
-message ActionResponse {
-  bool success = 1;
 }
 
 message JoinTeamRequest {
@@ -122,9 +129,8 @@ message GetTeamMembersRequest {
 
 message GetTeamMembersResponse {
   repeated TeamMemberResponse members = 1;
-  int32 size = 2;
-  int64 total = 3;
-  string nextCursor = 4;
+  int64 total = 2;
+  string nextCursor = 3;
 }
 
 message UpdateMemberRoleRequest {
@@ -147,11 +153,12 @@ message LeaveTeamRequest {
 service TeamService {
   //Team section
   rpc CreateTeam(CreateTeamRequest) returns (TeamResponse);
-  rpc GetFirstTeam(GetFirstTeamRequest) returns (TeamResponse);
+  rpc GetFirstTeamId(GetFirstTeamIdRequest) returns (GetFirstTeamIdResponse);
   rpc GetTeamById(GetTeamByIdRequest) returns (TeamResponse);
-  rpc SearchTeamByName(SearchTeamByNameRequest) returns (SearchTeamByNameResponse);
+  rpc GetUserTeams(GetUserTeamsRequest) returns (ListTeamResponse);
+  rpc SearchUserTeamByName(SearchUserTeamByNameRequest) returns (ListTeamResponse);
   rpc UpdateTeam(UpdateTeamRequest) returns (TeamResponse); // -> notification
-  rpc RemoveTeam(RemoveTeamRequest) returns (RemoveTeamResponse); // -> notification
+  rpc RemoveTeam(RemoveTeamRequest) returns (ActionResponse); // -> notification
 
   //Team member section
   rpc CreateInvitation(CreateInvitationRequest) returns (InvitationResponse); // -> notification

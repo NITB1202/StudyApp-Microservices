@@ -15,7 +15,7 @@ import java.util.UUID;
 @Table(name = "team_user",uniqueConstraints = {
         @UniqueConstraint(columnNames = {"userId", "teamId"})
 })
-public class TeamMember {
+public class TeamUser {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name = "id", nullable = false)
