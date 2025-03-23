@@ -4,14 +4,12 @@ import com.cloudinary.Cloudinary;
 import com.cloudinary.utils.ObjectUtils;
 import com.study.apigateway.dto.User.request.CreateUserRequestDto;
 import com.study.apigateway.dto.User.request.UpdateUserRequestDto;
-import com.study.apigateway.dto.User.response.GetUsersByListOfIdsResponseDto;
-import com.study.apigateway.dto.User.response.SearchUserResponseDto;
+import com.study.apigateway.dto.User.response.ListUserResponseDto;
 import com.study.apigateway.dto.User.response.UserResponseDto;
 import com.study.apigateway.grpcclient.UserServiceGrpcClient;
 import com.study.apigateway.mapper.UserMapper;
 import com.study.common.exceptions.BusinessException;
-import com.study.userservice.grpc.GetUsersByListOfIdsResponse;
-import com.study.userservice.grpc.SearchUserResponse;
+import com.study.userservice.grpc.ListUserResponse;
 import com.study.userservice.grpc.UserResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.io.buffer.DataBufferUtils;
@@ -47,27 +45,26 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public GetUsersByListOfIdsResponseDto getUsersByListOfIds(List<UUID> ids, UUID cursor, int size) {
-        GetUsersByListOfIdsResponse response = userServiceGrpcClient.getUsersByListOfIds(ids, cursor, size);
+    public ListUserResponseDto getUsersByListOfIds(List<UUID> ids, UUID cursor, int size) {
+        ListUserResponse response = userServiceGrpcClient.getUsersByListOfIds(ids, cursor, size);
         UUID nextCursor = response.getNextCursor().isEmpty() ? null : UUID.fromString(response.getNextCursor());
         List<UserResponseDto> users = UserMapper.toResponseDtoList(response.getUsersList());
 
-        return GetUsersByListOfIdsResponseDto.builder()
+        return ListUserResponseDto.builder()
                 .users(users)
                 .total(response.getTotal())
-                .size(response.getSize())
                 .nextCursor(nextCursor)
                 .build();
     }
 
     @Override
-    public Mono<SearchUserResponseDto> searchUserByUsername(String keyword, UUID cursor, int size) {
+    public Mono<ListUserResponseDto> searchUserByUsername(String keyword, UUID cursor, int size) {
         return Mono.fromCallable(() -> {
-            SearchUserResponse response = userServiceGrpcClient.searchUserByUsername(keyword, cursor, size);
+            ListUserResponse response = userServiceGrpcClient.searchUserByUsername(keyword, cursor, size);
             UUID nextCursor = response.getNextCursor().isEmpty() ? null : UUID.fromString(response.getNextCursor());
             List<UserResponseDto> users = UserMapper.toResponseDtoList(response.getUsersList());
 
-            return SearchUserResponseDto.builder()
+            return ListUserResponseDto.builder()
                     .users(users)
                     .total(response.getTotal())
                     .nextCursor(nextCursor)
