@@ -37,23 +37,16 @@ message GetUsersByListOfIdsRequest {
   int32 size = 3;
 }
 
-message GetUsersByListOfIdsResponse {
+message ListUserResponse {
   repeated UserResponse users = 1;
   int64 total = 2;
-  int32 size = 3;
-  string nextCursor = 4;
+  string nextCursor = 3;
 }
 
 message SearchUserRequest {
   string keyword = 1;
   string cursor = 2;
   int32 size = 3;
-}
-
-message SearchUserResponse {
-  repeated UserResponse users = 1;
-  int64 total = 2;
-  string nextCursor = 3;
 }
 
 message UpdateUserRequest {
@@ -68,7 +61,7 @@ message UpdateUserRequest {
 service UserService {
   rpc CreateUser(CreateUserRequest) returns (UserResponse);
   rpc GetUserById(GetUserByIdRequest) returns (UserResponse);
-  rpc GetUsersByListOfIds(GetUsersByListOfIdsRequest) returns (GetUsersByListOfIdsResponse);
-  rpc SearchUserByUsername(SearchUserRequest) returns (SearchUserResponse);
+  rpc GetUsersByListOfIds(GetUsersByListOfIdsRequest) returns (ListUserResponse);
+  rpc SearchUserByUsername(SearchUserRequest) returns (ListUserResponse);
   rpc UpdateUser(UpdateUserRequest) returns (UserResponse);
 }

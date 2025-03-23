@@ -2,7 +2,7 @@ package com.study.apigateway.controller;
 
 import com.study.apigateway.dto.User.request.CreateUserRequestDto;
 import com.study.apigateway.dto.User.request.UpdateUserRequestDto;
-import com.study.apigateway.dto.User.response.SearchUserResponseDto;
+import com.study.apigateway.dto.User.response.ListUserResponseDto;
 import com.study.apigateway.dto.User.response.UserResponseDto;
 import com.study.apigateway.exception.ErrorResponse;
 import com.study.apigateway.service.User.UserService;
@@ -49,9 +49,9 @@ public class UserController {
     @GetMapping("/search")
     @Operation(summary = "Search for users by username")
     @ApiResponse(responseCode = "200", description = "Search successfully.")
-    public Mono<ResponseEntity<SearchUserResponseDto>> searchUsersByUsername(@RequestParam String keyword,
-                                                                             @RequestParam(required = false) UUID cursor,
-                                                                             @RequestParam(defaultValue = "10") int size) {
+    public Mono<ResponseEntity<ListUserResponseDto>> searchUsersByUsername(@RequestParam String keyword,
+                                                                           @RequestParam(required = false) UUID cursor,
+                                                                           @RequestParam(defaultValue = "10") int size) {
         return userService.searchUserByUsername(keyword, cursor, size)
                 .map(ResponseEntity::ok);
     }
