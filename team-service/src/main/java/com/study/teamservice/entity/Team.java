@@ -11,7 +11,7 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@Table(name = "teams")
+@Table(name = "teams", uniqueConstraints = @UniqueConstraint(columnNames = "team_code"))
 public class Team {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
