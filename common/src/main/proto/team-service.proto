@@ -13,6 +13,12 @@ enum TeamRole {
   MEMBER = 3;
 }
 
+enum InvitationStatus {
+  PENDING = 0;
+  ACCEPTED = 1;
+  DECLINED = 2;
+}
+
 //Team section
 message CreateTeamRequest {
   string creatorId = 1;
@@ -63,12 +69,28 @@ message RemoveTeamRequest {
 
 message RemoveTeamResponse {
   bool success = 1;
+  string message = 2;
 }
 
 //Team member section
-message AddTeamMemberRequest {
+message CreateInvitationRequest {
   string teamId = 1;
-  string userId = 2;
+  string inviterId = 2;
+  string inviteeId = 3;
+}
+
+message InvitationResponse {
+  string id = 1;
+  string inviterId = 2;
+  string inviteeId = 3;
+  string teamId = 4;
+  string createdAt = 5;
+  InvitationStatus status = 6;
+}
+
+message ReplyToInvitationRequest {
+  string id = 1;
+  bool accept = 2;
 }
 
 message ActionResponse {
@@ -86,9 +108,9 @@ message GetTeamMemberByIdsRequest {
 }
 
 message TeamMemberResponse {
-  string userId = 3;
-  string joinDate = 4;
-  TeamRole role = 5;
+  string userId = 1;
+  string joinDate = 2;
+  TeamRole role = 3;
 }
 
 message GetTeamMembersRequest {
@@ -131,7 +153,8 @@ service TeamService {
   rpc RemoveTeam(RemoveTeamRequest) returns (RemoveTeamResponse); // -> notification
 
   //Team member section
-  rpc AddTeamMember(AddTeamMemberRequest) returns (ActionResponse); // -> notification
+  rpc CreateInvitation(CreateInvitationRequest) returns (InvitationResponse); // -> notification
+  rpc ReplyToInvitation(ReplyToInvitationRequest) returns (ActionResponse);  // if success -> notification
   rpc JoinTeam(JoinTeamRequest) returns (ActionResponse); // -> notification
   rpc GetTeamMemberByIds(GetTeamMemberByIdsRequest) returns (TeamMemberResponse);
   rpc GetTeamMembers(GetTeamMembersRequest) returns (GetTeamMembersResponse);
