@@ -9,7 +9,6 @@ import lombok.RequiredArgsConstructor;
 import net.devh.boot.grpc.server.service.GrpcService;
 
 import java.util.List;
-import java.util.UUID;
 
 @GrpcService
 @RequiredArgsConstructor
@@ -33,23 +32,16 @@ public class UserController extends UserServiceGrpc.UserServiceImplBase{
     }
 
     @Override
-    public void getUsersByListOfIds(GetUsersByListOfIdsRequest request, StreamObserver<GetUsersByListOfIdsResponse> responseObserver){
-        List<UUID> ids = request.getIdsList().stream()
-                .map(UUID::fromString)
-                .toList();
-        UUID cursor = request.getCursor().isBlank() ? null : UUID.fromString(request.getCursor());
-        int size = request.getSize() > 0 ? request.getSize() : 10;
-
-        List<User> users = userService.getUsersByListOfIds(ids, cursor, size);
+    public void getUsersByListOfIds(GetUsersByListOfIdsRequest request, StreamObserver<ListUserResponse> responseObserver){
+        List<User> users = userService.getUsersByListOfIds(request);
         List<UserResponse> userResponses = UserMapper.toUserResponseList(users);
 
         // Determine next cursor
-        String nextCursor = !users.isEmpty() && users.size() == size ? users.get(users.size() - 1).getId().toString() : "";
+        String nextCursor = !users.isEmpty() && users.size() == request.getSize() ? users.get(users.size() - 1).getId().toString() : "";
 
-        GetUsersByListOfIdsResponse response = GetUsersByListOfIdsResponse.newBuilder()
+        ListUserResponse response = ListUserResponse.newBuilder()
                 .addAllUsers(userResponses)
-                .setTotal(ids.size())
-                .setSize(size)
+                .setTotal(request.getIdsCount())
                 .setNextCursor(nextCursor)
                 .build();
 
@@ -58,14 +50,14 @@ public class UserController extends UserServiceGrpc.UserServiceImplBase{
     }
 
     @Override
-    public void searchUserByUsername(SearchUserRequest request, StreamObserver<SearchUserResponse> responseObserver){
+    public void searchUserByUsername(SearchUserRequest request, StreamObserver<ListUserResponse> responseObserver){
         List<User> users = userService.searchUsersByUsername(request);
         List<UserResponse> userResponses = UserMapper.toUserResponseList(users);
 
         long total = userService.countUsersByUsername(request.getKeyword());
-        String nextCursor = users.isEmpty() ? "" : users.get(users.size() - 1).getId().toString();
+        String nextCursor = !users.isEmpty() && users.size() == request.getSize() ? users.get(users.size() - 1).getId().toString() : "";
 
-        SearchUserResponse response = SearchUserResponse.newBuilder()
+        ListUserResponse response = ListUserResponse.newBuilder()
                 .addAllUsers(userResponses)
                 .setTotal(total)
                 .setNextCursor(nextCursor)

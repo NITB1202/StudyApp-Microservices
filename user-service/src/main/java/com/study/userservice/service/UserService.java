@@ -4,10 +4,7 @@ import com.study.common.exceptions.BusinessException;
 import com.study.common.exceptions.NotFoundException;
 import com.study.common.mappers.GenderMapper;
 import com.study.userservice.enity.User;
-import com.study.userservice.grpc.CreateUserRequest;
-import com.study.userservice.grpc.GetUserByIdRequest;
-import com.study.userservice.grpc.SearchUserRequest;
-import com.study.userservice.grpc.UpdateUserRequest;
+import com.study.userservice.grpc.*;
 import com.study.userservice.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
@@ -51,8 +48,15 @@ public class UserService {
         );
     }
 
-    public List<User> getUsersByListOfIds(List<UUID> ids, UUID cursor, int size){
+    public List<User> getUsersByListOfIds(GetUsersByListOfIdsRequest request) {
+        List<UUID> ids = request.getIdsList().stream()
+                .map(UUID::fromString)
+                .toList();
+        UUID cursor = request.getCursor().isBlank() ? null : UUID.fromString(request.getCursor());
+        int size = request.getSize() > 0 ? request.getSize() : 10;
+
         Pageable pageable = PageRequest.of(0, size, Sort.by("id").ascending());
+
         return userRepository.findByIdsWithCursor(ids, cursor, pageable);
     }
 

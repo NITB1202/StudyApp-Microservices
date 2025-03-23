@@ -12,7 +12,7 @@ import java.util.UUID;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class SearchUserResponseDto {
+public class ListUserResponseDto {
     private List<UserResponseDto> users;
 
     private Long total;

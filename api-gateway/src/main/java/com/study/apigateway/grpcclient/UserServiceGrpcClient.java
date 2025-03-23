@@ -34,7 +34,7 @@ public class UserServiceGrpcClient {
         return userServiceStub.getUserById(request);
     }
 
-    public GetUsersByListOfIdsResponse getUsersByListOfIds(List<UUID> ids, UUID cursor, int size) {
+    public ListUserResponse getUsersByListOfIds(List<UUID> ids, UUID cursor, int size) {
         // Convert UUID list to String list
         List<String> idStrings = ids.stream()
                 .map(UUID::toString)
@@ -52,7 +52,7 @@ public class UserServiceGrpcClient {
         return userServiceStub.getUsersByListOfIds(request);
     }
 
-    public SearchUserResponse searchUserByUsername(String keyword, UUID cursor, int size) {
+    public ListUserResponse searchUserByUsername(String keyword, UUID cursor, int size) {
         String cursorStr = cursor != null ? cursor.toString() : "";
 
         SearchUserRequest request = SearchUserRequest.newBuilder()
