@@ -136,6 +136,9 @@ public class TeamService {
         Set<String> updatedFields = new HashSet<>();
 
         if(!request.getName().isBlank()) {
+            if(request.getName().equals(team.getName()))
+                throw new BusinessException("The new name is the same as the old one");
+
             team.setName(request.getName());
             updatedFields.add("name");
         }
