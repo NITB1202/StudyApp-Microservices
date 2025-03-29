@@ -7,10 +7,9 @@ import org.springframework.stereotype.Component;
 @Component
 @RequiredArgsConstructor
 public class TeamEventPublisher {
-    private static final String TOPIC = "team-updated";
-    private final KafkaTemplate<String, TeamUpdatedEvent> kafkaTemplate;
+    private final KafkaTemplate<String, Object> kafkaTemplate;
 
-    public void publishTeamUpdatedEvent(TeamUpdatedEvent event) {
-        kafkaTemplate.send(TOPIC, event);
+    public void publishEvent(String topic, Object event) {
+        kafkaTemplate.send(topic,event);
     }
 }

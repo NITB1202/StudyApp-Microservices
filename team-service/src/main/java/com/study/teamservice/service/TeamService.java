@@ -5,6 +5,7 @@ import com.study.common.exceptions.BusinessException;
 import com.study.common.exceptions.NotFoundException;
 import com.study.teamservice.entity.Team;
 import com.study.teamservice.entity.TeamUser;
+import com.study.teamservice.event.TeamDeletedEvent;
 import com.study.teamservice.event.TeamEventPublisher;
 import com.study.teamservice.event.TeamUpdatedEvent;
 import com.study.teamservice.grpc.*;
@@ -28,6 +29,8 @@ public class TeamService {
     private final TeamUserRepository teamUserRepository;
     private final CodeService codeService;
     private final TeamEventPublisher teamEventPublisher;
+    private static final String UPDATE_TOPIC = "team-updated";
+    private static final String DELETE_TOPIC = "team-deleted";
 
     public Team createTeam(CreateTeamRequest request) {
         int retry = 0;
@@ -154,7 +157,7 @@ public class TeamService {
                     .memberIds(memberIds)
                     .build();
 
-            teamEventPublisher.publishTeamUpdatedEvent(event);
+            teamEventPublisher.publishEvent(UPDATE_TOPIC, event);
         }
 
         return teamRepository.save(team);
@@ -174,5 +177,12 @@ public class TeamService {
             throw new BusinessException("User doesn't have permission to delete this team");
 
         teamRepository.deleteById(UUID.fromString(request.getId()));
+
+        TeamDeletedEvent event = TeamDeletedEvent.builder()
+                .id(UUID.fromString(request.getId()))
+                .deletedBy(UUID.fromString(request.getUserId()))
+                .build();
+
+        teamEventPublisher.publishEvent(DELETE_TOPIC, event);
     }
 }
