@@ -1,4 +1,4 @@
-INSERT INTO teams (id, name, teamCode, create_date, creator_id, total_members)
+INSERT INTO teams (id, name, team_code, create_date, creator_id, total_members)
 VALUES
     ('111e8400-e29b-41d4-a716-446655440001', 'TEAM 01','AQhTe',
      '2024-12-01','041c77e0-ae77-4005-b745-ea12dca9bec6', 2),
