@@ -17,6 +17,7 @@
         <module>common</module>
         <module>server-registry</module>
         <module>user-service</module>
+        <module>team-service</module>
         <module>api-gateway</module>
     </modules>
 

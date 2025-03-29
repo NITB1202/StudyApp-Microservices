@@ -1,0 +1,172 @@
+syntax = "proto3";
+
+package team;
+
+option java_multiple_files = true;
+option java_package = "com.study.teamservice.grpc";
+option java_outer_classname = "TeamProto";
+
+enum TeamRole {
+  UNSPECIFIED = 0;
+  CREATOR = 1;
+  ADMIN = 2;
+  MEMBER = 3;
+}
+
+enum InvitationStatus {
+  PENDING = 0;
+  ACCEPTED = 1;
+  DECLINED = 2;
+}
+
+//Team section
+message CreateTeamRequest {
+  string creatorId = 1;
+  string name = 2;
+  string avatarUrl = 3;
+}
+
+message TeamResponse {
+  string id = 1;
+  string name = 2;
+  string teamCode = 3;
+  string createDate = 4;
+  string creatorId = 5;
+  int64 totalMembers = 6;
+  string avatarUrl = 7;
+}
+
+message GetFirstTeamIdRequest {
+  string userId = 1;
+}
+
+message GetFirstTeamIdResponse {
+  string teamId = 1;
+}
+
+message GetTeamByIdRequest {
+  string id = 1;
+}
+
+message GetUserTeamsRequest {
+  string userId = 1;
+  string cursor = 2;
+  int32 size =  3;
+}
+
+message ListTeamResponse {
+  repeated TeamResponse teams = 1;
+  int64 total = 2;
+  string nextCursor = 3;
+}
+
+message SearchUserTeamByNameRequest {
+  string userId = 1;
+  string keyword = 2;
+  string cursor = 3;
+  int32 size = 4;
+}
+
+message UpdateTeamRequest {
+  string id = 1;
+  string userId = 2;
+  string name = 3;
+  string avatarUrl = 4;
+}
+
+message DeleteTeamRequest {
+  string id = 1;
+  string userId = 2;
+}
+
+message ActionResponse {
+  bool success = 1;
+  string message = 2;
+}
+
+//Team member section
+message CreateInvitationRequest {
+  string teamId = 1;
+  string inviterId = 2;
+  string inviteeId = 3;
+}
+
+message InvitationResponse {
+  string id = 1;
+  string inviterId = 2;
+  string inviteeId = 3;
+  string teamId = 4;
+  string createdAt = 5;
+  InvitationStatus status = 6;
+}
+
+message ReplyToInvitationRequest {
+  string id = 1;
+  bool accept = 2;
+}
+
+message JoinTeamRequest {
+  string userId = 1;
+  string teamCode = 2;
+}
+
+message GetTeamMemberByIdsRequest {
+  string teamId = 1;
+  string userId = 2;
+}
+
+message TeamMemberResponse {
+  string userId = 1;
+  string joinDate = 2;
+  TeamRole role = 3;
+}
+
+message GetTeamMembersRequest {
+  string teamId = 1;
+  string cursor = 2;
+  int32 size = 3;
+}
+
+message GetTeamMembersResponse {
+  repeated TeamMemberResponse members = 1;
+  int64 total = 2;
+  string nextCursor = 3;
+}
+
+message UpdateMemberRoleRequest {
+  string teamId = 1;
+  string userId = 2;
+  TeamRole role = 3;
+}
+
+message RemoveTeamMemberRequest {
+  string teamId = 1;
+  string userId = 2;
+  string memberId = 3;
+}
+
+message LeaveTeamRequest {
+  string teamId = 1;
+  string userId = 2;
+}
+
+service TeamService {
+  //Team section
+  rpc CreateTeam(CreateTeamRequest) returns (TeamResponse);
+  rpc GetFirstTeamId(GetFirstTeamIdRequest) returns (GetFirstTeamIdResponse);
+  rpc GetTeamById(GetTeamByIdRequest) returns (TeamResponse);
+  rpc GetUserTeams(GetUserTeamsRequest) returns (ListTeamResponse);
+  rpc SearchUserTeamByName(SearchUserTeamByNameRequest) returns (ListTeamResponse);
+  rpc UpdateTeam(UpdateTeamRequest) returns (TeamResponse); // -> notification
+  rpc DeleteTeam(DeleteTeamRequest) returns (ActionResponse); // -> notification
+
+  //Team member section
+  rpc CreateInvitation(CreateInvitationRequest) returns (InvitationResponse); // -> notification
+  rpc ReplyToInvitation(ReplyToInvitationRequest) returns (ActionResponse);  // if success -> notification
+  rpc JoinTeam(JoinTeamRequest) returns (ActionResponse); // -> notification
+  rpc GetTeamMemberByIds(GetTeamMemberByIdsRequest) returns (TeamMemberResponse);
+  rpc GetTeamMembers(GetTeamMembersRequest) returns (GetTeamMembersResponse);
+  rpc UpdateMemberRole(UpdateMemberRoleRequest) returns (TeamMemberResponse);
+  rpc RemoveTeamMember(RemoveTeamMemberRequest) returns (ActionResponse); // -> notification
+  rpc LeaveTeam(LeaveTeamRequest) returns (ActionResponse); // -> notification
+}
