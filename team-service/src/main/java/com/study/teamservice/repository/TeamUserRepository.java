@@ -13,4 +13,5 @@ public interface TeamUserRepository extends JpaRepository<TeamUser, UUID> {
     List<TeamUser> findByUserIdOrderByJoinDateDesc(UUID userId, Pageable pageable);
     List<TeamUser> findByUserIdAndJoinDateBeforeOrderByJoinDateDesc(UUID userId, LocalDate joinDate, Pageable pageable);
     Long countByUserId(UUID userId);
+    TeamUser findByUserIdAndTeamId(UUID userId, UUID teamId);
 }

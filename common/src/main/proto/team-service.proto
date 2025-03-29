@@ -74,7 +74,7 @@ message UpdateTeamRequest {
   string avatarUrl = 4;
 }
 
-message RemoveTeamRequest {
+message DeleteTeamRequest {
   string id = 1;
   string userId = 2;
 }
@@ -158,7 +158,7 @@ service TeamService {
   rpc GetUserTeams(GetUserTeamsRequest) returns (ListTeamResponse);
   rpc SearchUserTeamByName(SearchUserTeamByNameRequest) returns (ListTeamResponse);
   rpc UpdateTeam(UpdateTeamRequest) returns (TeamResponse); // -> notification
-  rpc RemoveTeam(RemoveTeamRequest) returns (ActionResponse); // -> notification
+  rpc DeleteTeam(DeleteTeamRequest) returns (ActionResponse); // -> notification
 
   //Team member section
   rpc CreateInvitation(CreateInvitationRequest) returns (InvitationResponse); // -> notification

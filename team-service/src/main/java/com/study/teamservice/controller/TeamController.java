@@ -80,7 +80,21 @@ public class TeamController extends TeamServiceGrpc.TeamServiceImplBase {
 
     @Override
     public void updateTeam(UpdateTeamRequest request, StreamObserver<TeamResponse> responseObserver){
-
+        Team team = teamService.updateTeam(request);
+        TeamResponse response = TeamMapper.toTeamResponse(team);
+        responseObserver.onNext(response);
+        responseObserver.onCompleted();
     }
 
+    @Override
+    public void deleteTeam(DeleteTeamRequest request, StreamObserver<ActionResponse> responseObserver){
+        teamService.deleteTeam(request);
+        ActionResponse response = ActionResponse.newBuilder()
+                .setSuccess(true)
+                .setMessage("Delete team success")
+                .build();
+
+        responseObserver.onNext(response);
+        responseObserver.onCompleted();
+    }
 }

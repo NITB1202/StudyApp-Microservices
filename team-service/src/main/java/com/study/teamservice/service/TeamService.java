@@ -1,5 +1,7 @@
 package com.study.teamservice.service;
 
+import com.study.common.enums.TeamRole;
+import com.study.common.exceptions.BusinessException;
 import com.study.common.exceptions.NotFoundException;
 import com.study.teamservice.entity.Team;
 import com.study.teamservice.entity.TeamUser;
@@ -55,6 +57,7 @@ public class TeamService {
 
     public UUID getFirstTeamId(GetFirstTeamIdRequest request) {
         TeamUser teamUser = teamUserRepository.getFirstByUserIdOrderByJoinDateDesc(UUID.fromString(request.getUserId()));
+
         if(teamUser == null){
             throw new NotFoundException("User haven't joined any team");
         }
@@ -111,5 +114,44 @@ public class TeamService {
 
     public long countUserTeamByKeyword(UUID userId, String keyword){
         return teamRepository.countUserTeamsByKeyword(userId, keyword);
+    }
+
+    public Team updateTeam(UpdateTeamRequest request) {
+        Team team = teamRepository.findById(UUID.fromString(request.getId())).orElseThrow(
+                () -> new NotFoundException("Team not found")
+        );
+
+        TeamUser teamUser = teamUserRepository.findByUserIdAndTeamId(
+                UUID.fromString(request.getUserId()), UUID.fromString(request.getId()));
+
+        if(teamUser == null)
+            throw new NotFoundException("User is not part of this team");
+
+        if(teamUser.getRole() == TeamRole.MEMBER)
+            throw new BusinessException("User doesn't have permission to update this team");
+
+        if(!request.getName().isBlank())
+            team.setName(request.getName());
+
+        if(!request.getAvatarUrl().isBlank())
+            team.setAvatarUrl(request.getAvatarUrl());
+
+        return teamRepository.save(team);
+    }
+
+    public void deleteTeam(DeleteTeamRequest request) {
+        if(!teamRepository.existsById(UUID.fromString(request.getId())))
+            throw new NotFoundException("Team not found");
+
+        TeamUser teamUser = teamUserRepository.findByUserIdAndTeamId(
+                UUID.fromString(request.getUserId()), UUID.fromString(request.getId()));
+
+        if(teamUser == null)
+            throw new NotFoundException("User is not part of this team");
+
+        if(teamUser.getRole() != TeamRole.CREATOR)
+            throw new BusinessException("User doesn't have permission to delete this team");
+
+        teamRepository.deleteById(UUID.fromString(request.getId()));
     }
 }
