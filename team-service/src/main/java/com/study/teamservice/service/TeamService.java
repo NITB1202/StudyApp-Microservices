@@ -5,6 +5,8 @@ import com.study.common.exceptions.BusinessException;
 import com.study.common.exceptions.NotFoundException;
 import com.study.teamservice.entity.Team;
 import com.study.teamservice.entity.TeamUser;
+import com.study.teamservice.event.TeamEventPublisher;
+import com.study.teamservice.event.TeamUpdatedEvent;
 import com.study.teamservice.grpc.*;
 import com.study.teamservice.repository.TeamUserRepository;
 import com.study.teamservice.repository.TeamRepository;
@@ -16,10 +18,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -28,6 +27,7 @@ public class TeamService {
     private final TeamRepository teamRepository;
     private final TeamUserRepository teamUserRepository;
     private final CodeService codeService;
+    private final TeamEventPublisher teamEventPublisher;
 
     public Team createTeam(CreateTeamRequest request) {
         int retry = 0;
@@ -130,11 +130,32 @@ public class TeamService {
         if(teamUser.getRole() == TeamRole.MEMBER)
             throw new BusinessException("User doesn't have permission to update this team");
 
-        if(!request.getName().isBlank())
-            team.setName(request.getName());
+        Set<String> updatedFields = new HashSet<>();
 
-        if(!request.getAvatarUrl().isBlank())
+        if(!request.getName().isBlank()) {
+            team.setName(request.getName());
+            updatedFields.add("name");
+        }
+
+        if(!request.getAvatarUrl().isBlank()) {
             team.setAvatarUrl(request.getAvatarUrl());
+            updatedFields.add("avatarUrl");
+        }
+
+        if(!updatedFields.isEmpty()) {
+            List<UUID> memberIds = teamUserRepository.findByTeamId(team.getId()).stream()
+                    .map(TeamUser::getUserId)
+                    .toList();
+
+            TeamUpdatedEvent event = TeamUpdatedEvent.builder()
+                    .id(team.getId())
+                    .updatedBy(UUID.fromString(request.getUserId()))
+                    .updatedFields(updatedFields)
+                    .memberIds(memberIds)
+                    .build();
+
+            teamEventPublisher.publishTeamUpdatedEvent(event);
+        }
 
         return teamRepository.save(team);
     }
