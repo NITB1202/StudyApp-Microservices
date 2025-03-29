@@ -153,6 +153,8 @@ public class TeamService {
             TeamUpdatedEvent event = TeamUpdatedEvent.builder()
                     .id(team.getId())
                     .updatedBy(UUID.fromString(request.getUserId()))
+                    .name(team.getName())
+                    .avatarUrl(team.getAvatarUrl())
                     .updatedFields(updatedFields)
                     .memberIds(memberIds)
                     .build();
