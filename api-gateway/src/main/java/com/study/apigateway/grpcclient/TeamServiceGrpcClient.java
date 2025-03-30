@@ -90,10 +90,10 @@ public class TeamServiceGrpcClient {
         return stub.uploadTeamAvatar(request);
     }
 
-    public ActionResponse deleteTeam(UUID id){
+    public ActionResponse deleteTeam(UUID id, UUID userId){
         DeleteTeamRequest request = DeleteTeamRequest.newBuilder()
                 .setId(id.toString())
-                .setUserId(id.toString())
+                .setUserId(userId.toString())
                 .build();
 
         return stub.deleteTeam(request);

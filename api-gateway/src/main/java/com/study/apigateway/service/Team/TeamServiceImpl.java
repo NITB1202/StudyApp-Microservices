@@ -84,9 +84,9 @@ public class TeamServiceImpl implements TeamService {
     }
 
     @Override
-    public Mono<ActionResponseDto> deleteTeam(UUID id) {
+    public Mono<ActionResponseDto> deleteTeam(UUID id, UUID userId) {
         return Mono.fromCallable(()->{
-            ActionResponse response = grpcClient.deleteTeam(id);
+            ActionResponse response = grpcClient.deleteTeam(id, userId);
             return ActionMapper.toResponseDto(response);
         }).subscribeOn(Schedulers.boundedElastic());
     }

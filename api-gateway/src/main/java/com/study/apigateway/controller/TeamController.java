@@ -84,7 +84,8 @@ public class TeamController {
     @ApiResponse(responseCode = "200", description = "Delete successfully.")
     @ApiResponse(responseCode = "404", description = "Not found",
             content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
-    public Mono<ResponseEntity<ActionResponseDto>> deleteTeam(@PathVariable UUID id){
-        return teamService.deleteTeam(id).map(ResponseEntity::ok);
+    public Mono<ResponseEntity<ActionResponseDto>> deleteTeam(@PathVariable UUID id,
+                                                              @RequestParam UUID userId){
+        return teamService.deleteTeam(id, userId).map(ResponseEntity::ok);
     }
 }
