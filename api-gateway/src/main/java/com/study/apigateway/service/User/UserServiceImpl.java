@@ -6,11 +6,9 @@ import com.study.apigateway.dto.User.response.ListUserResponseDto;
 import com.study.apigateway.dto.User.response.UserResponseDto;
 import com.study.apigateway.grpcclient.UserServiceGrpcClient;
 import com.study.apigateway.mapper.UserMapper;
-import com.study.apigateway.utils.AvatarUtils;
 import com.study.userservice.grpc.ListUserResponse;
 import com.study.userservice.grpc.UserResponse;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.codec.multipart.FilePart;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
@@ -22,7 +20,6 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
     private final UserServiceGrpcClient userServiceGrpcClient;
-    private final AvatarUtils avatarUtils;
 
     @Override
     public Mono<UserResponseDto> createUser(CreateUserRequestDto request) {
@@ -71,18 +68,9 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public Mono<UserResponseDto> updateUser(UUID id, UpdateUserRequestDto request, FilePart newAvatar){
+    public Mono<UserResponseDto> updateUser(UUID id, UpdateUserRequestDto request){
         return Mono.fromCallable(() -> {
-            //In case the request is null
-            UpdateUserRequestDto handledRequest = request != null ? request : new UpdateUserRequestDto();
-
-            if (newAvatar != null) {
-                String newAvatarUrl = avatarUtils.uploadAvatar(id, newAvatar);
-                handledRequest.setAvatarUrl(newAvatarUrl);
-            }
-
-            UserResponse user = userServiceGrpcClient.updateUser(id, handledRequest);
-
+            UserResponse user = userServiceGrpcClient.updateUser(id, request);
             return UserMapper.toResponseDto(user);
         }).subscribeOn(Schedulers.boundedElastic());
     }
