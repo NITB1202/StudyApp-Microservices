@@ -220,4 +220,9 @@ public class TeamService {
 
         return teamUser.getRole() == TeamRole.MEMBER;
     }
+
+    public String getJoinDateString(UUID teamId, UUID userId){
+        TeamUser teamUser = teamUserRepository.findByUserIdAndTeamId(userId, teamId);
+        return teamUser.getJoinDate().toString();
+    }
 }
