@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.UUID;
 
 public interface TeamRepository extends JpaRepository<Team, UUID> {
+    boolean existsByNameAndCreatorId(String name, UUID creatorId);
     @Query("""
     SELECT t FROM Team t
     JOIN TeamUser tu ON tu.teamId = t.id

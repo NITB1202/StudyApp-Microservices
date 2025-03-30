@@ -33,6 +33,12 @@ public class TeamService {
     private static final String DELETE_TOPIC = "team-deleted";
 
     public Team createTeam(CreateTeamRequest request) {
+        UUID userId = UUID.fromString(request.getCreatorId());
+
+        if(teamRepository.existsByNameAndCreatorId(request.getName(), userId)){
+            throw new BusinessException("User has already created a team with the same name.");
+        }
+
         int retry = 0;
 
         while(true){
@@ -44,7 +50,7 @@ public class TeamService {
                         .description(request.getDescription())
                         .teamCode(randomCode)
                         .createDate(LocalDate.now())
-                        .creatorId(UUID.fromString(request.getCreatorId()))
+                        .creatorId(userId)
                         .totalMembers(1)
                         .build();
 
@@ -119,11 +125,14 @@ public class TeamService {
     }
 
     public Team updateTeam(UpdateTeamRequest request) {
-        Team team = teamRepository.findById(UUID.fromString(request.getId())).orElseThrow(
+        UUID teamId = UUID.fromString(request.getId());
+        UUID userId = UUID.fromString(request.getUserId());
+
+        Team team = teamRepository.findById(teamId).orElseThrow(
                 () -> new NotFoundException("Team not found")
         );
 
-        if(userDoesNotHavePermissionToUpdate(UUID.fromString(request.getUserId()), UUID.fromString(request.getId())))
+        if(userDoesNotHavePermissionToUpdate(userId, teamId))
             throw new BusinessException("User doesn't have permission to update this team");
 
         Set<String> updatedFields = new HashSet<>();
@@ -131,6 +140,10 @@ public class TeamService {
         if(!request.getName().isBlank()) {
             if(request.getName().equals(team.getName()))
                 throw new BusinessException("The new name is the same as the old one");
+
+            if(teamRepository.existsByNameAndCreatorId(request.getName(), userId)){
+                throw new BusinessException("User has already created a team with the same name.");
+            }
 
             team.setName(request.getName());
             updatedFields.add("name");
@@ -142,13 +155,13 @@ public class TeamService {
         }
 
         if(!updatedFields.isEmpty()) {
-            List<UUID> memberIds = teamUserRepository.findByTeamId(team.getId()).stream()
+            List<UUID> memberIds = teamUserRepository.findByTeamId(teamId).stream()
                     .map(TeamUser::getUserId)
                     .toList();
 
             TeamUpdatedEvent event = TeamUpdatedEvent.builder()
-                    .id(team.getId())
-                    .updatedBy(UUID.fromString(request.getUserId()))
+                    .id(teamId)
+                    .updatedBy(userId)
                     .updatedFields(updatedFields)
                     .memberIds(memberIds)
                     .build();
