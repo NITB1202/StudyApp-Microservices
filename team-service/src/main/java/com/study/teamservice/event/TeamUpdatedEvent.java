@@ -13,8 +13,6 @@ import java.util.UUID;
 public class TeamUpdatedEvent {
     private UUID id;
     private UUID updatedBy;
-    private String name;
-    private String avatarUrl;
     private List<UUID> memberIds;
     private Set<String> updatedFields;
 }

@@ -2,6 +2,8 @@ syntax = "proto3";
 
 package team;
 
+import "common.proto";
+
 option java_multiple_files = true;
 option java_package = "com.study.teamservice.grpc";
 option java_outer_classname = "TeamProto";
@@ -23,7 +25,7 @@ enum InvitationStatus {
 message CreateTeamRequest {
   string creatorId = 1;
   string name = 2;
-  string avatarUrl = 3;
+  string description = 3;
 }
 
 message TeamResponse {
@@ -33,7 +35,8 @@ message TeamResponse {
   string createDate = 4;
   string creatorId = 5;
   int64 totalMembers = 6;
-  string avatarUrl = 7;
+  string description = 7;
+  string avatarUrl = 8;
 }
 
 message GetFirstTeamIdRequest {
@@ -71,17 +74,12 @@ message UpdateTeamRequest {
   string id = 1;
   string userId = 2;
   string name = 3;
-  string avatarUrl = 4;
+  string description = 4;
 }
 
 message DeleteTeamRequest {
   string id = 1;
   string userId = 2;
-}
-
-message ActionResponse {
-  bool success = 1;
-  string message = 2;
 }
 
 //Team member section
@@ -150,6 +148,12 @@ message LeaveTeamRequest {
   string userId = 2;
 }
 
+message UploadTeamAvatarRequest {
+  string userId = 1;
+  string teamId = 2;
+  string avatarUrl = 3;
+}
+
 service TeamService {
   //Team section
   rpc CreateTeam(CreateTeamRequest) returns (TeamResponse);
@@ -158,15 +162,16 @@ service TeamService {
   rpc GetUserTeams(GetUserTeamsRequest) returns (ListTeamResponse);
   rpc SearchUserTeamByName(SearchUserTeamByNameRequest) returns (ListTeamResponse);
   rpc UpdateTeam(UpdateTeamRequest) returns (TeamResponse); // -> notification
-  rpc DeleteTeam(DeleteTeamRequest) returns (ActionResponse); // -> notification
+  rpc UploadTeamAvatar(UploadTeamAvatarRequest) returns (common.ActionResponse); // -> notification
+  rpc DeleteTeam(DeleteTeamRequest) returns (common.ActionResponse); // -> notification
 
   //Team member section
   rpc CreateInvitation(CreateInvitationRequest) returns (InvitationResponse); // -> notification
-  rpc ReplyToInvitation(ReplyToInvitationRequest) returns (ActionResponse);  // if success -> notification
-  rpc JoinTeam(JoinTeamRequest) returns (ActionResponse); // -> notification
+  rpc ReplyToInvitation(ReplyToInvitationRequest) returns (common.ActionResponse);  // if success -> notification
+  rpc JoinTeam(JoinTeamRequest) returns (common.ActionResponse); // -> notification
   rpc GetTeamMemberByIds(GetTeamMemberByIdsRequest) returns (TeamMemberResponse);
   rpc GetTeamMembers(GetTeamMembersRequest) returns (GetTeamMembersResponse);
   rpc UpdateMemberRole(UpdateMemberRoleRequest) returns (TeamMemberResponse);
-  rpc RemoveTeamMember(RemoveTeamMemberRequest) returns (ActionResponse); // -> notification
-  rpc LeaveTeam(LeaveTeamRequest) returns (ActionResponse); // -> notification
+  rpc RemoveTeamMember(RemoveTeamMemberRequest) returns (common.ActionResponse); // -> notification
+  rpc LeaveTeam(LeaveTeamRequest) returns (common.ActionResponse); // -> notification
 }
