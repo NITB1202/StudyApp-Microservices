@@ -54,7 +54,18 @@ public class TeamService {
                         .totalMembers(1)
                         .build();
 
-                return teamRepository.save(team);
+                teamRepository.save(team);
+
+                TeamUser teamUser = TeamUser.builder()
+                        .teamId(team.getId())
+                        .userId(userId)
+                        .role(TeamRole.CREATOR)
+                        .joinDate(LocalDate.now())
+                        .build();
+
+                teamUserRepository.save(teamUser);
+
+                return team;
             }
             catch (DataIntegrityViolationException e){
                 retry++;
