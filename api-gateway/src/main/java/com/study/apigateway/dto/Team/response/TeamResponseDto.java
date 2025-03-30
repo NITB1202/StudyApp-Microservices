@@ -25,7 +25,7 @@ public class TeamResponseDto {
 
     private UUID creatorId;
 
-    private Integer totalMembers;
+    private Long totalMembers;
 
     private String avatarUrl;
 }
