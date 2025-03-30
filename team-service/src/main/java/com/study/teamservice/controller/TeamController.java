@@ -48,8 +48,10 @@ public class TeamController extends TeamServiceGrpc.TeamServiceImplBase {
         List<Team> teams = teamService.getUserTeams(request);
         List<TeamResponse> teamResponses = TeamMapper.toTeamResponseList(teams);
 
-        String nextCursor = !teams.isEmpty() && teams.size() < request.getSize() ? teams.get(teams.size() - 1).getId().toString() : "";
-        long total = teamService.countUserTeam(UUID.fromString(request.getUserId()));
+        UUID userId = UUID.fromString(request.getUserId());
+        String nextCursor = !teams.isEmpty() && teams.size() == request.getSize() ?
+                teamService.getJoinDateString(teams.get(teams.size() - 1).getId(), userId) : "";
+        long total = teamService.countUserTeam(userId);
 
         ListTeamResponse response =  ListTeamResponse.newBuilder()
                 .addAllTeams(teamResponses)
@@ -66,8 +68,10 @@ public class TeamController extends TeamServiceGrpc.TeamServiceImplBase {
         List<Team> teams = teamService.searchUserTeamByName(request);
         List<TeamResponse> teamResponses = TeamMapper.toTeamResponseList(teams);
 
-        String nextCursor = !teams.isEmpty() && teams.size() < request.getSize() ? teams.get(teams.size() - 1).getId().toString() : "";
-        long total = teamService.countUserTeamByKeyword(UUID.fromString(request.getUserId()), request.getKeyword());
+        UUID userId = UUID.fromString(request.getUserId());
+        String nextCursor = !teams.isEmpty() && teams.size() == request.getSize() ?
+                teamService.getJoinDateString(teams.get(teams.size() - 1).getId(), userId) : "";
+        long total = teamService.countUserTeamByKeyword(userId, request.getKeyword());
 
         ListTeamResponse response =  ListTeamResponse.newBuilder()
                 .addAllTeams(teamResponses)
