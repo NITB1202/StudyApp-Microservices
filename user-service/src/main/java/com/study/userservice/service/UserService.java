@@ -99,9 +99,6 @@ public class UserService {
         if(request.getGender() != com.study.userservice.grpc.Gender.UNSPECIFIED)
             user.setGender(GenderMapper.toEnum(request.getGender()));
 
-        if(!request.getAvatarUrl().isBlank())
-            user.setAvatarUrl(request.getAvatarUrl());
-
         return userRepository.save(user);
     }
 }

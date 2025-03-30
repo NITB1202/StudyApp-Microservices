@@ -54,7 +54,6 @@ message UpdateUserRequest {
   string username = 2;
   string dateOfBirth = 3;
   Gender gender = 4;
-  string avatarUrl = 5;
 }
 
 // gRPC Service
