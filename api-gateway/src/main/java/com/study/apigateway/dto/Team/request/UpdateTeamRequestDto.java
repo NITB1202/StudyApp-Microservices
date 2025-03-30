@@ -20,5 +20,5 @@ public class UpdateTeamRequestDto {
     @Size(min =3, max = 20, message = "Name must be between 3 and 20 characters.")
     private String name;
 
-    private String avatarUrl;
+    private String description;
 }

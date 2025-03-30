@@ -2,6 +2,7 @@ package com.study.apigateway.grpcclient;
 
 import com.study.apigateway.dto.Team.request.CreateTeamRequestDto;
 import com.study.apigateway.dto.Team.request.UpdateTeamRequestDto;
+import com.study.common.grpc.ActionResponse;
 import com.study.teamservice.grpc.*;
 import net.devh.boot.grpc.client.inject.GrpcClient;
 import org.springframework.stereotype.Service;
@@ -18,7 +19,7 @@ public class TeamServiceGrpcClient {
         CreateTeamRequest request = CreateTeamRequest.newBuilder()
                 .setCreatorId(dto.getCreatorId().toString())
                 .setName(dto.getName())
-                .setAvatarUrl(dto.getAvatarUrl() == null ? "" : dto.getAvatarUrl())
+                .setDescription(dto.getDescription() != null ? dto.getDescription() : "")
                 .build();
 
         return stub.createTeam(request);
@@ -66,17 +67,27 @@ public class TeamServiceGrpcClient {
     }
 
     public TeamResponse updateTeam(UUID id, UpdateTeamRequestDto dto){
-        String name = dto.getName() == null ? "" : dto.getName();
-        String avatarUrl = dto.getAvatarUrl() == null ? "" : dto.getAvatarUrl();
+        String name = dto.getName() != null ? dto.getName() : "";
+        String description = dto.getDescription() != null ? dto.getDescription() : "";
 
         UpdateTeamRequest request = UpdateTeamRequest.newBuilder()
                 .setId(id.toString())
                 .setUserId(dto.getUserId().toString())
                 .setName(name)
-                .setAvatarUrl(avatarUrl)
+                .setDescription(description)
                 .build();
 
         return stub.updateTeam(request);
+    }
+
+    public ActionResponse uploadTeamAvatar(UUID teamId, UUID userId, String avatarUrl){
+        UploadTeamAvatarRequest request = UploadTeamAvatarRequest.newBuilder()
+                .setTeamId(teamId.toString())
+                .setUserId(userId.toString())
+                .setAvatarUrl(avatarUrl)
+                .build();
+
+        return stub.uploadTeamAvatar(request);
     }
 
     public ActionResponse deleteTeam(UUID id){
