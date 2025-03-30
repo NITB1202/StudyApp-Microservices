@@ -33,6 +33,9 @@ public class Team {
     @Column(name = "total_members", nullable = false)
     private Integer totalMembers;
 
+    @Column(name = "description")
+    private String description;
+
     @Column(name = "avatar_url")
     private String avatarUrl;
 }

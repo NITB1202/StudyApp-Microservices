@@ -1,5 +1,6 @@
 package com.study.teamservice.controller;
 
+import com.study.common.grpc.ActionResponse;
 import com.study.teamservice.entity.Team;
 import com.study.teamservice.grpc.*;
 import com.study.teamservice.mapper.TeamMapper;
@@ -82,6 +83,18 @@ public class TeamController extends TeamServiceGrpc.TeamServiceImplBase {
     public void updateTeam(UpdateTeamRequest request, StreamObserver<TeamResponse> responseObserver){
         Team team = teamService.updateTeam(request);
         TeamResponse response = TeamMapper.toTeamResponse(team);
+        responseObserver.onNext(response);
+        responseObserver.onCompleted();
+    }
+
+    @Override
+    public void uploadTeamAvatar(UploadTeamAvatarRequest request, StreamObserver<ActionResponse> responseObserver){
+        teamService.uploadTeamAvatar(request);
+        ActionResponse response = ActionResponse.newBuilder()
+                .setSuccess(true)
+                .setMessage("Upload avatar success")
+                .build();
+
         responseObserver.onNext(response);
         responseObserver.onCompleted();
     }

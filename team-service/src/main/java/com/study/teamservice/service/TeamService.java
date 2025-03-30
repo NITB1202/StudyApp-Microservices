@@ -34,7 +34,6 @@ public class TeamService {
 
     public Team createTeam(CreateTeamRequest request) {
         int retry = 0;
-        String avatarUrl = request.getAvatarUrl().isEmpty() ? null : request.getAvatarUrl();
 
         while(true){
             String randomCode = codeService.generateRandomCode();
@@ -42,11 +41,11 @@ public class TeamService {
             try{
                 Team team = Team.builder()
                         .name(request.getName())
+                        .description(request.getDescription())
                         .teamCode(randomCode)
                         .createDate(LocalDate.now())
                         .creatorId(UUID.fromString(request.getCreatorId()))
                         .totalMembers(1)
-                        .avatarUrl(avatarUrl)
                         .build();
 
                 return teamRepository.save(team);
@@ -124,13 +123,7 @@ public class TeamService {
                 () -> new NotFoundException("Team not found")
         );
 
-        TeamUser teamUser = teamUserRepository.findByUserIdAndTeamId(
-                UUID.fromString(request.getUserId()), UUID.fromString(request.getId()));
-
-        if(teamUser == null)
-            throw new NotFoundException("User is not part of this team");
-
-        if(teamUser.getRole() == TeamRole.MEMBER)
+        if(userDoesNotHavePermissionToUpdate(UUID.fromString(request.getUserId()), UUID.fromString(request.getId())))
             throw new BusinessException("User doesn't have permission to update this team");
 
         Set<String> updatedFields = new HashSet<>();
@@ -143,9 +136,9 @@ public class TeamService {
             updatedFields.add("name");
         }
 
-        if(!request.getAvatarUrl().isBlank()) {
-            team.setAvatarUrl(request.getAvatarUrl());
-            updatedFields.add("avatarUrl");
+        if(!request.getDescription().isBlank()) {
+            team.setDescription(request.getDescription());
+            updatedFields.add("description");
         }
 
         if(!updatedFields.isEmpty()) {
@@ -156,8 +149,6 @@ public class TeamService {
             TeamUpdatedEvent event = TeamUpdatedEvent.builder()
                     .id(team.getId())
                     .updatedBy(UUID.fromString(request.getUserId()))
-                    .name(team.getName())
-                    .avatarUrl(team.getAvatarUrl())
                     .updatedFields(updatedFields)
                     .memberIds(memberIds)
                     .build();
@@ -166,6 +157,36 @@ public class TeamService {
         }
 
         return teamRepository.save(team);
+    }
+
+    public void uploadTeamAvatar(UploadTeamAvatarRequest request) {
+        Team team = teamRepository.findById(UUID.fromString(request.getTeamId())).orElseThrow(
+                () -> new NotFoundException("Team not found")
+        );
+
+        if(userDoesNotHavePermissionToUpdate(UUID.fromString(request.getUserId()), UUID.fromString(request.getTeamId())))
+            throw new BusinessException("User doesn't have permission to update this team");
+
+        if(request.getAvatarUrl().isBlank())
+            throw new BusinessException("The avatar url is empty");
+
+        team.setAvatarUrl(request.getAvatarUrl());
+
+        Set<String> updatedFields = Set.of("avatar");
+        List<UUID> memberIds = teamUserRepository.findByTeamId(team.getId()).stream()
+                .map(TeamUser::getUserId)
+                .toList();
+
+        TeamUpdatedEvent event = TeamUpdatedEvent.builder()
+                .id(team.getId())
+                .updatedBy(UUID.fromString(request.getUserId()))
+                .updatedFields(updatedFields)
+                .memberIds(memberIds)
+                .build();
+
+        teamEventPublisher.publishEvent(UPDATE_TOPIC, event);
+
+        teamRepository.save(team);
     }
 
     public void deleteTeam(DeleteTeamRequest request) {
@@ -189,5 +210,14 @@ public class TeamService {
                 .build();
 
         teamEventPublisher.publishEvent(DELETE_TOPIC, event);
+    }
+
+    private boolean userDoesNotHavePermissionToUpdate(UUID userId, UUID teamId) {
+        TeamUser teamUser = teamUserRepository.findByUserIdAndTeamId(userId, teamId);
+
+        if(teamUser == null)
+            throw new NotFoundException("User is not part of this team");
+
+        return teamUser.getRole() == TeamRole.MEMBER;
     }
 }
