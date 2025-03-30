@@ -14,6 +14,7 @@ public class TeamMapper {
         return TeamResponseDto.builder()
                 .id(UUID.fromString(response.getId()))
                 .name(response.getName())
+                .description(response.getDescription())
                 .teamCode(response.getTeamCode())
                 .createDate(LocalDate.parse(response.getCreateDate()))
                 .creatorId(UUID.fromString(response.getCreatorId()))

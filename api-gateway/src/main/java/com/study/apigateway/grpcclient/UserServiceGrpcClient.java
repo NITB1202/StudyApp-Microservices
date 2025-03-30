@@ -2,6 +2,7 @@ package com.study.apigateway.grpcclient;
 
 import com.study.apigateway.dto.User.request.CreateUserRequestDto;
 import com.study.apigateway.dto.User.request.UpdateUserRequestDto;
+import com.study.common.grpc.ActionResponse;
 import com.study.common.mappers.GenderMapper;
 import com.study.userservice.grpc.*;
 
@@ -69,16 +70,23 @@ public class UserServiceGrpcClient {
         String username = dto.getUsername() != null ? dto.getUsername() : "";
         String dateOfBirth = dto.getDateOfBirth() != null ? dto.getDateOfBirth().toString() : "";
         Gender gender = dto.getGender() != null ? GenderMapper.toProtoEnum(dto.getGender()) : Gender.UNSPECIFIED;
-        String avatarUrl = dto.getAvatarUrl() != null ? dto.getAvatarUrl() : "";
 
         UpdateUserRequest request = UpdateUserRequest.newBuilder()
                 .setId(id.toString())
                 .setUsername(username)
                 .setDateOfBirth(dateOfBirth)
                 .setGender(gender)
-                .setAvatarUrl(avatarUrl)
                 .build();
 
         return userServiceStub.updateUser(request);
+    }
+
+    public ActionResponse uploadUserAvatar(UUID id, String avatarUrl){
+        UploadUserAvatarRequest request = UploadUserAvatarRequest.newBuilder()
+                .setId(id.toString())
+                .setAvatarUrl(avatarUrl)
+                .build();
+
+        return userServiceStub.uploadUserAvatar(request);
     }
 }

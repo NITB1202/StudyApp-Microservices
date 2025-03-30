@@ -8,13 +8,11 @@ import com.study.apigateway.dto.Team.response.TeamResponseDto;
 import com.study.apigateway.grpcclient.TeamServiceGrpcClient;
 import com.study.apigateway.mapper.ActionMapper;
 import com.study.apigateway.mapper.TeamMapper;
-import com.study.apigateway.utils.AvatarUtils;
-import com.study.teamservice.grpc.ActionResponse;
+import com.study.common.grpc.ActionResponse;
 import com.study.teamservice.grpc.GetFirstTeamIdResponse;
 import com.study.teamservice.grpc.ListTeamResponse;
 import com.study.teamservice.grpc.TeamResponse;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.codec.multipart.FilePart;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
@@ -27,7 +25,6 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class TeamServiceImpl implements TeamService {
     private final TeamServiceGrpcClient grpcClient;
-    private final AvatarUtils avatarUtils;
 
     @Override
     public Mono<TeamResponseDto> createTeam(CreateTeamRequestDto request) {
@@ -79,24 +76,17 @@ public class TeamServiceImpl implements TeamService {
     }
 
     @Override
-    public Mono<TeamResponseDto> updateTeam(UUID id, UpdateTeamRequestDto request, FilePart newAvatar) {
+    public Mono<TeamResponseDto> updateTeam(UUID id, UpdateTeamRequestDto request) {
         return Mono.fromCallable(()->{
-            if (newAvatar != null) {
-                String newAvatarUrl = avatarUtils.uploadAvatar(id, newAvatar);
-                request.setAvatarUrl(newAvatarUrl);
-            }
-
             TeamResponse team = grpcClient.updateTeam(id, request);
-
             return TeamMapper.toResponseDto(team);
-
         }).subscribeOn(Schedulers.boundedElastic());
     }
 
     @Override
-    public Mono<ActionResponseDto> deleteTeam(UUID id) {
+    public Mono<ActionResponseDto> deleteTeam(UUID id, UUID userId) {
         return Mono.fromCallable(()->{
-            ActionResponse response = grpcClient.deleteTeam(id);
+            ActionResponse response = grpcClient.deleteTeam(id, userId);
             return ActionMapper.toResponseDto(response);
         }).subscribeOn(Schedulers.boundedElastic());
     }

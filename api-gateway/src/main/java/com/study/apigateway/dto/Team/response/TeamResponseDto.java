@@ -17,6 +17,8 @@ public class TeamResponseDto {
     private UUID id;
 
     private String name;
+    
+    private String description;
 
     private String teamCode;
 

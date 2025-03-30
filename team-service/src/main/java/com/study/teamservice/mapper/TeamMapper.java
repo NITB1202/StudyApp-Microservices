@@ -13,6 +13,7 @@ public class TeamMapper {
         return TeamResponse.newBuilder()
                 .setId(team.getId().toString())
                 .setName(team.getName())
+                .setDescription(team.getDescription())
                 .setTeamCode(team.getTeamCode())
                 .setCreateDate(team.getCreateDate().toString())
                 .setCreatorId(team.getCreatorId().toString())

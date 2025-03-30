@@ -25,6 +25,4 @@ public class UpdateUserRequestDto {
 
     @JsonFormat(shape = JsonFormat.Shape.STRING)
     private Gender gender;
-
-    private String avatarUrl;
 }
