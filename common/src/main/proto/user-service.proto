@@ -2,6 +2,8 @@ syntax = "proto3";
 
 package user;
 
+import "common.proto";
+
 option java_multiple_files = true;
 option java_package = "com.study.userservice.grpc";
 option java_outer_classname = "UserProto";
@@ -56,6 +58,11 @@ message UpdateUserRequest {
   Gender gender = 4;
 }
 
+message UploadUserAvatarRequest {
+  string id = 1;
+  string avatarUrl = 2;
+}
+
 // gRPC Service
 service UserService {
   rpc CreateUser(CreateUserRequest) returns (UserResponse);
@@ -63,4 +70,5 @@ service UserService {
   rpc GetUsersByListOfIds(GetUsersByListOfIdsRequest) returns (ListUserResponse);
   rpc SearchUserByUsername(SearchUserRequest) returns (ListUserResponse);
   rpc UpdateUser(UpdateUserRequest) returns (UserResponse);
+  rpc UploadUserAvatar(UploadUserAvatarRequest) returns (common.ActionResponse);
 }

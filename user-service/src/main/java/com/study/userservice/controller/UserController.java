@@ -1,5 +1,6 @@
 package com.study.userservice.controller;
 
+import com.study.common.grpc.ActionResponse;
 import com.study.userservice.enity.User;
 import com.study.userservice.grpc.*;
 import com.study.userservice.mapper.UserMapper;
@@ -71,6 +72,18 @@ public class UserController extends UserServiceGrpc.UserServiceImplBase{
     public void updateUser(UpdateUserRequest request, StreamObserver<UserResponse> responseObserver){
         User user = userService.updateUser(request);
         UserResponse response = UserMapper.toUserResponse(user);
+        responseObserver.onNext(response);
+        responseObserver.onCompleted();
+    }
+
+    @Override
+    public void uploadUserAvatar(UploadUserAvatarRequest request, StreamObserver<ActionResponse> responseObserver){
+        userService.uploadUserAvatar(request);
+        ActionResponse response = ActionResponse.newBuilder()
+                .setSuccess(true)
+                .setMessage("Upload avatar success")
+                .build();
+
         responseObserver.onNext(response);
         responseObserver.onCompleted();
     }

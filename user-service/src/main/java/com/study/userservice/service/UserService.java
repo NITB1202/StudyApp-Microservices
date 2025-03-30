@@ -101,4 +101,17 @@ public class UserService {
 
         return userRepository.save(user);
     }
+
+    public void uploadUserAvatar(UploadUserAvatarRequest request){
+        User user = userRepository.findById(UUID.fromString(request.getId())).orElseThrow(
+                () -> new NotFoundException("User not found")
+        );
+
+        if(request.getAvatarUrl().isBlank()){
+            throw new BusinessException("Avatar url is empty");
+        }
+
+        user.setAvatarUrl(request.getAvatarUrl());
+        userRepository.save(user);
+    }
 }
