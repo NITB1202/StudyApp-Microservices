@@ -27,7 +27,7 @@ public class TeamController {
     private final TeamService teamService;
 
     @PostMapping
-    @Operation(description = "Create a new team.")
+    @Operation(summary = "Create a new team.")
     @ApiResponse(responseCode = "200", description = "Create successfully.")
     @ApiResponse(responseCode = "400", description = "Invalid request body.",
             content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
@@ -36,7 +36,7 @@ public class TeamController {
     }
 
     @GetMapping("/{id}")
-    @Operation(description = "Get team's information by id.")
+    @Operation(summary = "Get team's information by id.")
     @ApiResponse(responseCode = "200", description = "Get successfully")
     @ApiResponse(responseCode = "404", description = "Not found",
             content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
@@ -45,7 +45,7 @@ public class TeamController {
     }
 
     @GetMapping("/all")
-    @Operation(description = "Get part of the user's teams.")
+    @Operation(summary = "Get part of the user's teams.")
     @ApiResponse(responseCode = "200", description = "Get successfully.")
     @ApiResponse(responseCode = "404", description = "Not found",
             content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
@@ -56,7 +56,7 @@ public class TeamController {
     }
 
     @GetMapping("/search")
-    @Operation(description = "Search for user's teams by name.")
+    @Operation(summary = "Search for user's teams by name.")
     @ApiResponse(responseCode = "200", description = "Search successfully.")
     @ApiResponse(responseCode = "404", description = "Not found",
             content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
@@ -68,7 +68,7 @@ public class TeamController {
     }
 
     @PatchMapping("/{id}")
-    @Operation(description = "Update a specific team")
+    @Operation(summary = "Update a specific team")
     @ApiResponse(responseCode = "200", description = "Update successfully.")
     @ApiResponse(responseCode = "400", description = "Invalid request body.",
             content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
@@ -80,7 +80,7 @@ public class TeamController {
     }
 
     @DeleteMapping("/{id}")
-    @Operation(description = "Delete a specific team.")
+    @Operation(summary = "Delete a specific team.")
     @ApiResponse(responseCode = "200", description = "Delete successfully.")
     @ApiResponse(responseCode = "404", description = "Not found",
             content = @Content(schema = @Schema(implementation = ErrorResponse.class)))

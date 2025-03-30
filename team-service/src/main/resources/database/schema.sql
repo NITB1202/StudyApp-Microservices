@@ -1,6 +1,7 @@
 CREATE TABLE IF NOT EXISTS teams (
     id UUID DEFAULT RANDOM_UUID() PRIMARY KEY,
     name VARCHAR(255) NOT NULL,
+    description VARCHAR(255),
     team_code VARCHAR(10) NOT NULL UNIQUE,
     create_date DATE NOT NULL,
     creator_id UUID NOT NULL,

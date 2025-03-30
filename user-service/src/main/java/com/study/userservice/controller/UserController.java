@@ -38,7 +38,7 @@ public class UserController extends UserServiceGrpc.UserServiceImplBase{
         List<UserResponse> userResponses = UserMapper.toUserResponseList(users);
 
         // Determine next cursor
-        String nextCursor = !users.isEmpty() && users.size() == request.getSize() ? users.get(users.size() - 1).getId().toString() : "";
+        String nextCursor = !users.isEmpty() && users.size() < request.getSize() ? users.get(users.size() - 1).getId().toString() : "";
 
         ListUserResponse response = ListUserResponse.newBuilder()
                 .addAllUsers(userResponses)
@@ -56,7 +56,7 @@ public class UserController extends UserServiceGrpc.UserServiceImplBase{
         List<UserResponse> userResponses = UserMapper.toUserResponseList(users);
 
         long total = userService.countUsersByUsername(request.getKeyword());
-        String nextCursor = !users.isEmpty() && users.size() == request.getSize() ? users.get(users.size() - 1).getId().toString() : "";
+        String nextCursor = !users.isEmpty() && users.size() < request.getSize() ? users.get(users.size() - 1).getId().toString() : "";
 
         ListUserResponse response = ListUserResponse.newBuilder()
                 .addAllUsers(userResponses)

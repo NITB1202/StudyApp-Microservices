@@ -48,7 +48,7 @@ public class TeamController extends TeamServiceGrpc.TeamServiceImplBase {
         List<Team> teams = teamService.getUserTeams(request);
         List<TeamResponse> teamResponses = TeamMapper.toTeamResponseList(teams);
 
-        String nextCursor = !teams.isEmpty() && teams.size() == request.getSize() ? teams.get(teams.size() - 1).getId().toString() : "";
+        String nextCursor = !teams.isEmpty() && teams.size() < request.getSize() ? teams.get(teams.size() - 1).getId().toString() : "";
         long total = teamService.countUserTeam(UUID.fromString(request.getUserId()));
 
         ListTeamResponse response =  ListTeamResponse.newBuilder()
@@ -66,7 +66,7 @@ public class TeamController extends TeamServiceGrpc.TeamServiceImplBase {
         List<Team> teams = teamService.searchUserTeamByName(request);
         List<TeamResponse> teamResponses = TeamMapper.toTeamResponseList(teams);
 
-        String nextCursor = !teams.isEmpty() && teams.size() == request.getSize() ? teams.get(teams.size() - 1).getId().toString() : "";
+        String nextCursor = !teams.isEmpty() && teams.size() < request.getSize() ? teams.get(teams.size() - 1).getId().toString() : "";
         long total = teamService.countUserTeamByKeyword(UUID.fromString(request.getUserId()), request.getKeyword());
 
         ListTeamResponse response =  ListTeamResponse.newBuilder()
