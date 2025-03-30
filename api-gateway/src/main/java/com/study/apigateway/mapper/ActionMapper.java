@@ -1,6 +1,6 @@
 package com.study.apigateway.mapper;
 
-import com.study.apigateway.dto.Team.response.ActionResponseDto;
+import com.study.apigateway.dto.Action.ActionResponseDto;
 import com.study.teamservice.grpc.ActionResponse;
 
 public class ActionMapper {

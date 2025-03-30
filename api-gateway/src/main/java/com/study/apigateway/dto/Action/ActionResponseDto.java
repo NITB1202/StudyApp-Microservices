@@ -1,4 +1,4 @@
-package com.study.apigateway.dto.Team.response;
+package com.study.apigateway.dto.Action;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

@@ -1,14 +1,14 @@
 package com.study.apigateway.service.Team;
 
-import com.cloudinary.Cloudinary;
 import com.study.apigateway.dto.Team.request.CreateTeamRequestDto;
 import com.study.apigateway.dto.Team.request.UpdateTeamRequestDto;
-import com.study.apigateway.dto.Team.response.ActionResponseDto;
+import com.study.apigateway.dto.Action.ActionResponseDto;
 import com.study.apigateway.dto.Team.response.ListTeamResponseDto;
 import com.study.apigateway.dto.Team.response.TeamResponseDto;
 import com.study.apigateway.grpcclient.TeamServiceGrpcClient;
 import com.study.apigateway.mapper.ActionMapper;
 import com.study.apigateway.mapper.TeamMapper;
+import com.study.apigateway.utils.AvatarUtils;
 import com.study.teamservice.grpc.ActionResponse;
 import com.study.teamservice.grpc.GetFirstTeamIdResponse;
 import com.study.teamservice.grpc.ListTeamResponse;
@@ -27,7 +27,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class TeamServiceImpl implements TeamService {
     private final TeamServiceGrpcClient grpcClient;
-    private final Cloudinary cloudinary;
+    private final AvatarUtils avatarUtils;
 
     @Override
     public Mono<TeamResponseDto> createTeam(CreateTeamRequestDto request) {
@@ -81,10 +81,12 @@ public class TeamServiceImpl implements TeamService {
     @Override
     public Mono<TeamResponseDto> updateTeam(UUID id, UpdateTeamRequestDto request, FilePart newAvatar) {
         return Mono.fromCallable(()->{
-            //In case the request is null
-            UpdateTeamRequestDto handledRequest = request != null ? request : new UpdateTeamRequestDto();
+            if (newAvatar != null) {
+                String newAvatarUrl = avatarUtils.uploadAvatar(id, newAvatar);
+                request.setAvatarUrl(newAvatarUrl);
+            }
 
-            TeamResponse team = grpcClient.updateTeam(id, handledRequest);
+            TeamResponse team = grpcClient.updateTeam(id, request);
 
             return TeamMapper.toResponseDto(team);
 

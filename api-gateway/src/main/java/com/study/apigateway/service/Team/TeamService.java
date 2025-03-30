@@ -2,7 +2,7 @@ package com.study.apigateway.service.Team;
 
 import com.study.apigateway.dto.Team.request.CreateTeamRequestDto;
 import com.study.apigateway.dto.Team.request.UpdateTeamRequestDto;
-import com.study.apigateway.dto.Team.response.ActionResponseDto;
+import com.study.apigateway.dto.Action.ActionResponseDto;
 import com.study.apigateway.dto.Team.response.ListTeamResponseDto;
 import com.study.apigateway.dto.Team.response.TeamResponseDto;
 import org.springframework.http.codec.multipart.FilePart;
