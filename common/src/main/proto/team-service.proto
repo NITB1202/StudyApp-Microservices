@@ -98,11 +98,6 @@ message InvitationResponse {
   InvitationStatus status = 6;
 }
 
-message ReplyToInvitationRequest {
-  string id = 1;
-  bool accept = 2;
-}
-
 message JoinTeamRequest {
   string userId = 1;
   string teamCode = 2;
@@ -167,7 +162,6 @@ service TeamService {
 
   //Team member section
   rpc CreateInvitation(CreateInvitationRequest) returns (InvitationResponse); // -> notification
-  rpc ReplyToInvitation(ReplyToInvitationRequest) returns (common.ActionResponse);  // if success -> notification
   rpc JoinTeam(JoinTeamRequest) returns (common.ActionResponse); // -> notification
   rpc GetTeamMemberByIds(GetTeamMemberByIdsRequest) returns (TeamMemberResponse);
   rpc GetTeamMembers(GetTeamMembersRequest) returns (GetTeamMembersResponse);
