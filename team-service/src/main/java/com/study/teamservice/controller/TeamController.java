@@ -2,12 +2,16 @@ package com.study.teamservice.controller;
 
 import com.study.common.grpc.ActionResponse;
 import com.study.teamservice.entity.Team;
+import com.study.teamservice.entity.TeamUser;
 import com.study.teamservice.grpc.*;
 import com.study.teamservice.mapper.TeamMapper;
+import com.study.teamservice.mapper.TeamUserMapper;
+import com.study.teamservice.service.MemberService;
 import com.study.teamservice.service.TeamService;
 import io.grpc.stub.StreamObserver;
 import lombok.RequiredArgsConstructor;
 import net.devh.boot.grpc.server.service.GrpcService;
+import org.springframework.data.domain.Page;
 
 import java.util.List;
 import java.util.UUID;
@@ -16,7 +20,9 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class TeamController extends TeamServiceGrpc.TeamServiceImplBase {
     private final TeamService teamService;
+    private final MemberService memberService;
 
+    //Team section
     @Override
     public void createTeam(CreateTeamRequest request, StreamObserver<TeamResponse> responseObserver){
         Team team = teamService.createTeam(request);
@@ -50,7 +56,7 @@ public class TeamController extends TeamServiceGrpc.TeamServiceImplBase {
 
         UUID userId = UUID.fromString(request.getUserId());
         String nextCursor = !teams.isEmpty() && teams.size() == request.getSize() ?
-                teamService.getJoinDateString(teams.get(teams.size() - 1).getId(), userId) : "";
+                teamService.getJoinDateString(teams.getLast().getId(), userId) : "";
         long total = teamService.countUserTeam(userId);
 
         ListTeamResponse response =  ListTeamResponse.newBuilder()
@@ -70,7 +76,7 @@ public class TeamController extends TeamServiceGrpc.TeamServiceImplBase {
 
         UUID userId = UUID.fromString(request.getUserId());
         String nextCursor = !teams.isEmpty() && teams.size() == request.getSize() ?
-                teamService.getJoinDateString(teams.get(teams.size() - 1).getId(), userId) : "";
+                teamService.getJoinDateString(teams.getLast().getId(), userId) : "";
         long total = teamService.countUserTeamByKeyword(userId, request.getKeyword());
 
         ListTeamResponse response =  ListTeamResponse.newBuilder()
@@ -109,6 +115,92 @@ public class TeamController extends TeamServiceGrpc.TeamServiceImplBase {
         ActionResponse response = ActionResponse.newBuilder()
                 .setSuccess(true)
                 .setMessage("Delete team success")
+                .build();
+
+        responseObserver.onNext(response);
+        responseObserver.onCompleted();
+    }
+
+
+    //Member section
+    @Override
+    public void createInvitation(CreateInvitationRequest request, StreamObserver<ActionResponse> responseObserver){
+        memberService.createInvitation(request);
+        ActionResponse response = ActionResponse.newBuilder()
+                .setSuccess(true)
+                .setMessage("Create invitation success")
+                .build();
+
+        responseObserver.onNext(response);
+        responseObserver.onCompleted();
+    }
+
+    @Override
+    public void joinTeam(JoinTeamRequest request, StreamObserver<ActionResponse> responseObserver){
+        memberService.joinTeam(request);
+        ActionResponse response = ActionResponse.newBuilder()
+                .setSuccess(true)
+                .setMessage("Join team success")
+                .build();
+
+        responseObserver.onNext(response);
+        responseObserver.onCompleted();
+    }
+
+    @Override
+    public void getTeamMemberById(GetTeamMemberByIdRequest request, StreamObserver<TeamMemberResponse> responseObserver){
+        TeamUser member = memberService.getTeamMemberById(request);
+        TeamMemberResponse response = TeamUserMapper.toTeamMemberResponse(member);
+        responseObserver.onNext(response);
+        responseObserver.onCompleted();
+    }
+
+    @Override
+    public void getTeamMembers(GetTeamMembersRequest request, StreamObserver<GetTeamMembersResponse> responseObserver){
+        Page<TeamUser> members = memberService.getTeamMembers(request);
+        List<TeamMemberResponse> memberResponses = members.getContent().stream()
+                .map(TeamUserMapper::toTeamMemberResponse)
+                .toList();
+
+        String nextCursor = !memberResponses.isEmpty() && memberResponses.size() == request.getSize() ?
+                memberResponses.getLast().getUserId() : "";
+
+        GetTeamMembersResponse response = GetTeamMembersResponse.newBuilder()
+                .addAllMembers(memberResponses)
+                .setTotal(members.getTotalElements())
+                .setNextCursor(nextCursor)
+                .build();
+
+        responseObserver.onNext(response);
+        responseObserver.onCompleted();
+    }
+
+    @Override
+    public void updateMemberRole(UpdateMemberRoleRequest request, StreamObserver<TeamMemberResponse> responseObserver){
+        TeamUser member = memberService.updateMemberRole(request);
+        TeamMemberResponse response = TeamUserMapper.toTeamMemberResponse(member);
+        responseObserver.onNext(response);
+        responseObserver.onCompleted();
+    }
+
+    @Override
+    public void removeTeamMember(RemoveTeamMemberRequest request, StreamObserver<ActionResponse> responseObserver){
+        memberService.removeTeamMember(request);
+        ActionResponse response = ActionResponse.newBuilder()
+                .setSuccess(true)
+                .setMessage("Remove team member success")
+                .build();
+
+        responseObserver.onNext(response);
+        responseObserver.onCompleted();
+    }
+
+    @Override
+    public void leaveTeam(LeaveTeamRequest request, StreamObserver<ActionResponse> responseObserver){
+        memberService.leaveTeam(request);
+        ActionResponse response = ActionResponse.newBuilder()
+                .setSuccess(true)
+                .setMessage("Leave team success")
                 .build();
 
         responseObserver.onNext(response);
