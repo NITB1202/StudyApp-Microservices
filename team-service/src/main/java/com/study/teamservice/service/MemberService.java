@@ -44,12 +44,16 @@ public class MemberService {
         UUID inviterId = UUID.fromString(request.getInviterId());
         UUID inviteeId = UUID.fromString(request.getInviteeId());
 
-        if(!teamUserRepository.existsById(teamId)) {
+        if(!teamRepository.existsById(teamId)) {
             throw new NotFoundException("Team does not exist");
         }
 
         if(!teamUserRepository.existsByUserIdAndTeamId(inviterId, teamId)) {
             throw new NotFoundException("User is not in this team");
+        }
+
+        if(teamUserRepository.existsByUserIdAndTeamId(inviteeId, teamId)) {
+           throw new BusinessException("This user is already in the team");
         }
 
         InvitationCreatedEvent event = InvitationCreatedEvent.builder()
@@ -81,9 +85,9 @@ public class MemberService {
         return member;
     }
 
-    public Page<TeamUser> getTeamMembers(GetTeamMembersRequest request) {
+    public List<TeamUser> getTeamMembers(GetTeamMembersRequest request) {
         int size = request.getSize() > 0 ? request.getSize() : DEFAULT_SIZE;
-        UUID cursor = request.getCursor().isEmpty() ? null : UUID.fromString(request.getCursor());
+        LocalDate cursor = request.getCursor().isEmpty() ? null : LocalDate.parse(request.getCursor());
 
         List<TeamRole> roleOrder = Arrays.asList(TeamRole.CREATOR, TeamRole.ADMIN, TeamRole.MEMBER);
 
@@ -93,7 +97,7 @@ public class MemberService {
         ));
 
         if (cursor != null) {
-            return teamUserRepository.findByTeamIdAndRoleInAndIdGreaterThan(
+            return teamUserRepository.findByTeamIdAndRoleInAndJoinDateGreaterThan(
                     UUID.fromString(request.getTeamId()),
                     roleOrder,
                     cursor,
@@ -107,6 +111,10 @@ public class MemberService {
                     pageable
             );
         }
+    }
+
+    public long countMembers(UUID teamId){
+        return teamUserRepository.countByTeamId(teamId);
     }
 
     public TeamUser updateMemberRole(UpdateMemberRoleRequest request) {
@@ -130,6 +138,10 @@ public class MemberService {
         UUID teamId = UUID.fromString(request.getTeamId());
         UUID userId = UUID.fromString(request.getUserId());
         UUID memberId = UUID.fromString(request.getMemberId());
+
+        if(userId == memberId){
+            throw new BusinessException("User id and member id are the same.");
+        }
 
         validateUpdateMemberRequest(teamId, userId, memberId);
         removeMember(teamId, memberId);
@@ -169,11 +181,7 @@ public class MemberService {
     }
 
     public void validateUpdateMemberRequest(UUID teamId, UUID userId, UUID memberId) {
-        if(userId == memberId) {
-            throw new BusinessException("User id and member id are the same");
-        }
-
-        if(userDoesNotHavePermissionToUpdate(teamId, userId)) {
+        if(userDoesNotHavePermissionToUpdate(userId, teamId)) {
             throw new BusinessException("User does not have permission to perform this action.");
         }
 
@@ -189,6 +197,13 @@ public class MemberService {
     }
 
     private void addNewMember(UUID teamId, UUID userId) {
+        Team team = teamRepository.findById(teamId).orElseThrow(
+                ()-> new NotFoundException("Team does not exist")
+        );
+
+        team.setTotalMembers(team.getTotalMembers() + 1);
+        teamRepository.save(team);
+
         TeamUser teamUser = TeamUser.builder()
                 .teamId(teamId)
                 .userId(userId)
@@ -210,6 +225,19 @@ public class MemberService {
     }
 
     private void removeMember(UUID teamId, UUID userId){
+        Team team = teamRepository.findById(teamId).orElseThrow(
+                ()-> new NotFoundException("Team does not exist")
+        );
+
+        int teamMembers = team.getTotalMembers() - 1;
+        if(teamMembers == 0) {
+            teamRepository.delete(team);
+        }
+        else{
+            team.setTotalMembers(teamMembers);
+            teamRepository.save(team);
+        }
+
         TeamUser member = teamUserRepository.findByUserIdAndTeamId(userId, teamId);
 
         teamUserRepository.delete(member);

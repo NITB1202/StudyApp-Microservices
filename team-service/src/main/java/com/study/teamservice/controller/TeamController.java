@@ -11,7 +11,6 @@ import com.study.teamservice.service.TeamService;
 import io.grpc.stub.StreamObserver;
 import lombok.RequiredArgsConstructor;
 import net.devh.boot.grpc.server.service.GrpcService;
-import org.springframework.data.domain.Page;
 
 import java.util.List;
 import java.util.UUID;
@@ -56,7 +55,7 @@ public class TeamController extends TeamServiceGrpc.TeamServiceImplBase {
 
         UUID userId = UUID.fromString(request.getUserId());
         String nextCursor = !teams.isEmpty() && teams.size() == request.getSize() ?
-                teamService.getJoinDateString(teams.getLast().getId(), userId) : "";
+                teamService.getJoinDateString(teams.get(teams.size() - 1).getId(), userId) : "";
         long total = teamService.countUserTeam(userId);
 
         ListTeamResponse response =  ListTeamResponse.newBuilder()
@@ -76,7 +75,7 @@ public class TeamController extends TeamServiceGrpc.TeamServiceImplBase {
 
         UUID userId = UUID.fromString(request.getUserId());
         String nextCursor = !teams.isEmpty() && teams.size() == request.getSize() ?
-                teamService.getJoinDateString(teams.getLast().getId(), userId) : "";
+                teamService.getJoinDateString(teams.get(teams.size() - 1).getId(), userId) : "";
         long total = teamService.countUserTeamByKeyword(userId, request.getKeyword());
 
         ListTeamResponse response =  ListTeamResponse.newBuilder()
@@ -157,17 +156,18 @@ public class TeamController extends TeamServiceGrpc.TeamServiceImplBase {
 
     @Override
     public void getTeamMembers(GetTeamMembersRequest request, StreamObserver<GetTeamMembersResponse> responseObserver){
-        Page<TeamUser> members = memberService.getTeamMembers(request);
-        List<TeamMemberResponse> memberResponses = members.getContent().stream()
+        List<TeamUser> members = memberService.getTeamMembers(request);
+        List<TeamMemberResponse> memberResponses = members.stream()
                 .map(TeamUserMapper::toTeamMemberResponse)
                 .toList();
 
+        long total = memberService.countMembers(UUID.fromString(request.getTeamId()));
         String nextCursor = !memberResponses.isEmpty() && memberResponses.size() == request.getSize() ?
-                memberResponses.getLast().getUserId() : "";
+                memberResponses.get(memberResponses.size() - 1).getJoinDate() : "";
 
         GetTeamMembersResponse response = GetTeamMembersResponse.newBuilder()
                 .addAllMembers(memberResponses)
-                .setTotal(members.getTotalElements())
+                .setTotal(total)
                 .setNextCursor(nextCursor)
                 .build();
 
