@@ -16,7 +16,6 @@ import com.study.teamservice.repository.TeamRepository;
 import com.study.teamservice.repository.TeamUserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.event.EventListener;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;

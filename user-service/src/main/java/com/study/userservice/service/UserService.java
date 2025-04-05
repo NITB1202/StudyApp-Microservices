@@ -78,10 +78,9 @@ public class UserService {
                 () -> new NotFoundException("User not found")
         );
 
-        //Check if username has already existed, ignore the case username is unchanged.
+        //Check if username has already existed
         if(!request.getUsername().isBlank()){
-            if(!request.getUsername().equals(user.getUsername()) &&
-                    userRepository.existsByUsernameIgnoreCase(request.getUsername()))
+            if(userRepository.existsByUsernameIgnoreCase(request.getUsername()))
                 throw new BusinessException("Username already exists");
             else
                 user.setUsername(request.getUsername());
