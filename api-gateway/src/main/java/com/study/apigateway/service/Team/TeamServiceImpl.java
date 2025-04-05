@@ -5,7 +5,7 @@ import com.study.apigateway.dto.Team.request.UpdateTeamRequestDto;
 import com.study.apigateway.dto.Action.ActionResponseDto;
 import com.study.apigateway.dto.Team.response.ListTeamResponseDto;
 import com.study.apigateway.dto.Team.response.TeamResponseDto;
-import com.study.apigateway.grpcclient.TeamServiceGrpcClient;
+import com.study.apigateway.grpc.TeamServiceGrpcClient;
 import com.study.apigateway.mapper.ActionMapper;
 import com.study.apigateway.mapper.TeamMapper;
 import com.study.common.grpc.ActionResponse;

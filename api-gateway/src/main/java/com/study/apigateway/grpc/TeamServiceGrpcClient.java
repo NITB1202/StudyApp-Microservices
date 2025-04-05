@@ -1,4 +1,4 @@
-package com.study.apigateway.grpcclient;
+package com.study.apigateway.grpc;
 
 import com.study.apigateway.dto.Team.request.CreateTeamRequestDto;
 import com.study.apigateway.dto.Team.request.UpdateTeamRequestDto;

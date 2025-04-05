@@ -1,4 +1,4 @@
-package com.study.apigateway.grpcclient;
+package com.study.apigateway.grpc;
 
 import com.study.apigateway.dto.User.request.CreateUserRequestDto;
 import com.study.apigateway.dto.User.request.UpdateUserRequestDto;
