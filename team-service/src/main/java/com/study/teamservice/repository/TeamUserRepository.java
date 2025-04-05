@@ -1,6 +1,8 @@
 package com.study.teamservice.repository;
 
+import com.study.common.enums.TeamRole;
 import com.study.teamservice.entity.TeamUser;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 
@@ -16,4 +18,16 @@ public interface TeamUserRepository extends JpaRepository<TeamUser, UUID> {
     TeamUser findByUserIdAndTeamId(UUID userId, UUID teamId);
     List<TeamUser> findByTeamId(UUID teamId);
     boolean existsByUserIdAndTeamId(UUID userId, UUID teamId);
+    Page<TeamUser> findByTeamIdAndRoleInAndIdGreaterThan(
+            UUID teamId,
+            List<TeamRole> roleOrder,
+            UUID cursor,
+            Pageable pageable
+    );
+
+    Page<TeamUser> findByTeamIdAndRoleIn(
+            UUID teamId,
+            List<TeamRole> roleOrder,
+            Pageable pageable
+    );
 }

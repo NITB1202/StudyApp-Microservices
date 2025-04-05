@@ -15,9 +15,9 @@ public class InvitationStatusMapper {
 
     public static InvitationStatus toEnum(com.study.teamservice.grpc.InvitationStatus status) {
         return switch (status){
-            case PENDING, UNRECOGNIZED -> InvitationStatus.PENDING;
             case ACCEPTED -> InvitationStatus.ACCEPTED;
             case DECLINED -> InvitationStatus.DECLINED;
+            default -> InvitationStatus.PENDING;
         };
     }
 }

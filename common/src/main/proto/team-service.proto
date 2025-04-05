@@ -103,7 +103,7 @@ message JoinTeamRequest {
   string teamCode = 2;
 }
 
-message GetTeamMemberByIdsRequest {
+message GetTeamMemberByIdRequest {
   string teamId = 1;
   string userId = 2;
 }
@@ -129,7 +129,8 @@ message GetTeamMembersResponse {
 message UpdateMemberRoleRequest {
   string teamId = 1;
   string userId = 2;
-  TeamRole role = 3;
+  string memberId = 3;
+  TeamRole role = 4;
 }
 
 message RemoveTeamMemberRequest {
@@ -163,7 +164,7 @@ service TeamService {
   //Team member section
   rpc CreateInvitation(CreateInvitationRequest) returns (InvitationResponse); // -> notification
   rpc JoinTeam(JoinTeamRequest) returns (common.ActionResponse); // -> notification
-  rpc GetTeamMemberByIds(GetTeamMemberByIdsRequest) returns (TeamMemberResponse);
+  rpc GetTeamMemberById(GetTeamMemberByIdRequest) returns (TeamMemberResponse);
   rpc GetTeamMembers(GetTeamMembersRequest) returns (GetTeamMembersResponse);
   rpc UpdateMemberRole(UpdateMemberRoleRequest) returns (TeamMemberResponse);
   rpc RemoveTeamMember(RemoveTeamMemberRequest) returns (common.ActionResponse); // -> notification
