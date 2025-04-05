@@ -31,8 +31,9 @@ public class TeamController {
     @ApiResponse(responseCode = "200", description = "Create successfully.")
     @ApiResponse(responseCode = "400", description = "Invalid request body.",
             content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
-    public Mono<ResponseEntity<TeamResponseDto>> createTeam(@Valid @RequestBody CreateTeamRequestDto request){
-        return teamService.createTeam(request).map(ResponseEntity::ok);
+    public Mono<ResponseEntity<TeamResponseDto>> createTeam(@RequestParam UUID userId,
+                                                            @Valid @RequestBody CreateTeamRequestDto request){
+        return teamService.createTeam(userId, request).map(ResponseEntity::ok);
     }
 
     @GetMapping("/{id}")

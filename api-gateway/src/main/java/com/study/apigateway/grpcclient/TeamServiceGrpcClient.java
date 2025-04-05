@@ -15,9 +15,9 @@ public class TeamServiceGrpcClient {
     @GrpcClient("team-service")
     private TeamServiceGrpc.TeamServiceBlockingStub stub;
 
-    public TeamResponse createTeam(CreateTeamRequestDto dto){
+    public TeamResponse createTeam(UUID userId, CreateTeamRequestDto dto){
         CreateTeamRequest request = CreateTeamRequest.newBuilder()
-                .setCreatorId(dto.getCreatorId().toString())
+                .setCreatorId(userId.toString())
                 .setName(dto.getName())
                 .setDescription(dto.getDescription() != null ? dto.getDescription() : "")
                 .build();

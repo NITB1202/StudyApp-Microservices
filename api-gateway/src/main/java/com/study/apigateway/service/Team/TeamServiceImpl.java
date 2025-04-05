@@ -27,9 +27,9 @@ public class TeamServiceImpl implements TeamService {
     private final TeamServiceGrpcClient grpcClient;
 
     @Override
-    public Mono<TeamResponseDto> createTeam(CreateTeamRequestDto request) {
+    public Mono<TeamResponseDto> createTeam(UUID userId, CreateTeamRequestDto request) {
         return Mono.fromCallable(() -> {
-            TeamResponse team = grpcClient.createTeam(request);
+            TeamResponse team = grpcClient.createTeam(userId, request);
             return TeamMapper.toResponseDto(team);
         }).subscribeOn(Schedulers.boundedElastic());
     }
