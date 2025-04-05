@@ -1,7 +1,6 @@
 package com.study.teamservice.mapper;
 
 import com.study.common.mappers.InvitationStatusMapper;
-import com.study.teamservice.entity.Invitation;
 import com.study.teamservice.grpc.InvitationResponse;
 
 public class InvitationMapper {
