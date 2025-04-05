@@ -2,6 +2,7 @@ package com.study.teamservice.event;
 
 import lombok.*;
 
+import java.util.List;
 import java.util.UUID;
 
 @Getter @Setter
@@ -11,4 +12,5 @@ import java.util.UUID;
 public class TeamDeletedEvent {
     private UUID id;
     private UUID deletedBy;
+    private List<UUID> memberIds;
 }

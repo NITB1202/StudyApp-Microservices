@@ -31,6 +31,7 @@ public class TeamService {
     private final TeamEventPublisher teamEventPublisher;
     private static final String UPDATE_TOPIC = "team-updated";
     private static final String DELETE_TOPIC = "team-deleted";
+    private final MemberService memberService;
 
     public Team createTeam(CreateTeamRequest request) {
         UUID userId = UUID.fromString(request.getCreatorId());
@@ -166,9 +167,7 @@ public class TeamService {
         }
 
         if(!updatedFields.isEmpty()) {
-            List<UUID> memberIds = teamUserRepository.findByTeamId(teamId).stream()
-                    .map(TeamUser::getUserId)
-                    .toList();
+            List<UUID> memberIds = memberService.getTeamMembersId(teamId);
 
             TeamUpdatedEvent event = TeamUpdatedEvent.builder()
                     .id(teamId)
@@ -197,9 +196,7 @@ public class TeamService {
         team.setAvatarUrl(request.getAvatarUrl());
 
         Set<String> updatedFields = Set.of("avatar");
-        List<UUID> memberIds = teamUserRepository.findByTeamId(team.getId()).stream()
-                .map(TeamUser::getUserId)
-                .toList();
+        List<UUID> memberIds = memberService.getTeamMembersId(team.getId());
 
         TeamUpdatedEvent event = TeamUpdatedEvent.builder()
                 .id(team.getId())
@@ -214,11 +211,13 @@ public class TeamService {
     }
 
     public void deleteTeam(DeleteTeamRequest request) {
-        if(!teamRepository.existsById(UUID.fromString(request.getId())))
+        UUID teamId = UUID.fromString(request.getId());
+
+        if(!teamRepository.existsById(teamId))
             throw new NotFoundException("Team not found");
 
         TeamUser teamUser = teamUserRepository.findByUserIdAndTeamId(
-                UUID.fromString(request.getUserId()), UUID.fromString(request.getId()));
+                UUID.fromString(request.getUserId()), teamId);
 
         if(teamUser == null)
             throw new NotFoundException("User is not part of this team");
@@ -228,9 +227,12 @@ public class TeamService {
 
         teamRepository.deleteById(UUID.fromString(request.getId()));
 
+        List<UUID> memberIds = memberService.getTeamMembersId(teamId);
+
         TeamDeletedEvent event = TeamDeletedEvent.builder()
                 .id(UUID.fromString(request.getId()))
                 .deletedBy(UUID.fromString(request.getUserId()))
+                .memberIds(memberIds)
                 .build();
 
         teamEventPublisher.publishEvent(DELETE_TOPIC, event);
