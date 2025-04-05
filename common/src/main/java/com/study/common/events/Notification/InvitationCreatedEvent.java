@@ -1,4 +1,4 @@
-package com.study.teamservice.event;
+package com.study.common.events.Notification;
 
 import lombok.*;
 
@@ -8,7 +8,8 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class InvitationAcceptEvent {
+public class InvitationCreatedEvent {
     private UUID teamId;
-    private UUID userId;
+    private UUID fromId;
+    private UUID toId;
 }

@@ -1,5 +1,6 @@
 package com.study.teamservice.event;
 
+import com.study.common.events.Notification.InvitationAcceptEvent;
 import com.study.teamservice.service.MemberService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.kafka.annotation.KafkaListener;
