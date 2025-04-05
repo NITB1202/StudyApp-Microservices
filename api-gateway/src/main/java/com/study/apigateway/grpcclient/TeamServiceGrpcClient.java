@@ -66,13 +66,13 @@ public class TeamServiceGrpcClient {
         return stub.searchUserTeamByName(request);
     }
 
-    public TeamResponse updateTeam(UUID id, UpdateTeamRequestDto dto){
+    public TeamResponse updateTeam(UUID userId, UUID teamId, UpdateTeamRequestDto dto){
         String name = dto.getName() != null ? dto.getName() : "";
         String description = dto.getDescription() != null ? dto.getDescription() : "";
 
         UpdateTeamRequest request = UpdateTeamRequest.newBuilder()
-                .setId(id.toString())
-                .setUserId(dto.getUserId().toString())
+                .setId(teamId.toString())
+                .setUserId(userId.toString())
                 .setName(name)
                 .setDescription(description)
                 .build();

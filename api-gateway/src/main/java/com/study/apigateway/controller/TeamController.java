@@ -68,25 +68,26 @@ public class TeamController {
         return teamService.searchUserTeamByName(userId, keyword, cursor, size).map(ResponseEntity::ok);
     }
 
-    @PatchMapping("/{id}")
+    @PatchMapping("/{teamId}")
     @Operation(summary = "Update a specific team")
     @ApiResponse(responseCode = "200", description = "Update successfully.")
     @ApiResponse(responseCode = "400", description = "Invalid request body.",
             content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     @ApiResponse(responseCode = "404", description = "Not found",
             content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
-    public Mono<ResponseEntity<TeamResponseDto>> updateTeam(@PathVariable UUID id,
+    public Mono<ResponseEntity<TeamResponseDto>> updateTeam(@PathVariable UUID teamId,
+                                                            @RequestParam UUID userId,
                                                             @Valid @RequestBody UpdateTeamRequestDto request){
-        return teamService.updateTeam(id, request).map(ResponseEntity::ok);
+        return teamService.updateTeam(userId, teamId, request).map(ResponseEntity::ok);
     }
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/{teamId}")
     @Operation(summary = "Delete a specific team.")
     @ApiResponse(responseCode = "200", description = "Delete successfully.")
     @ApiResponse(responseCode = "404", description = "Not found",
             content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
-    public Mono<ResponseEntity<ActionResponseDto>> deleteTeam(@PathVariable UUID id,
+    public Mono<ResponseEntity<ActionResponseDto>> deleteTeam(@PathVariable UUID teamId,
                                                               @RequestParam UUID userId){
-        return teamService.deleteTeam(id, userId).map(ResponseEntity::ok);
+        return teamService.deleteTeam(teamId, userId).map(ResponseEntity::ok);
     }
 }

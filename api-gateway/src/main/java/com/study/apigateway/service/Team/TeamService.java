@@ -15,7 +15,7 @@ public interface TeamService {
     Mono<TeamResponseDto> getTeamById(UUID id);
     Mono<ListTeamResponseDto> getUserTeams(UUID userId, LocalDate cursor, int size);
     Mono<ListTeamResponseDto> searchUserTeamByName(UUID userId, String keyword, LocalDate cursor, int size);
-    Mono<TeamResponseDto> updateTeam(UUID id, UpdateTeamRequestDto request);
+    Mono<TeamResponseDto> updateTeam(UUID userId, UUID teamId, UpdateTeamRequestDto request);
     Mono<ActionResponseDto> deleteTeam(UUID id, UUID userId);
 
     UUID getFirstTeamId(UUID userId);
