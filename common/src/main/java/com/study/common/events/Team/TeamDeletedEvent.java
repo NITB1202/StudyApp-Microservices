@@ -1,18 +1,16 @@
-package com.study.teamservice.event;
+package com.study.common.events.Team;
 
 import lombok.*;
 
 import java.util.List;
-import java.util.Set;
 import java.util.UUID;
 
 @Getter @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class TeamUpdatedEvent {
+public class TeamDeletedEvent {
     private UUID id;
-    private UUID updatedBy;
+    private UUID deletedBy;
     private List<UUID> memberIds;
-    private Set<String> updatedFields;
 }

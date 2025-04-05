@@ -50,4 +50,5 @@ public interface TeamRepository extends JpaRepository<Team, UUID> {
     long countUserTeamsByKeyword(@Param("userId") UUID userId,
                                  @Param("keyword") String keyword);
 
+    Team findByTeamCode(String teamCode);
 }

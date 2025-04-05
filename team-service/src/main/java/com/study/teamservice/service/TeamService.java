@@ -5,9 +5,9 @@ import com.study.common.exceptions.BusinessException;
 import com.study.common.exceptions.NotFoundException;
 import com.study.teamservice.entity.Team;
 import com.study.teamservice.entity.TeamUser;
-import com.study.teamservice.event.TeamDeletedEvent;
+import com.study.common.events.Team.TeamDeletedEvent;
 import com.study.teamservice.event.TeamEventPublisher;
-import com.study.teamservice.event.TeamUpdatedEvent;
+import com.study.common.events.Team.TeamUpdatedEvent;
 import com.study.teamservice.grpc.*;
 import com.study.teamservice.repository.TeamUserRepository;
 import com.study.teamservice.repository.TeamRepository;
@@ -28,7 +28,10 @@ public class TeamService {
     private final TeamRepository teamRepository;
     private final TeamUserRepository teamUserRepository;
     private final CodeService codeService;
+    private final MemberService memberService;
     private final TeamEventPublisher teamEventPublisher;
+
+    private static final int DEFAULT_SIZE = 10;
     private static final String UPDATE_TOPIC = "team-updated";
     private static final String DELETE_TOPIC = "team-deleted";
 
@@ -92,7 +95,7 @@ public class TeamService {
 
     public List<Team> getUserTeams(GetUserTeamsRequest request) {
         //Validate request
-        int size = request.getSize() > 0 ? request.getSize() : 10;
+        int size = request.getSize() > 0 ? request.getSize() : DEFAULT_SIZE;
         LocalDate cursor = request.getCursor().isEmpty() ? null : LocalDate.parse(request.getCursor());
         UUID userId = UUID.fromString(request.getUserId());
 
@@ -119,7 +122,7 @@ public class TeamService {
     }
 
     public List<Team> searchUserTeamByName(SearchUserTeamByNameRequest request) {
-        int size = request.getSize() > 0 ? request.getSize() : 10;
+        int size = request.getSize() > 0 ? request.getSize() : DEFAULT_SIZE;
         LocalDate cursor = request.getCursor().isEmpty() ? null : LocalDate.parse(request.getCursor());
         UUID userId = UUID.fromString(request.getUserId());
         String keyword = "%" + request.getKeyword().trim() + "%";
@@ -143,7 +146,7 @@ public class TeamService {
                 () -> new NotFoundException("Team not found")
         );
 
-        if(userDoesNotHavePermissionToUpdate(userId, teamId))
+        if(memberService.userDoesNotHavePermissionToUpdate(userId, teamId))
             throw new BusinessException("User doesn't have permission to update this team");
 
         Set<String> updatedFields = new HashSet<>();
@@ -166,9 +169,7 @@ public class TeamService {
         }
 
         if(!updatedFields.isEmpty()) {
-            List<UUID> memberIds = teamUserRepository.findByTeamId(teamId).stream()
-                    .map(TeamUser::getUserId)
-                    .toList();
+            List<UUID> memberIds = memberService.getTeamMembersId(teamId);
 
             TeamUpdatedEvent event = TeamUpdatedEvent.builder()
                     .id(teamId)
@@ -184,11 +185,14 @@ public class TeamService {
     }
 
     public void uploadTeamAvatar(UploadTeamAvatarRequest request) {
-        Team team = teamRepository.findById(UUID.fromString(request.getTeamId())).orElseThrow(
+        UUID teamId = UUID.fromString(request.getTeamId());
+        UUID userId = UUID.fromString(request.getUserId());
+
+        Team team = teamRepository.findById(teamId).orElseThrow(
                 () -> new NotFoundException("Team not found")
         );
 
-        if(userDoesNotHavePermissionToUpdate(UUID.fromString(request.getUserId()), UUID.fromString(request.getTeamId())))
+        if(memberService.userDoesNotHavePermissionToUpdate(userId, teamId))
             throw new BusinessException("User doesn't have permission to update this team");
 
         if(request.getAvatarUrl().isBlank())
@@ -197,13 +201,11 @@ public class TeamService {
         team.setAvatarUrl(request.getAvatarUrl());
 
         Set<String> updatedFields = Set.of("avatar");
-        List<UUID> memberIds = teamUserRepository.findByTeamId(team.getId()).stream()
-                .map(TeamUser::getUserId)
-                .toList();
+        List<UUID> memberIds = memberService.getTeamMembersId(teamId);
 
         TeamUpdatedEvent event = TeamUpdatedEvent.builder()
-                .id(team.getId())
-                .updatedBy(UUID.fromString(request.getUserId()))
+                .id(teamId)
+                .updatedBy(userId)
                 .updatedFields(updatedFields)
                 .memberIds(memberIds)
                 .build();
@@ -214,11 +216,13 @@ public class TeamService {
     }
 
     public void deleteTeam(DeleteTeamRequest request) {
-        if(!teamRepository.existsById(UUID.fromString(request.getId())))
+        UUID teamId = UUID.fromString(request.getId());
+        UUID userId = UUID.fromString(request.getUserId());
+
+        if(!teamRepository.existsById(teamId))
             throw new NotFoundException("Team not found");
 
-        TeamUser teamUser = teamUserRepository.findByUserIdAndTeamId(
-                UUID.fromString(request.getUserId()), UUID.fromString(request.getId()));
+        TeamUser teamUser = teamUserRepository.findByUserIdAndTeamId(userId, teamId);
 
         if(teamUser == null)
             throw new NotFoundException("User is not part of this team");
@@ -226,23 +230,17 @@ public class TeamService {
         if(teamUser.getRole() != TeamRole.CREATOR)
             throw new BusinessException("User doesn't have permission to delete this team");
 
-        teamRepository.deleteById(UUID.fromString(request.getId()));
+        teamRepository.deleteById(teamId);
+
+        List<UUID> memberIds = memberService.getTeamMembersId(teamId);
 
         TeamDeletedEvent event = TeamDeletedEvent.builder()
-                .id(UUID.fromString(request.getId()))
-                .deletedBy(UUID.fromString(request.getUserId()))
+                .id(teamId)
+                .deletedBy(userId)
+                .memberIds(memberIds)
                 .build();
 
         teamEventPublisher.publishEvent(DELETE_TOPIC, event);
-    }
-
-    private boolean userDoesNotHavePermissionToUpdate(UUID userId, UUID teamId) {
-        TeamUser teamUser = teamUserRepository.findByUserIdAndTeamId(userId, teamId);
-
-        if(teamUser == null)
-            throw new NotFoundException("User is not part of this team");
-
-        return teamUser.getRole() == TeamRole.MEMBER;
     }
 
     public String getJoinDateString(UUID teamId, UUID userId){
