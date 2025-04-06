@@ -176,9 +176,13 @@ public class TeamController extends TeamServiceGrpc.TeamServiceImplBase {
     }
 
     @Override
-    public void updateMemberRole(UpdateMemberRoleRequest request, StreamObserver<TeamMemberResponse> responseObserver){
-        TeamUser member = memberService.updateMemberRole(request);
-        TeamMemberResponse response = TeamUserMapper.toTeamMemberResponse(member);
+    public void updateTeamMemberRole(UpdateMemberRoleRequest request, StreamObserver<ActionResponse> responseObserver){
+        memberService.updateTeamMemberRole(request);
+        ActionResponse response = ActionResponse.newBuilder()
+                .setSuccess(true)
+                .setMessage("Update member's role success")
+                .build();
+
         responseObserver.onNext(response);
         responseObserver.onCompleted();
     }

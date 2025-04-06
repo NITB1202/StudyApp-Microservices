@@ -151,7 +151,7 @@ service TeamService {
   rpc JoinTeam(JoinTeamRequest) returns (common.ActionResponse); // -> notification
   rpc GetTeamMemberById(GetTeamMemberByIdRequest) returns (TeamMemberResponse);
   rpc GetTeamMembers(GetTeamMembersRequest) returns (GetTeamMembersResponse);
-  rpc UpdateMemberRole(UpdateMemberRoleRequest) returns (TeamMemberResponse);
+  rpc UpdateTeamMemberRole(UpdateMemberRoleRequest) returns (common.ActionResponse);
   rpc RemoveTeamMember(RemoveTeamMemberRequest) returns (common.ActionResponse); // -> notification
   rpc LeaveTeam(LeaveTeamRequest) returns (common.ActionResponse); // -> notification
 }
