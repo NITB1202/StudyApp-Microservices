@@ -116,7 +116,7 @@ public class MemberService {
         return teamUserRepository.countByTeamId(teamId);
     }
 
-    public TeamUser updateMemberRole(UpdateMemberRoleRequest request) {
+    public void updateTeamMemberRole(UpdateMemberRoleRequest request) {
         UUID teamId = UUID.fromString(request.getTeamId());
         UUID userId = UUID.fromString(request.getUserId());
         UUID memberId = UUID.fromString(request.getMemberId());
@@ -130,7 +130,7 @@ public class MemberService {
 
         member.setRole(TeamRoleMapper.toEnum(request.getRole()));
 
-        return teamUserRepository.save(member);
+        teamUserRepository.save(member);
     }
 
     public void removeTeamMember(RemoveTeamMemberRequest request) {
