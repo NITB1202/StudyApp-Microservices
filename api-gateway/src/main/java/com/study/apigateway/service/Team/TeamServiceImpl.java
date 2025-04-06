@@ -5,7 +5,7 @@ import com.study.apigateway.dto.Team.request.UpdateTeamRequestDto;
 import com.study.apigateway.dto.Action.ActionResponseDto;
 import com.study.apigateway.dto.Team.response.ListTeamResponseDto;
 import com.study.apigateway.dto.Team.response.TeamResponseDto;
-import com.study.apigateway.grpcclient.TeamServiceGrpcClient;
+import com.study.apigateway.grpc.TeamServiceGrpcClient;
 import com.study.apigateway.mapper.ActionMapper;
 import com.study.apigateway.mapper.TeamMapper;
 import com.study.common.grpc.ActionResponse;
@@ -27,9 +27,9 @@ public class TeamServiceImpl implements TeamService {
     private final TeamServiceGrpcClient grpcClient;
 
     @Override
-    public Mono<TeamResponseDto> createTeam(CreateTeamRequestDto request) {
+    public Mono<TeamResponseDto> createTeam(UUID userId, CreateTeamRequestDto request) {
         return Mono.fromCallable(() -> {
-            TeamResponse team = grpcClient.createTeam(request);
+            TeamResponse team = grpcClient.createTeam(userId, request);
             return TeamMapper.toResponseDto(team);
         }).subscribeOn(Schedulers.boundedElastic());
     }
@@ -76,9 +76,9 @@ public class TeamServiceImpl implements TeamService {
     }
 
     @Override
-    public Mono<TeamResponseDto> updateTeam(UUID id, UpdateTeamRequestDto request) {
+    public Mono<TeamResponseDto> updateTeam(UUID userId, UUID teamId, UpdateTeamRequestDto request) {
         return Mono.fromCallable(()->{
-            TeamResponse team = grpcClient.updateTeam(id, request);
+            TeamResponse team = grpcClient.updateTeam(userId, teamId, request);
             return TeamMapper.toResponseDto(team);
         }).subscribeOn(Schedulers.boundedElastic());
     }

@@ -1,4 +1,4 @@
-package com.study.apigateway.grpcclient;
+package com.study.apigateway.grpc;
 
 import com.study.apigateway.dto.Team.request.CreateTeamRequestDto;
 import com.study.apigateway.dto.Team.request.UpdateTeamRequestDto;
@@ -15,9 +15,9 @@ public class TeamServiceGrpcClient {
     @GrpcClient("team-service")
     private TeamServiceGrpc.TeamServiceBlockingStub stub;
 
-    public TeamResponse createTeam(CreateTeamRequestDto dto){
+    public TeamResponse createTeam(UUID userId, CreateTeamRequestDto dto){
         CreateTeamRequest request = CreateTeamRequest.newBuilder()
-                .setCreatorId(dto.getCreatorId().toString())
+                .setCreatorId(userId.toString())
                 .setName(dto.getName())
                 .setDescription(dto.getDescription() != null ? dto.getDescription() : "")
                 .build();
@@ -66,13 +66,13 @@ public class TeamServiceGrpcClient {
         return stub.searchUserTeamByName(request);
     }
 
-    public TeamResponse updateTeam(UUID id, UpdateTeamRequestDto dto){
+    public TeamResponse updateTeam(UUID userId, UUID teamId, UpdateTeamRequestDto dto){
         String name = dto.getName() != null ? dto.getName() : "";
         String description = dto.getDescription() != null ? dto.getDescription() : "";
 
         UpdateTeamRequest request = UpdateTeamRequest.newBuilder()
-                .setId(id.toString())
-                .setUserId(dto.getUserId().toString())
+                .setId(teamId.toString())
+                .setUserId(userId.toString())
                 .setName(name)
                 .setDescription(description)
                 .build();
