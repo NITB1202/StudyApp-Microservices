@@ -69,7 +69,7 @@ public class TeamController {
     }
 
     @PatchMapping("/{teamId}")
-    @Operation(summary = "Update a specific team")
+    @Operation(summary = "Update team's information.")
     @ApiResponse(responseCode = "200", description = "Update successfully.")
     @ApiResponse(responseCode = "400", description = "Invalid request body.",
             content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
@@ -82,7 +82,7 @@ public class TeamController {
     }
 
     @DeleteMapping("/{teamId}")
-    @Operation(summary = "Delete a specific team.")
+    @Operation(summary = "Delete a team.")
     @ApiResponse(responseCode = "200", description = "Delete successfully.")
     @ApiResponse(responseCode = "404", description = "Not found.",
             content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
