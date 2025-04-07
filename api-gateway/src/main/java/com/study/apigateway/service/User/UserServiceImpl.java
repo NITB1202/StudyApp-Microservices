@@ -38,20 +38,6 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public ListUserResponseDto getUsersByListOfIds(List<UUID> ids, UUID cursor, int size) {
-        ListUserResponse response = userServiceGrpcClient.getUsersByListOfIds(ids, cursor, size);
-
-        UUID nextCursor = response.getNextCursor().isEmpty() ? null : UUID.fromString(response.getNextCursor());
-        List<UserResponseDto> users = UserMapper.toResponseDtoList(response.getUsersList());
-
-        return ListUserResponseDto.builder()
-                .users(users)
-                .total(response.getTotal())
-                .nextCursor(nextCursor)
-                .build();
-    }
-
-    @Override
     public Mono<ListUserResponseDto> searchUserByUsername(String keyword, UUID cursor, int size) {
         return Mono.fromCallable(() -> {
             ListUserResponse response = userServiceGrpcClient.searchUserByUsername(keyword, cursor, size);
