@@ -6,7 +6,6 @@ import com.study.apigateway.dto.User.response.ListUserResponseDto;
 import com.study.apigateway.dto.User.response.UserResponseDto;
 import reactor.core.publisher.Mono;
 
-import java.util.List;
 import java.util.UUID;
 
 public interface UserService {
@@ -14,7 +13,4 @@ public interface UserService {
     Mono<UserResponseDto> getUserById(UUID id);
     Mono<ListUserResponseDto> searchUserByUsername(String keyword, UUID cursor, int size);
     Mono<UserResponseDto> updateUser(UUID id, UpdateUserRequestDto user);
-
-    //internal -> Used by another service
-    ListUserResponseDto getUsersByListOfIds(List<UUID> ids, UUID cursor, int size);
 }
