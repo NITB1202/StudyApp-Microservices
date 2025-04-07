@@ -113,4 +113,8 @@ public class UserService {
         user.setAvatarUrl(request.getAvatarUrl());
         userRepository.save(user);
     }
+
+    public boolean existsById(ExistsByIdRequest request){
+        return userRepository.existsById(UUID.fromString(request.getId()));
+    }
 }

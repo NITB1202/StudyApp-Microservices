@@ -87,4 +87,15 @@ public class UserController extends UserServiceGrpc.UserServiceImplBase{
         responseObserver.onNext(response);
         responseObserver.onCompleted();
     }
+
+    @Override
+    public void existsById(ExistsByIdRequest request, StreamObserver<ExistsByIdResponse> responseObserver){
+        boolean exists = userService.existsById(request);
+        ExistsByIdResponse response = ExistsByIdResponse.newBuilder()
+                .setExists(exists)
+                .build();
+
+        responseObserver.onNext(response);
+        responseObserver.onCompleted();
+    }
 }
