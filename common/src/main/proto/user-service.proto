@@ -63,6 +63,14 @@ message UploadUserAvatarRequest {
   string avatarUrl = 2;
 }
 
+message ExistsByIdRequest{
+  string id = 1;
+}
+
+message ExistsByIdResponse {
+  bool exists = 1;
+}
+
 // gRPC Service
 service UserService {
   rpc CreateUser(CreateUserRequest) returns (UserResponse);
@@ -71,4 +79,5 @@ service UserService {
   rpc SearchUserByUsername(SearchUserRequest) returns (ListUserResponse);
   rpc UpdateUser(UpdateUserRequest) returns (UserResponse);
   rpc UploadUserAvatar(UploadUserAvatarRequest) returns (common.ActionResponse);
+  rpc ExistsById(ExistsByIdRequest) returns (ExistsByIdResponse);
 }
