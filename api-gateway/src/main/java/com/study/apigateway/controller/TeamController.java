@@ -39,7 +39,7 @@ public class TeamController {
     @GetMapping("/{id}")
     @Operation(summary = "Get team's information by id.")
     @ApiResponse(responseCode = "200", description = "Get successfully")
-    @ApiResponse(responseCode = "404", description = "Not found",
+    @ApiResponse(responseCode = "404", description = "Not found.",
             content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     public Mono<ResponseEntity<TeamResponseDto>> getTeamById(@PathVariable UUID id){
         return teamService.getTeamById(id).map(ResponseEntity::ok);
@@ -48,7 +48,7 @@ public class TeamController {
     @GetMapping("/all")
     @Operation(summary = "Get part of the user's teams.")
     @ApiResponse(responseCode = "200", description = "Get successfully.")
-    @ApiResponse(responseCode = "404", description = "Not found",
+    @ApiResponse(responseCode = "404", description = "Not found.",
             content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     public Mono<ResponseEntity<ListTeamResponseDto>> getUserTeams(@RequestParam UUID userId,
                                                                   @RequestParam(required = false) LocalDate cursor,
@@ -59,7 +59,7 @@ public class TeamController {
     @GetMapping("/search")
     @Operation(summary = "Search for user's teams by name.")
     @ApiResponse(responseCode = "200", description = "Search successfully.")
-    @ApiResponse(responseCode = "404", description = "Not found",
+    @ApiResponse(responseCode = "404", description = "Not found.",
             content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     public Mono<ResponseEntity<ListTeamResponseDto>> searchTeams(@RequestParam UUID userId,
                                                                  @RequestParam String keyword,
@@ -73,7 +73,7 @@ public class TeamController {
     @ApiResponse(responseCode = "200", description = "Update successfully.")
     @ApiResponse(responseCode = "400", description = "Invalid request body.",
             content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
-    @ApiResponse(responseCode = "404", description = "Not found",
+    @ApiResponse(responseCode = "404", description = "Not found.",
             content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     public Mono<ResponseEntity<TeamResponseDto>> updateTeam(@PathVariable UUID teamId,
                                                             @RequestParam UUID userId,
@@ -84,7 +84,7 @@ public class TeamController {
     @DeleteMapping("/{teamId}")
     @Operation(summary = "Delete a specific team.")
     @ApiResponse(responseCode = "200", description = "Delete successfully.")
-    @ApiResponse(responseCode = "404", description = "Not found",
+    @ApiResponse(responseCode = "404", description = "Not found.",
             content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     public Mono<ResponseEntity<ActionResponseDto>> deleteTeam(@PathVariable UUID teamId,
                                                               @RequestParam UUID userId){
