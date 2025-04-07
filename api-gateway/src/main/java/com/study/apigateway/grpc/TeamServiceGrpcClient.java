@@ -148,6 +148,7 @@ public class TeamServiceGrpcClient {
     public ActionResponse updateTeamMemberRole(UUID userId, UpdateMemberRoleRequestDto dto){
         UpdateMemberRoleRequest request = UpdateMemberRoleRequest.newBuilder()
                 .setUserId(userId.toString())
+                .setTeamId(dto.getTeamId().toString())
                 .setMemberId(dto.getMemberId().toString())
                 .setRole(TeamRoleMapper.toProtoEnum(dto.getRole()))
                 .build();
