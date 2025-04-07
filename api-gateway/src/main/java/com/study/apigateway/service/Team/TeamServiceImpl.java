@@ -6,8 +6,10 @@ import com.study.apigateway.dto.Action.ActionResponseDto;
 import com.study.apigateway.dto.Team.response.ListTeamResponseDto;
 import com.study.apigateway.dto.Team.response.TeamResponseDto;
 import com.study.apigateway.grpc.TeamServiceGrpcClient;
+import com.study.apigateway.grpc.UserServiceGrpcClient;
 import com.study.apigateway.mapper.ActionMapper;
 import com.study.apigateway.mapper.TeamMapper;
+import com.study.common.exceptions.NotFoundException;
 import com.study.common.grpc.ActionResponse;
 import com.study.teamservice.grpc.GetFirstTeamIdResponse;
 import com.study.teamservice.grpc.ListTeamResponse;
@@ -25,10 +27,14 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class TeamServiceImpl implements TeamService {
     private final TeamServiceGrpcClient grpcClient;
+    private final UserServiceGrpcClient userClient;
 
     @Override
     public Mono<TeamResponseDto> createTeam(UUID userId, CreateTeamRequestDto request) {
         return Mono.fromCallable(() -> {
+            if(!userClient.existsById(userId).getExists()){
+                throw new NotFoundException("User not found");
+            }
             TeamResponse team = grpcClient.createTeam(userId, request);
             return TeamMapper.toResponseDto(team);
         }).subscribeOn(Schedulers.boundedElastic());
