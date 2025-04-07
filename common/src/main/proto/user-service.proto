@@ -33,12 +33,6 @@ message GetUserByIdRequest {
   string id = 1;
 }
 
-message GetUsersByListOfIdsRequest {
-  repeated string ids = 1;
-  string cursor = 2;
-  int32 size = 3;
-}
-
 message ListUserResponse {
   repeated UserResponse users = 1;
   int64 total = 2;
@@ -75,7 +69,6 @@ message ExistsByIdResponse {
 service UserService {
   rpc CreateUser(CreateUserRequest) returns (UserResponse);
   rpc GetUserById(GetUserByIdRequest) returns (UserResponse);
-  rpc GetUsersByListOfIds(GetUsersByListOfIdsRequest) returns (ListUserResponse);
   rpc SearchUserByUsername(SearchUserRequest) returns (ListUserResponse);
   rpc UpdateUser(UpdateUserRequest) returns (UserResponse);
   rpc UploadUserAvatar(UploadUserAvatarRequest) returns (common.ActionResponse);
