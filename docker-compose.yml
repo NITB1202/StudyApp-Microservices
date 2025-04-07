@@ -41,6 +41,68 @@ services:
     networks:
       - backend
 
+  zookeeper:
+    image: confluentinc/cp-zookeeper:latest
+    container_name: zookeeper
+    restart: always
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+    networks:
+      - backend
+
+  kafka:
+    image: confluentinc/cp-kafka:latest
+    container_name: kafka
+    restart: always
+    depends_on:
+      - zookeeper
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9080,PLAINTEXT_LOCAL://localhost:9081
+      KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9080,PLAINTEXT_LOCAL://0.0.0.0:9081
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_LOCAL:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
+    networks:
+      - backend
+
+  team-db:
+    image: postgres:15
+    container_name: team-db
+    restart: always
+    ports:
+      - "5433:5432"
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      - team-db-data:/var/lib/postgresql/data
+    networks:
+      - backend
+
+  team-service:
+    build:
+      context: ./team-service
+    container_name: team-service
+    restart: always
+    depends_on:
+      - zookeeper
+      - kafka
+      - team-db
+      - eureka-server
+    environment:
+      SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE}
+      TEAM_SERVICE_DB_HOST: ${TEAM_SERVICE_DB_HOST}
+      TEAM_SERVICE_DB_PORT: ${TEAM_SERVICE_DB_PORT}
+      TEAM_SERVICE_DB_NAME: ${TEAM_SERVICE_DB_NAME}
+      TEAM_SERVICE_DB_USERNAME: ${TEAM_SERVICE_DB_USERNAME}
+      TEAM_SERVICE_DB_PASSWORD: ${TEAM_SERVICE_DB_PASSWORD}
+    networks:
+      - backend
+
   api-gateway:
     build:
       context: ./api-gateway
@@ -56,40 +118,9 @@ services:
     networks:
       - backend
 
-  zookeeper:
-    image: confluentinc/cp-zookeeper:latest
-    container_name: zookeeper
-    restart: always
-    environment:
-      ZOOKEEPER_CLIENT_PORT: 2181
-    ports:
-      - "2181:2181"
-    networks:
-      - backend
-
-  kafka:
-    image: confluentinc/cp-kafka:latest
-    container_name: kafka
-    restart: always
-    depends_on:
-      - zookeeper
-    ports:
-      - "9081:9081"
-      - "9080:9080"
-    environment:
-      KAFKA_BROKER_ID: 1
-      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
-      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9080,PLAINTEXT_LOCAL://localhost:9081
-      KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9080,PLAINTEXT_LOCAL://0.0.0.0:9081
-      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_LOCAL:PLAINTEXT
-      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
-      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
-      KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
-    networks:
-      - backend
-
 volumes:
   user-db-data:
+  team-db-data:
 
 networks:
   backend:

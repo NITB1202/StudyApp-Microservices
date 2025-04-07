@@ -48,11 +48,11 @@ public class MemberService {
         }
 
         if(!teamUserRepository.existsByUserIdAndTeamId(inviterId, teamId)) {
-            throw new NotFoundException("User is not in this team");
+            throw new NotFoundException("User id or team id is incorrect");
         }
 
         if(teamUserRepository.existsByUserIdAndTeamId(inviteeId, teamId)) {
-           throw new BusinessException("This user is already in the team");
+           throw new BusinessException("The invitee is already in the team");
         }
 
         InvitationCreatedEvent event = InvitationCreatedEvent.builder()
@@ -65,13 +65,19 @@ public class MemberService {
     }
 
     public void joinTeam(JoinTeamRequest request) {
+        UUID userId = UUID.fromString(request.getUserId());
+
         Team team = teamRepository.findByTeamCode(request.getTeamCode());
 
         if(team == null) {
             throw new NotFoundException("Team does not exist");
         }
 
-        addNewMember(team.getId(), UUID.fromString(request.getUserId()));
+        if(teamUserRepository.existsByUserIdAndTeamId(userId, team.getId())) {
+            throw new BusinessException("User is already in the team");
+        }
+
+        addNewMember(team.getId(), userId);
     }
 
     public TeamUser getTeamMemberById(GetTeamMemberByIdRequest request) {
@@ -81,6 +87,7 @@ public class MemberService {
         if(member == null) {
             throw new NotFoundException("This user is not part of the team");
         }
+
         return member;
     }
 
@@ -187,7 +194,7 @@ public class MemberService {
         TeamUser member = teamUserRepository.findByUserIdAndTeamId(memberId, teamId);
 
         if(member == null) {
-            throw new NotFoundException("This user is not part of the team");
+            throw new NotFoundException("Member id or team id is incorrect");
         }
 
         if(member.getRole() == TeamRole.CREATOR) {
