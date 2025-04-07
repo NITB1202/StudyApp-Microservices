@@ -11,7 +11,6 @@ import com.study.apigateway.mapper.ActionMapper;
 import com.study.apigateway.mapper.TeamMapper;
 import com.study.common.exceptions.NotFoundException;
 import com.study.common.grpc.ActionResponse;
-import com.study.teamservice.grpc.GetFirstTeamIdResponse;
 import com.study.teamservice.grpc.ListTeamResponse;
 import com.study.teamservice.grpc.TeamResponse;
 import lombok.RequiredArgsConstructor;
@@ -95,11 +94,5 @@ public class TeamServiceImpl implements TeamService {
             ActionResponse response = grpcClient.deleteTeam(id, userId);
             return ActionMapper.toResponseDto(response);
         }).subscribeOn(Schedulers.boundedElastic());
-    }
-
-    @Override
-    public UUID getFirstTeamId(UUID userId) {
-        GetFirstTeamIdResponse team = grpcClient.getFirstTeamId(userId);
-        return UUID.fromString(team.getTeamId());
     }
 }
