@@ -28,9 +28,9 @@ public class MemberController {
     private final MemberService memberService;
 
     @PostMapping("/invitation")
-    @Operation(summary = "Invite a user to the team")
-    @ApiResponse(responseCode = "200", description = "Invite successfully")
-    @ApiResponse(responseCode = "404", description = "Not found",
+    @Operation(summary = "Invite a user to the team.")
+    @ApiResponse(responseCode = "200", description = "Invite successfully.")
+    @ApiResponse(responseCode = "404", description = "Not found.",
             content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     public Mono<ResponseEntity<ActionResponseDto>> createInvitation(@RequestParam UUID userId,
                                                                     @Valid @RequestBody CreateInvitationRequestDto request){
@@ -38,9 +38,9 @@ public class MemberController {
     }
 
     @PostMapping
-    @Operation(summary = "Join a team by team code")
-    @ApiResponse(responseCode = "200", description = "Join successfully")
-    @ApiResponse(responseCode = "404", description = "Not found",
+    @Operation(summary = "Join a team by team code.")
+    @ApiResponse(responseCode = "200", description = "Join successfully.")
+    @ApiResponse(responseCode = "404", description = "Not found.",
             content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     public Mono<ResponseEntity<ActionResponseDto>> joinTeam(@RequestParam UUID userId,
                                                             @RequestParam String teamCode){
@@ -48,9 +48,9 @@ public class MemberController {
     }
 
     @GetMapping
-    @Operation(summary = "Get the team member information by id")
-    @ApiResponse(responseCode = "200", description = "Get successfully")
-    @ApiResponse(responseCode = "404", description = "Not found",
+    @Operation(summary = "Get the team member information by id.")
+    @ApiResponse(responseCode = "200", description = "Get successfully.")
+    @ApiResponse(responseCode = "404", description = "Not found.",
             content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     public Mono<ResponseEntity<TeamMemberResponseDto>> getTeamMemberById(@RequestParam UUID teamId,
                                                                          @RequestParam UUID memberId){
@@ -58,9 +58,9 @@ public class MemberController {
     }
 
     @GetMapping("/list")
-    @Operation(summary = "Get a list of team members")
-    @ApiResponse(responseCode = "200", description = "Get successfully")
-    @ApiResponse(responseCode = "404", description = "Not found",
+    @Operation(summary = "Get a list of team members.")
+    @ApiResponse(responseCode = "200", description = "Get successfully.")
+    @ApiResponse(responseCode = "404", description = "Not found.",
             content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     public Mono<ResponseEntity<ListTeamMemberResponseDto>> getTeamMembers(@RequestParam UUID teamId,
                                                                           @RequestParam(required = false) LocalDate cursor,
@@ -69,11 +69,11 @@ public class MemberController {
     }
 
     @PatchMapping
-    @Operation(summary = "Update the role of a specific team member")
-    @ApiResponse(responseCode = "200", description = "Update successfully")
-    @ApiResponse(responseCode = "400", description = "Invalid request body",
+    @Operation(summary = "Update the role of a specific team member.")
+    @ApiResponse(responseCode = "200", description = "Update successfully.")
+    @ApiResponse(responseCode = "400", description = "Invalid request body.",
             content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
-    @ApiResponse(responseCode = "404", description = "Not found",
+    @ApiResponse(responseCode = "404", description = "Not found.",
             content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     public Mono<ResponseEntity<ActionResponseDto>> updateTeamMemberRole(@RequestParam UUID userId,
                                                                         @Valid @RequestBody UpdateMemberRoleRequestDto request){
@@ -81,9 +81,9 @@ public class MemberController {
     }
 
     @DeleteMapping
-    @Operation(summary = "Remove a member from the team")
-    @ApiResponse(responseCode = "200", description = "Delete successfully")
-    @ApiResponse(responseCode = "404", description = "Not found",
+    @Operation(summary = "Remove a member from the team.")
+    @ApiResponse(responseCode = "200", description = "Delete successfully.")
+    @ApiResponse(responseCode = "404", description = "Not found.",
             content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     public Mono<ResponseEntity<ActionResponseDto>> removeTeamMember(@RequestParam UUID userId,
                                                                     @Valid @RequestBody RemoveTeamMemberRequestDto request){
@@ -91,9 +91,9 @@ public class MemberController {
     }
 
     @DeleteMapping("/leave")
-    @Operation(summary = "Leave a team")
-    @ApiResponse(responseCode = "200", description = "Leave successfully")
-    @ApiResponse(responseCode = "404", description = "Not found",
+    @Operation(summary = "Leave a team.")
+    @ApiResponse(responseCode = "200", description = "Leave successfully.")
+    @ApiResponse(responseCode = "404", description = "Not found.",
             content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     public Mono<ResponseEntity<ActionResponseDto>> leaveTeam(@RequestParam UUID userId,
                                                              @RequestParam UUID teamId){

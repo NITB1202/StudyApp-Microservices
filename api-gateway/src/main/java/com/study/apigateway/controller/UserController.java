@@ -35,15 +35,15 @@ public class UserController {
 
     @GetMapping("/{id}")
     @Operation(summary = "Get user's information by id.")
-    @ApiResponse(responseCode = "200", description = "Get successfully")
-    @ApiResponse(responseCode = "404", description = "Not found",
+    @ApiResponse(responseCode = "200", description = "Get successfully.")
+    @ApiResponse(responseCode = "404", description = "Not found.",
             content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     public Mono<ResponseEntity<UserResponseDto>> getUserById(@PathVariable UUID id) {
         return userService.getUserById(id).map(ResponseEntity::ok);
     }
 
     @GetMapping("/search")
-    @Operation(summary = "Search for users by username")
+    @Operation(summary = "Search for users by username.")
     @ApiResponse(responseCode = "200", description = "Search successfully.")
     public Mono<ResponseEntity<ListUserResponseDto>> searchUsersByUsername(@RequestParam String keyword,
                                                                            @RequestParam(required = false) UUID cursor,
@@ -52,11 +52,11 @@ public class UserController {
     }
 
     @PatchMapping("/{id}")
-    @Operation(summary = "Update a specific user.")
+    @Operation(summary = "Update user's information.")
     @ApiResponse(responseCode = "200", description = "Update successfully.")
     @ApiResponse(responseCode = "400", description = "Invalid request body.",
             content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
-    @ApiResponse(responseCode = "404", description = "Not found",
+    @ApiResponse(responseCode = "404", description = "Not found.",
             content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     public Mono<ResponseEntity<UserResponseDto>> updateUser(@PathVariable UUID id,
                                                             @Valid @RequestBody UpdateUserRequestDto request) {
