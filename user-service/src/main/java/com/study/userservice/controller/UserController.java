@@ -33,24 +33,6 @@ public class UserController extends UserServiceGrpc.UserServiceImplBase{
     }
 
     @Override
-    public void getUsersByListOfIds(GetUsersByListOfIdsRequest request, StreamObserver<ListUserResponse> responseObserver){
-        List<User> users = userService.getUsersByListOfIds(request);
-        List<UserResponse> userResponses = UserMapper.toUserResponseList(users);
-
-        // Determine next cursor
-        String nextCursor = !users.isEmpty() && users.size() == request.getSize() ? users.get(users.size() - 1).getId().toString() : "";
-
-        ListUserResponse response = ListUserResponse.newBuilder()
-                .addAllUsers(userResponses)
-                .setTotal(request.getIdsCount())
-                .setNextCursor(nextCursor)
-                .build();
-
-        responseObserver.onNext(response);
-        responseObserver.onCompleted();
-    }
-
-    @Override
     public void searchUserByUsername(SearchUserRequest request, StreamObserver<ListUserResponse> responseObserver){
         List<User> users = userService.searchUsersByUsername(request);
         List<UserResponse> userResponses = UserMapper.toUserResponseList(users);

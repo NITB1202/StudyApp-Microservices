@@ -48,18 +48,6 @@ public class UserService {
         );
     }
 
-    public List<User> getUsersByListOfIds(GetUsersByListOfIdsRequest request) {
-        List<UUID> ids = request.getIdsList().stream()
-                .map(UUID::fromString)
-                .toList();
-        UUID cursor = request.getCursor().isBlank() ? null : UUID.fromString(request.getCursor());
-        int size = request.getSize() > 0 ? request.getSize() : 10;
-
-        Pageable pageable = PageRequest.of(0, size, Sort.by("id").ascending());
-
-        return userRepository.findByIdsWithCursor(ids, cursor, pageable);
-    }
-
     public List<User> searchUsersByUsername(SearchUserRequest request) {
         int size = request.getSize() > 0 ? request.getSize() : 10;
         UUID cursor = request.getCursor().isEmpty() ? null : UUID.fromString(request.getCursor());
