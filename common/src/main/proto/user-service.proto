@@ -57,7 +57,7 @@ message UploadUserAvatarRequest {
   string avatarUrl = 2;
 }
 
-message ExistsByIdRequest{
+message ExistsByIdRequest {
   string id = 1;
 }
 
