@@ -124,15 +124,6 @@ public class TeamServiceGrpcClient {
         return stub.joinTeam(request);
     }
 
-    public TeamMemberResponse getTeamMemberById(UUID teamId, UUID memberId){
-        GetTeamMemberByIdRequest request = GetTeamMemberByIdRequest.newBuilder()
-                .setTeamId(teamId.toString())
-                .setUserId(memberId.toString())
-                .build();
-
-        return stub.getTeamMemberById(request);
-    }
-
     public GetTeamMembersResponse getTeamMembers(UUID teamId, LocalDate cursor, int size){
         String cursorDate = cursor != null ? cursor.toString() : "";
 

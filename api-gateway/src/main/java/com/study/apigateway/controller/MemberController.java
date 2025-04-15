@@ -5,7 +5,6 @@ import com.study.apigateway.dto.Notification.request.CreateInvitationRequestDto;
 import com.study.apigateway.dto.Team.request.RemoveTeamMemberRequestDto;
 import com.study.apigateway.dto.Team.request.UpdateMemberRoleRequestDto;
 import com.study.apigateway.dto.Team.response.ListTeamMemberResponseDto;
-import com.study.apigateway.dto.Team.response.TeamMemberResponseDto;
 import com.study.apigateway.exception.ErrorResponse;
 import com.study.apigateway.service.Team.MemberService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -45,16 +44,6 @@ public class MemberController {
     public Mono<ResponseEntity<ActionResponseDto>> joinTeam(@RequestParam UUID userId,
                                                             @RequestParam String teamCode){
         return memberService.joinTeam(userId, teamCode).map(ResponseEntity::ok);
-    }
-
-    @GetMapping
-    @Operation(summary = "Get the team member information by id.")
-    @ApiResponse(responseCode = "200", description = "Get successfully.")
-    @ApiResponse(responseCode = "404", description = "Not found.",
-            content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
-    public Mono<ResponseEntity<TeamMemberResponseDto>> getTeamMemberById(@RequestParam UUID teamId,
-                                                                         @RequestParam UUID memberId){
-        return memberService.getTeamMemberById(teamId, memberId).map(ResponseEntity::ok);
     }
 
     @GetMapping("/list")
