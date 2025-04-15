@@ -31,16 +31,6 @@ public class TeamController extends TeamServiceGrpc.TeamServiceImplBase {
     }
 
     @Override
-    public void getFirstTeamId(GetFirstTeamIdRequest request, StreamObserver<GetFirstTeamIdResponse> responseObserver){
-        UUID teamId = teamService.getFirstTeamId(request);
-        GetFirstTeamIdResponse response = GetFirstTeamIdResponse.newBuilder()
-                .setTeamId(teamId.toString())
-                .build();
-        responseObserver.onNext(response);
-        responseObserver.onCompleted();
-    }
-
-    @Override
     public void getTeamById(GetTeamByIdRequest request, StreamObserver<TeamResponse> responseObserver){
         Team team = teamService.getTeamById(request);
         TeamResponse response = TeamMapper.toTeamResponse(team);

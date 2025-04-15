@@ -77,16 +77,6 @@ public class TeamService {
         }
     }
 
-    public UUID getFirstTeamId(GetFirstTeamIdRequest request) {
-        TeamUser teamUser = teamUserRepository.getFirstByUserIdOrderByJoinDateDesc(UUID.fromString(request.getUserId()));
-
-        if(teamUser == null){
-            throw new NotFoundException("User haven't joined any team");
-        }
-
-        return teamUser.getTeamId();
-    }
-
     public Team getTeamById(GetTeamByIdRequest request) {
         return teamRepository.findById(UUID.fromString(request.getId())).orElseThrow(
                 () -> new NotFoundException("Team not found")

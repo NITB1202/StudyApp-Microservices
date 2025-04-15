@@ -33,14 +33,6 @@ message TeamResponse {
   string avatarUrl = 8;
 }
 
-message GetFirstTeamIdRequest {
-  string userId = 1;
-}
-
-message GetFirstTeamIdResponse {
-  string teamId = 1;
-}
-
 message GetTeamByIdRequest {
   string id = 1;
 }
@@ -133,7 +125,6 @@ message UploadTeamAvatarRequest {
 service TeamService {
   //Team section
   rpc CreateTeam(CreateTeamRequest) returns (TeamResponse);
-  rpc GetFirstTeamId(GetFirstTeamIdRequest) returns (GetFirstTeamIdResponse);
   rpc GetTeamById(GetTeamByIdRequest) returns (TeamResponse);
   rpc GetUserTeams(GetUserTeamsRequest) returns (ListTeamResponse);
   rpc SearchUserTeamByName(SearchUserTeamByNameRequest) returns (ListTeamResponse);
