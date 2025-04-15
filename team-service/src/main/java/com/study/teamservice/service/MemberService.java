@@ -80,17 +80,6 @@ public class MemberService {
         addNewMember(team.getId(), userId);
     }
 
-    public TeamUser getTeamMemberById(GetTeamMemberByIdRequest request) {
-        TeamUser member = teamUserRepository.findByUserIdAndTeamId(
-                UUID.fromString(request.getUserId()), UUID.fromString(request.getTeamId()));
-
-        if(member == null) {
-            throw new NotFoundException("This user is not part of the team");
-        }
-
-        return member;
-    }
-
     public List<TeamUser> getTeamMembers(GetTeamMembersRequest request) {
         int size = request.getSize() > 0 ? request.getSize() : DEFAULT_SIZE;
         LocalDate cursor = request.getCursor().isEmpty() ? null : LocalDate.parse(request.getCursor());

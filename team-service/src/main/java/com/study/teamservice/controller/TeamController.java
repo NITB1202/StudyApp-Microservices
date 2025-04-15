@@ -147,14 +147,6 @@ public class TeamController extends TeamServiceGrpc.TeamServiceImplBase {
     }
 
     @Override
-    public void getTeamMemberById(GetTeamMemberByIdRequest request, StreamObserver<TeamMemberResponse> responseObserver){
-        TeamUser member = memberService.getTeamMemberById(request);
-        TeamMemberResponse response = TeamUserMapper.toTeamMemberResponse(member);
-        responseObserver.onNext(response);
-        responseObserver.onCompleted();
-    }
-
-    @Override
     public void getTeamMembers(GetTeamMembersRequest request, StreamObserver<GetTeamMembersResponse> responseObserver){
         List<TeamUser> members = memberService.getTeamMembers(request);
         List<TeamMemberResponse> memberResponses = members.stream()
