@@ -38,14 +38,6 @@ public class TeamServiceGrpcClient {
         return stub.getTeamById(request);
     }
 
-    public GetFirstTeamIdResponse getFirstTeamId(UUID userId){
-        GetFirstTeamIdRequest request = GetFirstTeamIdRequest.newBuilder()
-                .setUserId(userId.toString())
-                .build();
-
-        return stub.getFirstTeamId(request);
-    }
-
     public ListTeamResponse getUserTeams(UUID userId, LocalDate cursor, int size){
         String cursorDate = cursor != null ? cursor.toString() : "";
 
