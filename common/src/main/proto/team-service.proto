@@ -88,11 +88,6 @@ message JoinTeamRequest {
   string teamCode = 2;
 }
 
-message GetTeamMemberByIdRequest {
-  string teamId = 1;
-  string userId = 2;
-}
-
 message TeamMemberResponse {
   string userId = 1;
   string joinDate = 2;
@@ -149,7 +144,6 @@ service TeamService {
   //Team member section
   rpc CreateInvitation(CreateInvitationRequest) returns (common.ActionResponse); // -> notification
   rpc JoinTeam(JoinTeamRequest) returns (common.ActionResponse); // -> notification
-  rpc GetTeamMemberById(GetTeamMemberByIdRequest) returns (TeamMemberResponse);
   rpc GetTeamMembers(GetTeamMembersRequest) returns (GetTeamMembersResponse);
   rpc UpdateTeamMemberRole(UpdateMemberRoleRequest) returns (common.ActionResponse);
   rpc RemoveTeamMember(RemoveTeamMemberRequest) returns (common.ActionResponse); // -> notification
