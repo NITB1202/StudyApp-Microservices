@@ -6,15 +6,11 @@ import com.study.apigateway.dto.Team.request.RemoveTeamMemberRequestDto;
 import com.study.apigateway.dto.Team.request.UpdateMemberRoleRequestDto;
 import com.study.apigateway.dto.Team.response.ListTeamMemberResponseDto;
 import com.study.apigateway.dto.Team.response.TeamMemberResponseDto;
-import com.study.apigateway.dto.User.response.UserResponseDto;
 import com.study.apigateway.grpc.TeamServiceGrpcClient;
 import com.study.apigateway.grpc.UserServiceGrpcClient;
 import com.study.apigateway.mapper.ActionMapper;
 import com.study.apigateway.mapper.TeamMemberMapper;
-import com.study.apigateway.mapper.UserMapper;
-import com.study.apigateway.service.User.UserService;
 import com.study.common.grpc.ActionResponse;
-import com.study.common.mappers.TeamRoleMapper;
 import com.study.teamservice.grpc.GetTeamMembersResponse;
 import com.study.teamservice.grpc.TeamMemberResponse;
 import com.study.userservice.grpc.UserResponse;
@@ -47,15 +43,6 @@ public class MemberServiceImpl implements MemberService {
         return Mono.fromCallable(()->{
             ActionResponse response = teamGrpcClient.joinTeam(userId, teamCode);
             return ActionMapper.toResponseDto(response);
-        }).subscribeOn(Schedulers.boundedElastic());
-    }
-
-    @Override
-    public Mono<TeamMemberResponseDto> getTeamMemberById(UUID teamId, UUID memberId) {
-        return Mono.fromCallable(()->{
-            TeamMemberResponse teamUser = teamGrpcClient.getTeamMemberById(teamId, memberId);
-            UserResponse user = userGrpcClient.getUserById(memberId);
-            return TeamMemberMapper.toTeamMemberResponseDto(teamUser, user);
         }).subscribeOn(Schedulers.boundedElastic());
     }
 
