@@ -10,7 +10,6 @@ import java.util.List;
 import java.util.UUID;
 
 public interface TeamUserRepository extends JpaRepository<TeamUser, UUID> {
-    TeamUser getFirstByUserIdOrderByJoinDateDesc(UUID userId);
     List<TeamUser> findByUserIdOrderByJoinDateDesc(UUID userId, Pageable pageable);
     List<TeamUser> findByUserIdAndJoinDateBeforeOrderByJoinDateDesc(UUID userId, LocalDate joinDate, Pageable pageable);
     Long countByUserId(UUID userId);
