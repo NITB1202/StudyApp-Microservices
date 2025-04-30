@@ -5,17 +5,16 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.List;
 import java.util.UUID;
 
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class ListUserResponseDto {
-    private List<UserSummaryResponseDto> users;
+public class UserSummaryResponseDto {
+    private UUID id;
 
-    private Long total;
+    private String username;
 
-    private UUID nextCursor;
+    private String avatarUrl;
 }

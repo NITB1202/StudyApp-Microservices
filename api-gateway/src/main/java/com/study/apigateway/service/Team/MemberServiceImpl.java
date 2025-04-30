@@ -13,7 +13,7 @@ import com.study.apigateway.mapper.TeamMemberMapper;
 import com.study.common.grpc.ActionResponse;
 import com.study.teamservice.grpc.GetTeamMembersResponse;
 import com.study.teamservice.grpc.TeamMemberResponse;
-import com.study.userservice.grpc.UserResponse;
+import com.study.userservice.grpc.UserDetailResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
@@ -57,7 +57,7 @@ public class MemberServiceImpl implements MemberService {
             List<TeamMemberResponseDto> members = new ArrayList<>();
 
             for(TeamMemberResponse teamUser : teamUsers) {
-                UserResponse user = userGrpcClient.getUserById(UUID.fromString(teamUser.getUserId()));
+                UserDetailResponse user = userGrpcClient.getUserById(UUID.fromString(teamUser.getUserId()));
                 TeamMemberResponseDto dto = TeamMemberMapper.toTeamMemberResponseDto(teamUser, user);
                 members.add(dto);
             }

@@ -3,6 +3,7 @@ package com.study.apigateway.controller;
 import com.study.apigateway.dto.User.request.CreateUserRequestDto;
 import com.study.apigateway.dto.User.request.UpdateUserRequestDto;
 import com.study.apigateway.dto.User.response.ListUserResponseDto;
+import com.study.apigateway.dto.User.response.UserDetailResponseDto;
 import com.study.apigateway.dto.User.response.UserResponseDto;
 import com.study.apigateway.exception.ErrorResponse;
 import com.study.apigateway.service.User.UserService;
@@ -38,7 +39,7 @@ public class UserController {
     @ApiResponse(responseCode = "200", description = "Get successfully.")
     @ApiResponse(responseCode = "404", description = "Not found.",
             content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
-    public Mono<ResponseEntity<UserResponseDto>> getUserById(@PathVariable UUID id) {
+    public Mono<ResponseEntity<UserDetailResponseDto>> getUserById(@PathVariable UUID id) {
         return userService.getUserById(id).map(ResponseEntity::ok);
     }
 
