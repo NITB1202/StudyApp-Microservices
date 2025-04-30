@@ -26,7 +26,7 @@ public class UserServiceGrpcClient {
         return userServiceStub.createUser(request);
     }
 
-    public UserResponse getUserById(UUID id) {
+    public UserDetailResponse getUserById(UUID id) {
         GetUserByIdRequest request = GetUserByIdRequest.newBuilder()
                 .setId(id.toString())
                 .build();

@@ -3,7 +3,7 @@ package com.study.apigateway.mapper;
 import com.study.apigateway.dto.Team.response.TeamMemberResponseDto;
 import com.study.common.mappers.TeamRoleMapper;
 import com.study.teamservice.grpc.TeamMemberResponse;
-import com.study.userservice.grpc.UserResponse;
+import com.study.userservice.grpc.UserDetailResponse;
 
 import java.time.LocalDate;
 import java.util.UUID;
@@ -11,7 +11,7 @@ import java.util.UUID;
 public class TeamMemberMapper {
     private TeamMemberMapper(){}
 
-    public static TeamMemberResponseDto toTeamMemberResponseDto(TeamMemberResponse teamUser, UserResponse user) {
+    public static TeamMemberResponseDto toTeamMemberResponseDto(TeamMemberResponse teamUser, UserDetailResponse user) {
         return TeamMemberResponseDto.builder()
                 .userId(UUID.fromString(user.getId()))
                 .username(user.getUsername())

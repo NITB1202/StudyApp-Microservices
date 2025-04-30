@@ -14,7 +14,7 @@ import java.util.UUID;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class UserResponseDto {
+public class UserDetailResponseDto {
     private UUID id;
 
     private String username;
@@ -24,4 +24,6 @@ public class UserResponseDto {
 
     @JsonFormat(shape = JsonFormat.Shape.STRING)
     private Gender gender;
+
+    private String avatarUrl;
 }
