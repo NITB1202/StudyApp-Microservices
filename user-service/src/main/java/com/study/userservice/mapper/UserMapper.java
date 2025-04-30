@@ -2,10 +2,12 @@ package com.study.userservice.mapper;
 
 import com.study.common.mappers.GenderMapper;
 import com.study.userservice.enity.User;
+import com.study.userservice.grpc.ListUserResponse;
+import com.study.userservice.grpc.UserDetailResponse;
 import com.study.userservice.grpc.UserResponse;
+import com.study.userservice.grpc.UserSummaryResponse;
 
 import java.util.List;
-import java.util.Objects;
 
 public class UserMapper {
     //Private constructor to prevent initializing object
@@ -17,13 +19,36 @@ public class UserMapper {
                 .setUsername(user.getUsername())
                 .setDateOfBirth(user.getDateOfBirth().toString())
                 .setGender(GenderMapper.toProtoEnum(user.getGender()))
-                .setAvatarUrl(Objects.requireNonNullElse(user.getAvatarUrl(), ""))
                 .build();
     }
 
-    public static List<UserResponse> toUserResponseList(List<User> users){
-        return users.stream()
-                .map(UserMapper::toUserResponse)
+    public static UserDetailResponse toUserDetailResponse(User user){
+        return UserDetailResponse.newBuilder()
+                .setId(user.getId().toString())
+                .setUsername(user.getUsername())
+                .setDateOfBirth(user.getDateOfBirth().toString())
+                .setGender(GenderMapper.toProtoEnum(user.getGender()))
+                .setAvatarUrl(user.getAvatarUrl())
+                .build();
+    }
+
+    public static UserSummaryResponse toUserSummaryResponse(User user){
+        return UserSummaryResponse.newBuilder()
+                .setId(user.getId().toString())
+                .setUsername(user.getUsername())
+                .setAvatarUrl(user.getAvatarUrl())
+                .build();
+    }
+
+    public static ListUserResponse toListUserResponse(List<User> users, long total, String nextCursor){
+        List<UserSummaryResponse> userResponses = users.stream()
+                .map(UserMapper::toUserSummaryResponse)
                 .toList();
+
+        return ListUserResponse.newBuilder()
+                .addAllUsers(userResponses)
+                .setTotal(total)
+                .setNextCursor(nextCursor)
+                .build();
     }
 }
