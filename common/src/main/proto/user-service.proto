@@ -26,23 +26,36 @@ message UserResponse {
   string username = 2;
   string dateOfBirth = 3;
   Gender gender = 4;
-  string avatarUrl = 5;
 }
 
 message GetUserByIdRequest {
   string id = 1;
 }
 
-message ListUserResponse {
-  repeated UserResponse users = 1;
-  int64 total = 2;
-  string nextCursor = 3;
+message UserDetailResponse {
+  string id = 1;
+  string username = 2;
+  string dateOfBirth = 3;
+  Gender gender = 4;
+  string avatarUrl = 5;
 }
 
 message SearchUserRequest {
   string keyword = 1;
   string cursor = 2;
   int32 size = 3;
+}
+
+message UserSummaryResponse {
+  string id = 1;
+  string username = 2;
+  string avatarUrl = 3;
+}
+
+message ListUserResponse {
+  repeated UserSummaryResponse users = 1;
+  int64 total = 2;
+  string nextCursor = 3;
 }
 
 message UpdateUserRequest {
@@ -68,7 +81,7 @@ message ExistsByIdResponse {
 // gRPC Service
 service UserService {
   rpc CreateUser(CreateUserRequest) returns (UserResponse);
-  rpc GetUserById(GetUserByIdRequest) returns (UserResponse);
+  rpc GetUserById(GetUserByIdRequest) returns (UserDetailResponse);
   rpc SearchUserByUsername(SearchUserRequest) returns (ListUserResponse);
   rpc UpdateUser(UpdateUserRequest) returns (UserResponse);
   rpc UploadUserAvatar(UploadUserAvatarRequest) returns (common.ActionResponse);

@@ -37,6 +37,7 @@ public class UserService {
                 .username(request.getUsername())
                 .dateOfBirth(dateOfBirth)
                 .gender(GenderMapper.toEnum(request.getGender()))
+                .avatarUrl("")
                 .build();
 
         return userRepository.save(user);

@@ -25,9 +25,9 @@ public class UserController extends UserServiceGrpc.UserServiceImplBase{
     }
 
     @Override
-    public void getUserById(GetUserByIdRequest request, StreamObserver<UserResponse> responseObserver){
+    public void getUserById(GetUserByIdRequest request, StreamObserver<UserDetailResponse> responseObserver){
         User user = userService.getUserById(request);
-        UserResponse response = UserMapper.toUserResponse(user);
+        UserDetailResponse response = UserMapper.toUserDetailResponse(user);
         responseObserver.onNext(response);
         responseObserver.onCompleted();
     }
@@ -35,16 +35,10 @@ public class UserController extends UserServiceGrpc.UserServiceImplBase{
     @Override
     public void searchUserByUsername(SearchUserRequest request, StreamObserver<ListUserResponse> responseObserver){
         List<User> users = userService.searchUsersByUsername(request);
-        List<UserResponse> userResponses = UserMapper.toUserResponseList(users);
-
         long total = userService.countUsersByUsername(request.getKeyword());
         String nextCursor = !users.isEmpty() && users.size() == request.getSize() ? users.get(users.size() - 1).getId().toString() : "";
 
-        ListUserResponse response = ListUserResponse.newBuilder()
-                .addAllUsers(userResponses)
-                .setTotal(total)
-                .setNextCursor(nextCursor)
-                .build();
+        ListUserResponse response = UserMapper.toListUserResponse(users, total, nextCursor);
 
         responseObserver.onNext(response);
         responseObserver.onCompleted();
