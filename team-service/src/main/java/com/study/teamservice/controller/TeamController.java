@@ -31,9 +31,9 @@ public class TeamController extends TeamServiceGrpc.TeamServiceImplBase {
     }
 
     @Override
-    public void getTeamById(GetTeamByIdRequest request, StreamObserver<TeamResponse> responseObserver){
+    public void getTeamById(GetTeamByIdRequest request, StreamObserver<TeamDetailResponse> responseObserver){
         Team team = teamService.getTeamById(request);
-        TeamResponse response = TeamMapper.toTeamResponse(team);
+        TeamDetailResponse response = TeamMapper.toTeamDetailResponse(team);
         responseObserver.onNext(response);
         responseObserver.onCompleted();
     }
@@ -41,18 +41,14 @@ public class TeamController extends TeamServiceGrpc.TeamServiceImplBase {
     @Override
     public void getUserTeams(GetUserTeamsRequest request, StreamObserver<ListTeamResponse> responseObserver){
         List<Team> teams = teamService.getUserTeams(request);
-        List<TeamResponse> teamResponses = TeamMapper.toTeamResponseList(teams);
 
         UUID userId = UUID.fromString(request.getUserId());
-        String nextCursor = !teams.isEmpty() && teams.size() == request.getSize() ?
-                teamService.getJoinDateString(teams.get(teams.size() - 1).getId(), userId) : "";
-        long total = teamService.countUserTeam(userId);
 
-        ListTeamResponse response =  ListTeamResponse.newBuilder()
-                .addAllTeams(teamResponses)
-                .setTotal(total)
-                .setNextCursor(nextCursor)
-                .build();
+        List<TeamSummaryResponse> teamResponses = teamService.toListTeamSummaryResponse(teams, userId);
+        String nextCursor = memberService.calculateNextPageCursor(userId, teams, request.getSize());
+        long total = memberService.countTeams(userId);
+
+        ListTeamResponse response = TeamMapper.toListTeamResponse(teamResponses, total, nextCursor);
 
         responseObserver.onNext(response);
         responseObserver.onCompleted();
@@ -61,18 +57,15 @@ public class TeamController extends TeamServiceGrpc.TeamServiceImplBase {
     @Override
     public void searchUserTeamByName(SearchUserTeamByNameRequest request, StreamObserver<ListTeamResponse> responseObserver){
         List<Team> teams = teamService.searchUserTeamByName(request);
-        List<TeamResponse> teamResponses = TeamMapper.toTeamResponseList(teams);
 
         UUID userId = UUID.fromString(request.getUserId());
-        String nextCursor = !teams.isEmpty() && teams.size() == request.getSize() ?
-                teamService.getJoinDateString(teams.get(teams.size() - 1).getId(), userId) : "";
+
+        List<TeamSummaryResponse> teamResponses = teamService.toListTeamSummaryResponse(teams, userId);
+
+        String nextCursor = memberService.calculateNextPageCursor(userId, teams, request.getSize());
         long total = teamService.countUserTeamByKeyword(userId, request.getKeyword());
 
-        ListTeamResponse response =  ListTeamResponse.newBuilder()
-                .addAllTeams(teamResponses)
-                .setTotal(total)
-                .setNextCursor(nextCursor)
-                .build();
+        ListTeamResponse response =  TeamMapper.toListTeamResponse(teamResponses, total, nextCursor);
 
         responseObserver.onNext(response);
         responseObserver.onCompleted();
@@ -137,21 +130,20 @@ public class TeamController extends TeamServiceGrpc.TeamServiceImplBase {
     }
 
     @Override
-    public void getTeamMembers(GetTeamMembersRequest request, StreamObserver<GetTeamMembersResponse> responseObserver){
+    public void getTeamMember(GetTeamMemberRequest request, StreamObserver<TeamMemberResponse> responseObserver){
+        TeamUser teamUser = memberService.getTeamMember(request);
+        TeamMemberResponse response = TeamUserMapper.toTeamMemberResponse(teamUser);
+        responseObserver.onNext(response);
+        responseObserver.onCompleted();
+    }
+
+    @Override
+    public void getTeamMembers(GetTeamMembersRequest request, StreamObserver<ListTeamMembersResponse> responseObserver){
         List<TeamUser> members = memberService.getTeamMembers(request);
-        List<TeamMemberResponse> memberResponses = members.stream()
-                .map(TeamUserMapper::toTeamMemberResponse)
-                .toList();
-
         long total = memberService.countMembers(UUID.fromString(request.getTeamId()));
-        String nextCursor = !memberResponses.isEmpty() && memberResponses.size() == request.getSize() ?
-                memberResponses.get(memberResponses.size() - 1).getJoinDate() : "";
 
-        GetTeamMembersResponse response = GetTeamMembersResponse.newBuilder()
-                .addAllMembers(memberResponses)
-                .setTotal(total)
-                .setNextCursor(nextCursor)
-                .build();
+        ListTeamMembersResponse response = TeamUserMapper
+                .toListTeamMemberResponse(members, total, request.getSize());
 
         responseObserver.onNext(response);
         responseObserver.onCompleted();

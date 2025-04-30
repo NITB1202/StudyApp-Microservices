@@ -30,7 +30,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class MemberService {
     private final TeamUserRepository teamUserRepository;
-    private final TeamRepository teamRepository;
+    private final TeamService teamService;
     private final TeamEventPublisher teamEventPublisher;
 
     private static final int DEFAULT_SIZE = 10;
@@ -43,7 +43,7 @@ public class MemberService {
         UUID inviterId = UUID.fromString(request.getInviterId());
         UUID inviteeId = UUID.fromString(request.getInviteeId());
 
-        if(!teamRepository.existsById(teamId)) {
+        if(!teamService.existsById(teamId)) {
             throw new NotFoundException("Team does not exist");
         }
 
@@ -67,7 +67,7 @@ public class MemberService {
     public void joinTeam(JoinTeamRequest request) {
         UUID userId = UUID.fromString(request.getUserId());
 
-        Team team = teamRepository.findByTeamCode(request.getTeamCode());
+        Team team = teamService.getByTeamCode(request.getTeamCode());
 
         if(team == null) {
             throw new NotFoundException("Team does not exist");
@@ -78,6 +78,12 @@ public class MemberService {
         }
 
         addNewMember(team.getId(), userId);
+    }
+
+    public TeamUser getTeamMember(GetTeamMemberRequest request) {
+        UUID userId = UUID.fromString(request.getUserId());
+        UUID teamId = UUID.fromString(request.getTeamId());
+        return teamUserRepository.findByUserIdAndTeamId(userId, teamId);
     }
 
     public List<TeamUser> getTeamMembers(GetTeamMembersRequest request) {
@@ -106,10 +112,6 @@ public class MemberService {
                     pageable
             );
         }
-    }
-
-    public long countMembers(UUID teamId){
-        return teamUserRepository.countByTeamId(teamId);
     }
 
     public void updateTeamMemberRole(UpdateMemberRoleRequest request) {
@@ -152,12 +154,106 @@ public class MemberService {
             throw new NotFoundException("User is not part of the team");
         }
 
+        // Check if any non-member (ADMIN/CREATOR) exists in the team
+        long nonMemberCount = teamUserRepository.countNonMemberByTeamId(teamId);
+        if (nonMemberCount == 0) {
+            throw new BusinessException("You are the last manager of the team." +
+                    " Please hand over your responsibilities before leaving.");
+        }
+
         removeMember(teamId, userId);
     }
 
     @EventListener
     public void acceptInvitation(InvitationAcceptEvent request) {
         addNewMember(request.getTeamId(), request.getUserId());
+    }
+
+
+    private void validateUpdateMemberRequest(UUID teamId, UUID userId, UUID memberId) {
+        if(userDoesNotHavePermissionToUpdate(userId, teamId)) {
+            throw new BusinessException("User does not have permission to perform this action.");
+        }
+
+        TeamUser member = teamUserRepository.findByUserIdAndTeamId(memberId, teamId);
+
+        if(member == null) {
+            throw new NotFoundException("Member id or team id is incorrect");
+        }
+
+        if(member.getRole() == TeamRole.CREATOR) {
+            throw new BusinessException("Can't update the creator of the team");
+        }
+    }
+
+    private void addNewMember(UUID teamId, UUID userId) {
+        teamService.increaseMember(teamId);
+        createUserTeam(teamId, userId, TeamRole.MEMBER);
+
+        List<UUID> memberIds = getTeamMembersId(teamId);
+
+        UserJoinedTeamEvent event = UserJoinedTeamEvent.builder()
+                .teamId(teamId)
+                .userId(userId)
+                .memberIds(memberIds)
+                .build();
+
+        teamEventPublisher.publishEvent(USER_JOINED_TOPIC, event);
+    }
+
+    private void removeMember(UUID teamId, UUID userId){
+        teamService.decreaseMember(teamId);
+        TeamUser member = teamUserRepository.findByUserIdAndTeamId(userId, teamId);
+
+        teamUserRepository.delete(member);
+
+        List<UUID> memberIds = getTeamMembersId(teamId);
+
+        UserLeftTeamEvent event = UserLeftTeamEvent.builder()
+                .teamId(teamId)
+                .userId(userId)
+                .memberIds(memberIds)
+                .build();
+
+        teamEventPublisher.publishEvent(USER_LEFT_TOPIC, event);
+    }
+
+    public void createUserTeam(UUID teamId, UUID userId, TeamRole role) {
+        TeamUser teamUser = TeamUser.builder()
+                .teamId(teamId)
+                .userId(userId)
+                .role(role)
+                .joinDate(LocalDate.now())
+                .build();
+
+        teamUserRepository.save(teamUser);
+    }
+
+    public long countTeams(UUID userId){
+        return teamUserRepository.countByUserId(userId);
+    }
+
+    public long countMembers(UUID teamId){
+        return teamUserRepository.countByTeamId(teamId);
+    }
+
+    public TeamUser getByUserIdAndTeamId(UUID userId, UUID teamId) {
+        return teamUserRepository.findByUserIdAndTeamId(userId, teamId);
+    }
+
+    public List<TeamUser> getUserTeamsByCursor(UUID userId, LocalDate cursor, Pageable pageable) {
+        return cursor != null ?
+                teamUserRepository.findByUserIdAndJoinDateBeforeOrderByJoinDateDesc(userId, cursor, pageable) :
+                teamUserRepository.findByUserIdOrderByJoinDateDesc(userId, pageable);
+    }
+
+    public String calculateNextPageCursor(UUID userId, List<Team> teams, int requestSize) {
+        if(teams.isEmpty()) return "";
+
+        Team lastTeam = teams.get(teams.size() - 1);
+        TeamUser memberInfo = teamUserRepository.findByUserIdAndTeamId(userId, lastTeam.getId());
+
+        return teams.size() == requestSize ? memberInfo.getJoinDate().toString() : "";
     }
 
     public List<UUID> getTeamMembersId(UUID teamId) {
@@ -175,76 +271,9 @@ public class MemberService {
         return teamUser.getRole() == TeamRole.MEMBER;
     }
 
-    public void validateUpdateMemberRequest(UUID teamId, UUID userId, UUID memberId) {
-        if(userDoesNotHavePermissionToUpdate(userId, teamId)) {
-            throw new BusinessException("User does not have permission to perform this action.");
-        }
-
-        TeamUser member = teamUserRepository.findByUserIdAndTeamId(memberId, teamId);
-
-        if(member == null) {
-            throw new NotFoundException("Member id or team id is incorrect");
-        }
-
-        if(member.getRole() == TeamRole.CREATOR) {
-            throw new BusinessException("Can't update the creator of the team");
-        }
-    }
-
-    private void addNewMember(UUID teamId, UUID userId) {
-        Team team = teamRepository.findById(teamId).orElseThrow(
-                ()-> new NotFoundException("Team does not exist")
-        );
-
-        team.setTotalMembers(team.getTotalMembers() + 1);
-        teamRepository.save(team);
-
-        TeamUser teamUser = TeamUser.builder()
-                .teamId(teamId)
-                .userId(userId)
-                .role(TeamRole.MEMBER)
-                .joinDate(LocalDate.now())
-                .build();
-
-        teamUserRepository.save(teamUser);
-
-        List<UUID> memberIds = getTeamMembersId(teamId);
-
-        UserJoinedTeamEvent event = UserJoinedTeamEvent.builder()
-                .teamId(teamId)
-                .userId(userId)
-                .memberIds(memberIds)
-                .build();
-
-        teamEventPublisher.publishEvent(USER_JOINED_TOPIC, event);
-    }
-
-    private void removeMember(UUID teamId, UUID userId){
-        Team team = teamRepository.findById(teamId).orElseThrow(
-                ()-> new NotFoundException("Team does not exist")
-        );
-
-        int teamMembers = team.getTotalMembers() - 1;
-        if(teamMembers == 0) {
-            teamRepository.delete(team);
-        }
-        else{
-            team.setTotalMembers(teamMembers);
-            teamRepository.save(team);
-        }
-
-        TeamUser member = teamUserRepository.findByUserIdAndTeamId(userId, teamId);
-
-        teamUserRepository.delete(member);
-
-        List<UUID> memberIds = getTeamMembersId(teamId);
-
-        UserLeftTeamEvent event = UserLeftTeamEvent.builder()
-                .teamId(teamId)
-                .userId(userId)
-                .memberIds(memberIds)
-                .build();
-
-        teamEventPublisher.publishEvent(USER_LEFT_TOPIC, event);
+    public boolean isTeamManagedByUser(UUID teamId, UUID userId) {
+        TeamUser teamUser = teamUserRepository.findByUserIdAndTeamId(userId, teamId);
+        if(teamUser == null) return false;
+        return teamUser.getRole() != TeamRole.MEMBER;
     }
 }

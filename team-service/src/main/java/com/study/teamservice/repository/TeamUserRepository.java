@@ -4,6 +4,8 @@ import com.study.common.enums.TeamRole;
 import com.study.teamservice.entity.TeamUser;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -22,11 +24,18 @@ public interface TeamUserRepository extends JpaRepository<TeamUser, UUID> {
             LocalDate cursor,
             Pageable pageable
     );
-
     List<TeamUser> findByTeamIdAndRoleIn(
             UUID teamId,
             List<TeamRole> roleOrder,
             Pageable pageable
     );
     Long countByTeamId(UUID teamId);
+    @Query("""
+    SELECT COUNT(tu) 
+    FROM TeamUser tu 
+    WHERE tu.teamId = :teamId 
+      AND tu.role <> 'MEMBER'
+    """)
+    long countNonMemberByTeamId(@Param("teamId") UUID teamId);
+
 }

@@ -9,7 +9,7 @@ import com.study.common.events.Team.TeamDeletedEvent;
 import com.study.teamservice.event.TeamEventPublisher;
 import com.study.common.events.Team.TeamUpdatedEvent;
 import com.study.teamservice.grpc.*;
-import com.study.teamservice.repository.TeamUserRepository;
+import com.study.teamservice.mapper.TeamMapper;
 import com.study.teamservice.repository.TeamRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -26,7 +26,6 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class TeamService {
     private final TeamRepository teamRepository;
-    private final TeamUserRepository teamUserRepository;
     private final CodeService codeService;
     private final MemberService memberService;
     private final TeamEventPublisher teamEventPublisher;
@@ -55,18 +54,12 @@ public class TeamService {
                         .createDate(LocalDate.now())
                         .creatorId(userId)
                         .totalMembers(1)
+                        .avatarUrl("")
                         .build();
 
                 teamRepository.save(team);
 
-                TeamUser teamUser = TeamUser.builder()
-                        .teamId(team.getId())
-                        .userId(userId)
-                        .role(TeamRole.CREATOR)
-                        .joinDate(LocalDate.now())
-                        .build();
-
-                teamUserRepository.save(teamUser);
+                memberService.createUserTeam(team.getId(), userId, TeamRole.CREATOR);
 
                 return team;
             }
@@ -92,9 +85,7 @@ public class TeamService {
         Pageable pageable = PageRequest.of(0, size, Sort.by("joinDate").descending());
 
         //Get result
-        List<TeamUser> teamUsers = cursor != null ?
-                teamUserRepository.findByUserIdAndJoinDateBeforeOrderByJoinDateDesc(userId, cursor, pageable) :
-                teamUserRepository.findByUserIdOrderByJoinDateDesc(userId, pageable);
+        List<TeamUser> teamUsers = memberService.getUserTeamsByCursor(userId, cursor, pageable);
 
         //Get teams with unchanged position
         List<UUID> teamIds = teamUsers.stream().map(TeamUser::getTeamId).toList();
@@ -105,10 +96,6 @@ public class TeamService {
                 .map(teamMap::get)
                 .filter(Objects::nonNull)
                 .toList();
-    }
-
-    public long countUserTeam(UUID userId){
-        return teamUserRepository.countByUserId(userId);
     }
 
     public List<Team> searchUserTeamByName(SearchUserTeamByNameRequest request) {
@@ -122,10 +109,6 @@ public class TeamService {
         return cursor != null ?
                 teamRepository.searchTeamsByUserAndNameWithCursor(userId, keyword, cursor, pageable) :
                 teamRepository.searchTeamsByUserAndName(userId, keyword, pageable);
-    }
-
-    public long countUserTeamByKeyword(UUID userId, String keyword){
-        return teamRepository.countUserTeamsByKeyword(userId, keyword);
     }
 
     public Team updateTeam(UpdateTeamRequest request) {
@@ -212,7 +195,7 @@ public class TeamService {
         if(!teamRepository.existsById(teamId))
             throw new NotFoundException("Team not found");
 
-        TeamUser teamUser = teamUserRepository.findByUserIdAndTeamId(userId, teamId);
+        TeamUser teamUser = memberService.getByUserIdAndTeamId(userId, teamId);
 
         if(teamUser == null)
             throw new NotFoundException("User is not part of this team");
@@ -233,8 +216,52 @@ public class TeamService {
         teamEventPublisher.publishEvent(DELETE_TOPIC, event);
     }
 
-    public String getJoinDateString(UUID teamId, UUID userId){
-        TeamUser teamUser = teamUserRepository.findByUserIdAndTeamId(userId, teamId);
-        return teamUser.getJoinDate().toString();
+
+    public long countUserTeamByKeyword(UUID userId, String keyword){
+        return teamRepository.countUserTeamsByKeyword(userId, keyword);
+    }
+
+    public boolean existsById(UUID teamId) {
+        return teamRepository.existsById(teamId);
+    }
+
+    public Team getByTeamCode(String teamCode) {
+        return teamRepository.findByTeamCode(teamCode);
+    }
+
+    public void increaseMember(UUID teamId) {
+        Team team = teamRepository.findById(teamId).orElseThrow(
+                ()-> new NotFoundException("Team does not exist")
+        );
+
+        team.setTotalMembers(team.getTotalMembers() + 1);
+        teamRepository.save(team);
+    }
+
+    public void decreaseMember(UUID teamId) {
+        Team team = teamRepository.findById(teamId).orElseThrow(
+                ()-> new NotFoundException("Team does not exist")
+        );
+
+        int teamMembers = team.getTotalMembers() - 1;
+        if(teamMembers == 0) {
+            teamRepository.delete(team);
+        }
+        else{
+            team.setTotalMembers(teamMembers);
+            teamRepository.save(team);
+        }
+    }
+
+    public List<TeamSummaryResponse> toListTeamSummaryResponse(List<Team> teams, UUID userId) {
+        List<TeamSummaryResponse> teamResponses = new ArrayList<>();
+
+        for (Team team : teams) {
+            boolean managedByUser = memberService.isTeamManagedByUser(team.getId(), userId);
+            TeamSummaryResponse teamSummaryResponse = TeamMapper.toTeamSummaryResponse(team, managedByUser);
+            teamResponses.add(teamSummaryResponse);
+        }
+
+        return teamResponses;
     }
 }
