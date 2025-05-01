@@ -1,23 +1,24 @@
 package com.study.apigateway.dto.Team.response;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.study.common.enums.TeamRole;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
-import java.util.List;
+import java.util.UUID;
 
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class ListTeamResponseDto {
-    private List<TeamSummaryResponseDto> teams;
+public class TeamUserProfileResponseDto {
+    private UUID userId;
 
-    private Long total;
+    private TeamRole role;
 
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
-    private LocalDate nextCursor;
+    private LocalDate joinDate;
 }

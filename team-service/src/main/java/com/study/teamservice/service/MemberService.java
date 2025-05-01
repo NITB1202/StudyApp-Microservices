@@ -8,6 +8,7 @@ import com.study.teamservice.entity.Team;
 import com.study.teamservice.entity.TeamUser;
 import com.study.teamservice.grpc.*;
 import com.study.teamservice.repository.TeamUserRepository;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -162,6 +163,7 @@ public class MemberService {
         teamUserRepository.save(member);
     }
 
+    @Transactional
     public void removeTeamMember(RemoveTeamMemberRequest request) {
         UUID teamId = UUID.fromString(request.getTeamId());
         UUID userId = UUID.fromString(request.getUserId());
@@ -176,6 +178,7 @@ public class MemberService {
         teamUserRepository.deleteByUserIdAndTeamId(memberId, teamId);
     }
 
+    @Transactional
     public void leaveTeam(LeaveTeamRequest request) {
         UUID teamId = UUID.fromString(request.getTeamId());
         UUID userId = UUID.fromString(request.getUserId());
@@ -262,6 +265,7 @@ public class MemberService {
         }
     }
 
+    @Transactional
     public void deleteAllMembers(UUID teamId) {
         teamUserRepository.deleteAllByTeamId(teamId);
     }
