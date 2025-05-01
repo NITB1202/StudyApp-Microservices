@@ -5,6 +5,7 @@ import com.study.apigateway.dto.Notification.request.CreateInvitationRequestDto;
 import com.study.apigateway.dto.Team.request.RemoveTeamMemberRequestDto;
 import com.study.apigateway.dto.Team.request.UpdateMemberRoleRequestDto;
 import com.study.apigateway.dto.Team.response.ListTeamMemberResponseDto;
+import com.study.apigateway.dto.Team.response.TeamUserProfileResponseDto;
 import com.study.apigateway.exception.ErrorResponse;
 import com.study.apigateway.service.Team.MemberService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -46,15 +47,33 @@ public class MemberController {
         return memberService.joinTeam(userId, teamCode).map(ResponseEntity::ok);
     }
 
-    @GetMapping("/list")
-    @Operation(summary = "Get a list of team members.")
+    @GetMapping
+    @Operation(summary = "Get user's information in the team.")
     @ApiResponse(responseCode = "200", description = "Get successfully.")
     @ApiResponse(responseCode = "404", description = "Not found.",
             content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+    public Mono<ResponseEntity<TeamUserProfileResponseDto>> getUserInTeam(@RequestParam UUID userId,
+                                                                          @RequestParam UUID teamId){
+        return memberService.getUserInTeam(userId, teamId).map(ResponseEntity::ok);
+    }
+
+    @GetMapping("/list")
+    @Operation(summary = "Get a list of team members.")
+    @ApiResponse(responseCode = "200", description = "Get successfully.")
     public Mono<ResponseEntity<ListTeamMemberResponseDto>> getTeamMembers(@RequestParam UUID teamId,
                                                                           @RequestParam(required = false) LocalDate cursor,
                                                                           @RequestParam(defaultValue = "10") int size){
         return memberService.getTeamMembers(teamId, cursor, size).map(ResponseEntity::ok);
+    }
+
+    @GetMapping("/search")
+    @Operation(summary = "Search for a member by username.")
+    @ApiResponse(responseCode = "200", description = "Search successfully.")
+    public Mono<ResponseEntity<ListTeamMemberResponseDto>> searchTeamMembersByUsername(@RequestParam UUID teamId,
+                                                                                       @RequestParam String keyword,
+                                                                                       @RequestParam(required = false) LocalDate cursor,
+                                                                                       @RequestParam(defaultValue = "10") int size){
+        return memberService.searchTeamMembersByUsername(teamId, keyword, cursor, size).map(ResponseEntity::ok);
     }
 
     @PatchMapping

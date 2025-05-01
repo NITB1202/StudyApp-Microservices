@@ -238,13 +238,10 @@ public class TeamController extends TeamServiceGrpc.TeamServiceImplBase {
         UUID teamId = UUID.fromString(request.getTeamId());
 
         memberService.leaveTeam(request);
-        if(memberService.countMembers(teamId) > 0) {
+        if(memberService.countMembers(teamId) > 0)
             teamNotificationService.publishUserLeftTeamNotification(userId, teamId);
-        }
-        else {
-            teamService.deleteTeam(teamId);
+        else
             teamNotificationService.publishTeamDeletionNotification(userId, teamId);
-        }
 
         ActionResponse response = ActionResponse.newBuilder()
                 .setSuccess(true)
