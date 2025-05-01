@@ -7,17 +7,27 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
-import java.util.List;
+import java.util.UUID;
 
 @Data
 @Builder
-@NoArgsConstructor
 @AllArgsConstructor
-public class ListTeamResponseDto {
-    private List<TeamSummaryResponseDto> teams;
+@NoArgsConstructor
+public class TeamDetailResponseDto {
+    private UUID id;
 
-    private Long total;
+    private String name;
+
+    private String description;
+
+    private String teamCode;
 
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
-    private LocalDate nextCursor;
+    private LocalDate createDate;
+
+    private UUID creatorId;
+
+    private Long totalMembers;
+
+    private String avatarUrl;
 }

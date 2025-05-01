@@ -30,37 +30,12 @@ public class TeamServiceGrpcClient {
         return stub.createTeam(request);
     }
 
-    public TeamResponse getTeamById(UUID id){
+    public TeamDetailResponse getTeamById(UUID id){
         GetTeamByIdRequest request = GetTeamByIdRequest.newBuilder()
                 .setId(id.toString())
                 .build();
 
         return stub.getTeamById(request);
-    }
-
-    public ListTeamResponse getUserTeams(UUID userId, LocalDate cursor, int size){
-        String cursorDate = cursor != null ? cursor.toString() : "";
-
-        GetUserTeamsRequest request = GetUserTeamsRequest.newBuilder()
-                .setUserId(userId.toString())
-                .setCursor(cursorDate)
-                .setSize(size)
-                .build();
-
-        return stub.getUserTeams(request);
-    }
-
-    public ListTeamResponse searchUserTeamByName(UUID userId, String keyword, LocalDate cursor, int size){
-        String dateCursor = cursor != null ? cursor.toString() : "";
-
-        SearchUserTeamByNameRequest request = SearchUserTeamByNameRequest.newBuilder()
-                .setUserId(userId.toString())
-                .setKeyword(keyword)
-                .setCursor(dateCursor)
-                .setSize(size)
-                .build();
-
-        return stub.searchUserTeamByName(request);
     }
 
     public TeamResponse updateTeam(UUID userId, UUID teamId, UpdateTeamRequestDto dto){
@@ -116,7 +91,41 @@ public class TeamServiceGrpcClient {
         return stub.joinTeam(request);
     }
 
-    public GetTeamMembersResponse getTeamMembers(UUID teamId, LocalDate cursor, int size){
+    public ListTeamResponse getUserTeams(UUID userId, LocalDate cursor, int size){
+        String cursorDate = cursor != null ? cursor.toString() : "";
+
+        GetUserTeamsRequest request = GetUserTeamsRequest.newBuilder()
+                .setUserId(userId.toString())
+                .setCursor(cursorDate)
+                .setSize(size)
+                .build();
+
+        return stub.getUserTeams(request);
+    }
+
+    public ListTeamResponse searchUserTeamByName(UUID userId, String keyword, LocalDate cursor, int size){
+        String dateCursor = cursor != null ? cursor.toString() : "";
+
+        SearchUserTeamByNameRequest request = SearchUserTeamByNameRequest.newBuilder()
+                .setUserId(userId.toString())
+                .setKeyword(keyword)
+                .setCursor(dateCursor)
+                .setSize(size)
+                .build();
+
+        return stub.searchUserTeamByName(request);
+    }
+
+    public TeamMemberResponse getTeamMember(UUID userId, UUID teamId) {
+        GetTeamMemberRequest request = GetTeamMemberRequest.newBuilder()
+                .setUserId(userId.toString())
+                .setTeamId(teamId.toString())
+                .build();
+
+        return stub.getTeamMember(request);
+    }
+
+    public ListTeamMembersResponse getTeamMembers(UUID teamId, LocalDate cursor, int size){
         String cursorDate = cursor != null ? cursor.toString() : "";
 
         GetTeamMembersRequest request = GetTeamMembersRequest.newBuilder()
@@ -126,6 +135,14 @@ public class TeamServiceGrpcClient {
                 .build();
 
         return stub.getTeamMembers(request);
+    }
+
+    public AllTeamMembersResponse getAllTeamMembers(UUID teamId){
+        GetAllTeamMembersRequest request = GetAllTeamMembersRequest.newBuilder()
+                .setTeamId(teamId.toString())
+                .build();
+
+        return stub.getAllTeamMembers(request);
     }
 
     public ActionResponse updateTeamMemberRole(UUID userId, UpdateMemberRoleRequestDto dto){

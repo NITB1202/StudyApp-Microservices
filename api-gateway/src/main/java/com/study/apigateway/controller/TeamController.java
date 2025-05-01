@@ -4,6 +4,7 @@ import com.study.apigateway.dto.Action.ActionResponseDto;
 import com.study.apigateway.dto.Team.request.CreateTeamRequestDto;
 import com.study.apigateway.dto.Team.request.UpdateTeamRequestDto;
 import com.study.apigateway.dto.Team.response.ListTeamResponseDto;
+import com.study.apigateway.dto.Team.response.TeamDetailResponseDto;
 import com.study.apigateway.dto.Team.response.TeamResponseDto;
 import com.study.apigateway.exception.ErrorResponse;
 import com.study.apigateway.service.Team.TeamService;
@@ -41,7 +42,7 @@ public class TeamController {
     @ApiResponse(responseCode = "200", description = "Get successfully")
     @ApiResponse(responseCode = "404", description = "Not found.",
             content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
-    public Mono<ResponseEntity<TeamResponseDto>> getTeamById(@PathVariable UUID id){
+    public Mono<ResponseEntity<TeamDetailResponseDto>> getTeamById(@PathVariable UUID id){
         return teamService.getTeamById(id).map(ResponseEntity::ok);
     }
 
