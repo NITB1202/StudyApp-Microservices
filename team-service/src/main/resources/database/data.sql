@@ -1,9 +1,9 @@
-INSERT INTO teams (id, name, description, team_code, create_date, creator_id, total_members)
+INSERT INTO teams (id, name, description, team_code, create_date, creator_id, total_members, avatar_url)
 VALUES
     ('111e8400-e29b-41d4-a716-446655440001', 'TEAM 01', '','AQhTe',
-     '2024-12-01','041c77e0-ae77-4005-b745-ea12dca9bec6', 2),
+     '2024-12-01','041c77e0-ae77-4005-b745-ea12dca9bec6', 2, ''),
     ('555e8400-e29b-41d4-a716-446655440006', 'TEAM 02', 'demo', 'fDjQA',
-     '2024-07-08', '9f5d79f2-83a2-411d-bb66-caeb640a62b0', 1);
+     '2024-07-08', '9f5d79f2-83a2-411d-bb66-caeb640a62b0', 1, '');
 
 INSERT INTO team_user (id, team_id, user_id, join_date, role)
 VALUES

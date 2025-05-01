@@ -43,6 +43,30 @@ message TeamDetailResponse {
   string avatarUrl = 8;
 }
 
+message UpdateTeamRequest {
+  string id = 1;
+  string userId = 2;
+  string name = 3;
+  string description = 4;
+}
+
+message DeleteTeamRequest {
+  string id = 1;
+  string userId = 2;
+}
+
+//Team member section
+message CreateInvitationRequest {
+  string teamId = 1;
+  string inviterId = 2;
+  string inviteeId = 3;
+}
+
+message JoinTeamRequest {
+  string userId = 1;
+  string teamCode = 2;
+}
+
 message GetUserTeamsRequest {
   string userId = 1;
   string cursor = 2;
@@ -67,30 +91,6 @@ message SearchUserTeamByNameRequest {
   string keyword = 2;
   string cursor = 3;
   int32 size = 4;
-}
-
-message UpdateTeamRequest {
-  string id = 1;
-  string userId = 2;
-  string name = 3;
-  string description = 4;
-}
-
-message DeleteTeamRequest {
-  string id = 1;
-  string userId = 2;
-}
-
-//Team member section
-message CreateInvitationRequest {
-  string teamId = 1;
-  string inviterId = 2;
-  string inviteeId = 3;
-}
-
-message JoinTeamRequest {
-  string userId = 1;
-  string teamCode = 2;
 }
 
 message GetTeamMemberRequest {
@@ -121,6 +121,14 @@ message ListTeamMembersResponse {
   string nextCursor = 3;
 }
 
+message GetAllTeamMembersRequest {
+  string teamId = 1;
+}
+
+message AllTeamMembersResponse {
+  repeated TeamMemberResponse members = 1;
+}
+
 message UpdateMemberRoleRequest {
   string teamId = 1;
   string userId = 2;
@@ -149,8 +157,6 @@ service TeamService {
   //Team section
   rpc CreateTeam(CreateTeamRequest) returns (TeamResponse);
   rpc GetTeamById(GetTeamByIdRequest) returns (TeamDetailResponse);
-  rpc GetUserTeams(GetUserTeamsRequest) returns (ListTeamResponse);
-  rpc SearchUserTeamByName(SearchUserTeamByNameRequest) returns (ListTeamResponse);
   rpc UpdateTeam(UpdateTeamRequest) returns (TeamResponse); // -> notification
   rpc UploadTeamAvatar(UploadTeamAvatarRequest) returns (common.ActionResponse); // -> notification
   rpc DeleteTeam(DeleteTeamRequest) returns (common.ActionResponse); // -> notification
@@ -158,8 +164,11 @@ service TeamService {
   //Team member section
   rpc CreateInvitation(CreateInvitationRequest) returns (common.ActionResponse); // -> notification
   rpc JoinTeam(JoinTeamRequest) returns (common.ActionResponse); // -> notification
+  rpc GetUserTeams(GetUserTeamsRequest) returns (ListTeamResponse);
+  rpc SearchUserTeamByName(SearchUserTeamByNameRequest) returns (ListTeamResponse);
   rpc GetTeamMember(GetTeamMemberRequest) returns (TeamMemberResponse);
   rpc GetTeamMembers(GetTeamMembersRequest) returns (ListTeamMembersResponse);
+  rpc GetAllTeamMembers(GetAllTeamMembersRequest) returns (AllTeamMembersResponse);
   rpc UpdateTeamMemberRole(UpdateMemberRoleRequest) returns (common.ActionResponse);
   rpc RemoveTeamMember(RemoveTeamMemberRequest) returns (common.ActionResponse); // -> notification
   rpc LeaveTeam(LeaveTeamRequest) returns (common.ActionResponse); // -> notification

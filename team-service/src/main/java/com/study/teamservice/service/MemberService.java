@@ -1,42 +1,29 @@
 package com.study.teamservice.service;
 
 import com.study.common.enums.TeamRole;
-import com.study.common.events.Team.UserLeftTeamEvent;
 import com.study.common.exceptions.BusinessException;
 import com.study.common.exceptions.NotFoundException;
 import com.study.common.mappers.TeamRoleMapper;
 import com.study.teamservice.entity.Team;
 import com.study.teamservice.entity.TeamUser;
-import com.study.common.events.Notification.InvitationCreatedEvent;
-import com.study.common.events.Notification.InvitationAcceptEvent;
-import com.study.teamservice.event.TeamEventPublisher;
-import com.study.common.events.Team.UserJoinedTeamEvent;
 import com.study.teamservice.grpc.*;
-import com.study.teamservice.repository.TeamRepository;
 import com.study.teamservice.repository.TeamUserRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.context.event.EventListener;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
-import java.util.Arrays;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
 public class MemberService {
     private final TeamUserRepository teamUserRepository;
     private final TeamService teamService;
-    private final TeamEventPublisher teamEventPublisher;
 
     private static final int DEFAULT_SIZE = 10;
-    private static final String INVITATION_CREATED_TOPIC = "invitation-created";
-    private static final String USER_JOINED_TOPIC = "user-joined";
-    private static final String USER_LEFT_TOPIC = "user-left";
 
     public void createInvitation(CreateInvitationRequest request) {
         UUID teamId = UUID.fromString(request.getTeamId());
@@ -54,17 +41,9 @@ public class MemberService {
         if(teamUserRepository.existsByUserIdAndTeamId(inviteeId, teamId)) {
            throw new BusinessException("The invitee is already in the team");
         }
-
-        InvitationCreatedEvent event = InvitationCreatedEvent.builder()
-                .teamId(teamId)
-                .fromId(inviterId)
-                .toId(inviteeId)
-                .build();
-
-        teamEventPublisher.publishEvent(INVITATION_CREATED_TOPIC, event);
     }
 
-    public void joinTeam(JoinTeamRequest request) {
+    public Team joinTeam(JoinTeamRequest request) {
         UUID userId = UUID.fromString(request.getUserId());
 
         Team team = teamService.getByTeamCode(request.getTeamCode());
@@ -77,13 +56,60 @@ public class MemberService {
             throw new BusinessException("User is already in the team");
         }
 
-        addNewMember(team.getId(), userId);
+        saveMember(team.getId(), userId, TeamRole.MEMBER);
+
+        return team;
+    }
+
+    public List<Team> getUserTeams(GetUserTeamsRequest request) {
+        //Validate request
+        int size = request.getSize() > 0 ? request.getSize() : DEFAULT_SIZE;
+        LocalDate cursor = request.getCursor().isEmpty() ? null : LocalDate.parse(request.getCursor());
+        UUID userId = UUID.fromString(request.getUserId());
+
+        Pageable pageable = PageRequest.of(0, size, Sort.by("joinDate").descending());
+
+        //Get result
+        List<TeamUser> teamUsers = cursor != null ?
+                teamUserRepository.findByUserIdAndJoinDateBeforeOrderByJoinDateDesc(userId, cursor, pageable) :
+                teamUserRepository.findByUserIdOrderByJoinDateDesc(userId, pageable);
+
+        //Get teams with unchanged position
+        List<UUID> teamIds = teamUsers.stream().map(TeamUser::getTeamId).toList();
+        List<Team> teams = new ArrayList<>();
+
+        for(UUID teamId : teamIds) {
+            Team team = teamService.getTeamById(teamId);
+            teams.add(team);
+        }
+
+        return teams;
+    }
+
+    public List<Team> searchUserTeamByName(SearchUserTeamByNameRequest request) {
+        int size = request.getSize() > 0 ? request.getSize() : DEFAULT_SIZE;
+        LocalDate cursor = request.getCursor().isEmpty() ? null : LocalDate.parse(request.getCursor());
+        UUID userId = UUID.fromString(request.getUserId());
+        String keyword = "%" + request.getKeyword().trim() + "%";
+
+        Pageable pageable = PageRequest.of(0, size, Sort.by("tu.joinDate").descending());
+
+        return cursor != null ?
+                teamUserRepository.searchTeamsByUserAndNameWithCursor(userId, keyword, cursor, pageable) :
+                teamUserRepository.searchTeamsByUserAndName(userId, keyword, pageable);
     }
 
     public TeamUser getTeamMember(GetTeamMemberRequest request) {
         UUID userId = UUID.fromString(request.getUserId());
         UUID teamId = UUID.fromString(request.getTeamId());
-        return teamUserRepository.findByUserIdAndTeamId(userId, teamId);
+
+        TeamUser teamUser = teamUserRepository.findByUserIdAndTeamId(userId, teamId);
+
+        if(teamUser == null) {
+            throw new NotFoundException("User id or team id is incorrect");
+        }
+
+        return teamUser;
     }
 
     public List<TeamUser> getTeamMembers(GetTeamMembersRequest request) {
@@ -114,6 +140,11 @@ public class MemberService {
         }
     }
 
+    public List<TeamUser> getAllTeamMembers(GetAllTeamMembersRequest request){
+        UUID teamId = UUID.fromString(request.getTeamId());
+        return teamUserRepository.findByTeamId(teamId);
+    }
+
     public void updateTeamMemberRole(UpdateMemberRoleRequest request) {
         UUID teamId = UUID.fromString(request.getTeamId());
         UUID userId = UUID.fromString(request.getUserId());
@@ -141,7 +172,8 @@ public class MemberService {
         }
 
         validateUpdateMemberRequest(teamId, userId, memberId);
-        removeMember(teamId, memberId);
+        teamService.decreaseMember(teamId);
+        teamUserRepository.deleteByUserIdAndTeamId(memberId, teamId);
     }
 
     public void leaveTeam(LeaveTeamRequest request) {
@@ -161,19 +193,63 @@ public class MemberService {
                     " Please hand over your responsibilities before leaving.");
         }
 
-        removeMember(teamId, userId);
+        teamService.decreaseMember(teamId);
+        teamUserRepository.deleteByUserIdAndTeamId(userId, teamId);
     }
 
-    @EventListener
-    public void acceptInvitation(InvitationAcceptEvent request) {
-        addNewMember(request.getTeamId(), request.getUserId());
+
+    public void saveMember(UUID teamId, UUID userId, TeamRole role) {
+        teamService.increaseMember(teamId);
+
+        TeamUser teamUser = TeamUser.builder()
+                .teamId(teamId)
+                .userId(userId)
+                .role(role)
+                .joinDate(LocalDate.now())
+                .build();
+
+        teamUserRepository.save(teamUser);
     }
 
+    public boolean isTeamManagedByUser(UUID teamId, UUID userId) {
+        TeamUser teamUser = teamUserRepository.findByUserIdAndTeamId(userId, teamId);
+        if(teamUser == null) return false;
+        return teamUser.getRole() != TeamRole.MEMBER;
+    }
+
+    public long countUserTeams(UUID userId){
+        return teamUserRepository.countByUserId(userId);
+    }
+
+    public long countUserTeamsByKeyword(UUID userId, String keyword){
+        return teamUserRepository.countUserTeamsByKeyword(userId, keyword);
+    }
+
+    public long countMembers(UUID teamId){
+        return teamUserRepository.countByTeamId(teamId);
+    }
+
+    public String calculateNextPageCursor(UUID userId, List<Team> teams, int requestSize) {
+        if(teams.isEmpty()) return "";
+
+        Team lastTeam = teams.get(teams.size() - 1);
+        TeamUser memberInfo = teamUserRepository.findByUserIdAndTeamId(userId, lastTeam.getId());
+
+        return teams.size() == requestSize ? memberInfo.getJoinDate().toString() : "";
+    }
+
+    public void validateUpdateTeamPermission(UUID userId, UUID teamId) {
+        TeamUser teamUser = teamUserRepository.findByUserIdAndTeamId(userId, teamId);
+
+        if(teamUser == null)
+            throw new NotFoundException("User is not part of this team");
+
+        if(teamUser.getRole() == TeamRole.MEMBER)
+            throw new BusinessException("User doesn't have permission to update this team");
+    }
 
     private void validateUpdateMemberRequest(UUID teamId, UUID userId, UUID memberId) {
-        if(userDoesNotHavePermissionToUpdate(userId, teamId)) {
-            throw new BusinessException("User does not have permission to perform this action.");
-        }
+        validateUpdateTeamPermission(userId, teamId);
 
         TeamUser member = teamUserRepository.findByUserIdAndTeamId(memberId, teamId);
 
@@ -186,94 +262,7 @@ public class MemberService {
         }
     }
 
-    private void addNewMember(UUID teamId, UUID userId) {
-        teamService.increaseMember(teamId);
-        createUserTeam(teamId, userId, TeamRole.MEMBER);
-
-        List<UUID> memberIds = getTeamMembersId(teamId);
-
-        UserJoinedTeamEvent event = UserJoinedTeamEvent.builder()
-                .teamId(teamId)
-                .userId(userId)
-                .memberIds(memberIds)
-                .build();
-
-        teamEventPublisher.publishEvent(USER_JOINED_TOPIC, event);
-    }
-
-    private void removeMember(UUID teamId, UUID userId){
-        teamService.decreaseMember(teamId);
-        TeamUser member = teamUserRepository.findByUserIdAndTeamId(userId, teamId);
-
-        teamUserRepository.delete(member);
-
-        List<UUID> memberIds = getTeamMembersId(teamId);
-
-        UserLeftTeamEvent event = UserLeftTeamEvent.builder()
-                .teamId(teamId)
-                .userId(userId)
-                .memberIds(memberIds)
-                .build();
-
-        teamEventPublisher.publishEvent(USER_LEFT_TOPIC, event);
-    }
-
-    public void createUserTeam(UUID teamId, UUID userId, TeamRole role) {
-        TeamUser teamUser = TeamUser.builder()
-                .teamId(teamId)
-                .userId(userId)
-                .role(role)
-                .joinDate(LocalDate.now())
-                .build();
-
-        teamUserRepository.save(teamUser);
-    }
-
-    public long countTeams(UUID userId){
-        return teamUserRepository.countByUserId(userId);
-    }
-
-    public long countMembers(UUID teamId){
-        return teamUserRepository.countByTeamId(teamId);
-    }
-
-    public TeamUser getByUserIdAndTeamId(UUID userId, UUID teamId) {
-        return teamUserRepository.findByUserIdAndTeamId(userId, teamId);
-    }
-
-    public List<TeamUser> getUserTeamsByCursor(UUID userId, LocalDate cursor, Pageable pageable) {
-        return cursor != null ?
-                teamUserRepository.findByUserIdAndJoinDateBeforeOrderByJoinDateDesc(userId, cursor, pageable) :
-                teamUserRepository.findByUserIdOrderByJoinDateDesc(userId, pageable);
-    }
-
-    public String calculateNextPageCursor(UUID userId, List<Team> teams, int requestSize) {
-        if(teams.isEmpty()) return "";
-
-        Team lastTeam = teams.get(teams.size() - 1);
-        TeamUser memberInfo = teamUserRepository.findByUserIdAndTeamId(userId, lastTeam.getId());
-
-        return teams.size() == requestSize ? memberInfo.getJoinDate().toString() : "";
-    }
-
-    public List<UUID> getTeamMembersId(UUID teamId) {
-        return teamUserRepository.findByTeamId(teamId).stream()
-                .map(TeamUser::getUserId)
-                .toList();
-    }
-
-    public boolean userDoesNotHavePermissionToUpdate(UUID userId, UUID teamId) {
-        TeamUser teamUser = teamUserRepository.findByUserIdAndTeamId(userId, teamId);
-
-        if(teamUser == null)
-            throw new NotFoundException("User is not part of this team");
-
-        return teamUser.getRole() == TeamRole.MEMBER;
-    }
-
-    public boolean isTeamManagedByUser(UUID teamId, UUID userId) {
-        TeamUser teamUser = teamUserRepository.findByUserIdAndTeamId(userId, teamId);
-        if(teamUser == null) return false;
-        return teamUser.getRole() != TeamRole.MEMBER;
+    public void deleteAllMembers(UUID teamId) {
+        teamUserRepository.deleteAllByTeamId(teamId);
     }
 }
