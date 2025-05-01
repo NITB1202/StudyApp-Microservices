@@ -25,35 +25,22 @@ message CreateTeamRequest {
 message TeamResponse {
   string id = 1;
   string name = 2;
-  string teamCode = 3;
-  string createDate = 4;
-  string creatorId = 5;
-  int64 totalMembers = 6;
   string description = 7;
-  string avatarUrl = 8;
 }
 
 message GetTeamByIdRequest {
   string id = 1;
 }
 
-message GetUserTeamsRequest {
-  string userId = 1;
-  string cursor = 2;
-  int32 size =  3;
-}
-
-message ListTeamResponse {
-  repeated TeamResponse teams = 1;
-  int64 total = 2;
-  string nextCursor = 3;
-}
-
-message SearchUserTeamByNameRequest {
-  string userId = 1;
-  string keyword = 2;
-  string cursor = 3;
-  int32 size = 4;
+message TeamDetailResponse {
+  string id = 1;
+  string name = 2;
+  string teamCode = 3;
+  string createDate = 4;
+  string creatorId = 5;
+  int64 totalMembers = 6;
+  string description = 7;
+  string avatarUrl = 8;
 }
 
 message UpdateTeamRequest {
@@ -80,6 +67,37 @@ message JoinTeamRequest {
   string teamCode = 2;
 }
 
+message GetUserTeamsRequest {
+  string userId = 1;
+  string cursor = 2;
+  int32 size =  3;
+}
+
+message TeamSummaryResponse {
+  string id = 1;
+  string name = 2;
+  string avatarUrl = 3;
+  bool managedByUser = 4;
+}
+
+message ListTeamResponse {
+  repeated TeamSummaryResponse teams = 1;
+  int64 total = 2;
+  string nextCursor = 3;
+}
+
+message SearchUserTeamByNameRequest {
+  string userId = 1;
+  string keyword = 2;
+  string cursor = 3;
+  int32 size = 4;
+}
+
+message GetTeamMemberRequest {
+  string userId = 1;
+  string teamId = 2;
+}
+
 message TeamMemberResponse {
   string userId = 1;
   string joinDate = 2;
@@ -92,10 +110,23 @@ message GetTeamMembersRequest {
   int32 size = 3;
 }
 
-message GetTeamMembersResponse {
-  repeated TeamMemberResponse members = 1;
+message TeamMemberSummaryResponse {
+  string userId = 1;
+  TeamRole role = 2;
+}
+
+message ListTeamMembersResponse {
+  repeated TeamMemberSummaryResponse members = 1;
   int64 total = 2;
   string nextCursor = 3;
+}
+
+message GetAllTeamMembersRequest {
+  string teamId = 1;
+}
+
+message AllTeamMembersResponse {
+  repeated TeamMemberResponse members = 1;
 }
 
 message UpdateMemberRoleRequest {
@@ -125,9 +156,7 @@ message UploadTeamAvatarRequest {
 service TeamService {
   //Team section
   rpc CreateTeam(CreateTeamRequest) returns (TeamResponse);
-  rpc GetTeamById(GetTeamByIdRequest) returns (TeamResponse);
-  rpc GetUserTeams(GetUserTeamsRequest) returns (ListTeamResponse);
-  rpc SearchUserTeamByName(SearchUserTeamByNameRequest) returns (ListTeamResponse);
+  rpc GetTeamById(GetTeamByIdRequest) returns (TeamDetailResponse);
   rpc UpdateTeam(UpdateTeamRequest) returns (TeamResponse); // -> notification
   rpc UploadTeamAvatar(UploadTeamAvatarRequest) returns (common.ActionResponse); // -> notification
   rpc DeleteTeam(DeleteTeamRequest) returns (common.ActionResponse); // -> notification
@@ -135,7 +164,11 @@ service TeamService {
   //Team member section
   rpc CreateInvitation(CreateInvitationRequest) returns (common.ActionResponse); // -> notification
   rpc JoinTeam(JoinTeamRequest) returns (common.ActionResponse); // -> notification
-  rpc GetTeamMembers(GetTeamMembersRequest) returns (GetTeamMembersResponse);
+  rpc GetUserTeams(GetUserTeamsRequest) returns (ListTeamResponse);
+  rpc SearchUserTeamByName(SearchUserTeamByNameRequest) returns (ListTeamResponse);
+  rpc GetTeamMember(GetTeamMemberRequest) returns (TeamMemberResponse);
+  rpc GetTeamMembers(GetTeamMembersRequest) returns (ListTeamMembersResponse);
+  rpc GetAllTeamMembers(GetAllTeamMembersRequest) returns (AllTeamMembersResponse);
   rpc UpdateTeamMemberRole(UpdateMemberRoleRequest) returns (common.ActionResponse);
   rpc RemoveTeamMember(RemoveTeamMemberRequest) returns (common.ActionResponse); // -> notification
   rpc LeaveTeam(LeaveTeamRequest) returns (common.ActionResponse); // -> notification
