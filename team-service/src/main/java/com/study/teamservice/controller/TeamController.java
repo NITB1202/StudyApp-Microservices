@@ -8,7 +8,7 @@ import com.study.teamservice.grpc.*;
 import com.study.teamservice.mapper.TeamMapper;
 import com.study.teamservice.mapper.TeamUserMapper;
 import com.study.teamservice.service.MemberService;
-import com.study.teamservice.service.TeamNotificationService;
+import com.study.teamservice.service.impl.TeamNotificationServiceImpl;
 import com.study.teamservice.service.TeamService;
 import io.grpc.stub.StreamObserver;
 import lombok.RequiredArgsConstructor;
@@ -21,7 +21,7 @@ import java.util.*;
 public class TeamController extends TeamServiceGrpc.TeamServiceImplBase {
     private final TeamService teamService;
     private final MemberService memberService;
-    private final TeamNotificationService teamNotificationService;
+    private final TeamNotificationServiceImpl teamNotificationService;
 
     //Team section
     @Override
@@ -41,8 +41,8 @@ public class TeamController extends TeamServiceGrpc.TeamServiceImplBase {
 
     @Override
     public void getTeamById(GetTeamByIdRequest request, StreamObserver<TeamDetailResponse> responseObserver){
-        UUID id = UUID.fromString(request.getId());
-        Team team = teamService.getTeamById(id);
+        UUID teamId = UUID.fromString(request.getId());
+        Team team = teamService.getTeamById(teamId);
         TeamDetailResponse response = TeamMapper.toTeamDetailResponse(team);
         responseObserver.onNext(response);
         responseObserver.onCompleted();
@@ -90,7 +90,7 @@ public class TeamController extends TeamServiceGrpc.TeamServiceImplBase {
         UUID teamId = UUID.fromString(request.getId());
 
         memberService.validateUpdateTeamPermission(userId, teamId);
-        teamService.deleteTeam(teamId);
+        teamService.deleteTeam(request);
         memberService.deleteAllMembers(teamId);
         teamNotificationService.publishTeamDeletionNotification(userId, teamId);
 
@@ -141,13 +141,16 @@ public class TeamController extends TeamServiceGrpc.TeamServiceImplBase {
 
     @Override
     public void getUserTeams(GetUserTeamsRequest request, StreamObserver<ListTeamResponse> responseObserver){
-        List<Team> teams = memberService.getUserTeams(request);
+        List<TeamUser> userTeams = memberService.getUserTeams(request);
+
+        List<UUID> teamIds = userTeams.stream().map(TeamUser::getTeamId).toList();
+        List<Team> teams = teamService.getTeamsByListOfIds(teamIds);
 
         UUID userId = UUID.fromString(request.getUserId());
 
         List<TeamSummaryResponse> teamResponses = toListTeamSummaryResponse(userId, teams);
         long total = memberService.countUserTeams(userId);
-        String nextCursor = memberService.calculateNextPageCursor(userId, teams, request.getSize());
+        String nextCursor = memberService.calculateTeamNextPageCursor(userId, teams, request.getSize());
 
         ListTeamResponse response = TeamMapper.toListTeamResponse(teamResponses, total, nextCursor);
 
@@ -157,13 +160,16 @@ public class TeamController extends TeamServiceGrpc.TeamServiceImplBase {
 
     @Override
     public void searchUserTeamByName(SearchUserTeamByNameRequest request, StreamObserver<ListTeamResponse> responseObserver){
-        List<Team> teams = memberService.searchUserTeamByName(request);
+        List<TeamUser> userTeams = memberService.searchUserTeamsByName(request);
+
+        List<UUID> teamIds = userTeams.stream().map(TeamUser::getTeamId).toList();
+        List<Team> teams = teamService.getTeamsByListOfIds(teamIds);
 
         UUID userId = UUID.fromString(request.getUserId());
 
         List<TeamSummaryResponse> teamResponses = toListTeamSummaryResponse(userId, teams);
 
-        String nextCursor = memberService.calculateNextPageCursor(userId, teams, request.getSize());
+        String nextCursor = memberService.calculateTeamNextPageCursor(userId, teams, request.getSize());
         long total = memberService.countUserTeamsByKeyword(userId, request.getKeyword());
 
         ListTeamResponse response =  TeamMapper.toListTeamResponse(teamResponses, total, nextCursor);
@@ -183,10 +189,10 @@ public class TeamController extends TeamServiceGrpc.TeamServiceImplBase {
     @Override
     public void getTeamMembers(GetTeamMembersRequest request, StreamObserver<ListTeamMembersResponse> responseObserver){
         List<TeamUser> members = memberService.getTeamMembers(request);
-        long total = memberService.countMembers(UUID.fromString(request.getTeamId()));
+        long total = memberService.countTeamMembers(UUID.fromString(request.getTeamId()));
+        String nextCursor = memberService.calculateMemberNextPageCursor(members, request.getSize());
 
-        ListTeamMembersResponse response = TeamUserMapper
-                .toListTeamMemberResponse(members, total, request.getSize());
+        ListTeamMembersResponse response = TeamUserMapper.toListTeamMemberResponse(members, total, nextCursor);
 
         responseObserver.onNext(response);
         responseObserver.onCompleted();
@@ -219,7 +225,7 @@ public class TeamController extends TeamServiceGrpc.TeamServiceImplBase {
         UUID teamId = UUID.fromString(request.getTeamId());
 
         memberService.removeTeamMember(request);
-        if(memberService.countMembers(teamId) > 1) {
+        if(memberService.countTeamMembers(teamId) > 1) {
             teamNotificationService.publishUserLeftTeamNotification(userId, teamId);
         }
 
@@ -238,7 +244,7 @@ public class TeamController extends TeamServiceGrpc.TeamServiceImplBase {
         UUID teamId = UUID.fromString(request.getTeamId());
 
         memberService.leaveTeam(request);
-        if(memberService.countMembers(teamId) > 0)
+        if(memberService.countTeamMembers(teamId) > 0)
             teamNotificationService.publishUserLeftTeamNotification(userId, teamId);
         else
             teamNotificationService.publishTeamDeletionNotification(userId, teamId);
