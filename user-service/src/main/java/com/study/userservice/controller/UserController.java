@@ -1,5 +1,6 @@
 package com.study.userservice.controller;
 
+import com.google.protobuf.Empty;
 import com.study.common.grpc.ActionResponse;
 import com.study.userservice.enity.User;
 import com.study.userservice.grpc.*;
@@ -65,13 +66,9 @@ public class UserController extends UserServiceGrpc.UserServiceImplBase{
     }
 
     @Override
-    public void existsById(ExistsByIdRequest request, StreamObserver<ExistsByIdResponse> responseObserver){
-        boolean exists = userService.existsById(request);
-        ExistsByIdResponse response = ExistsByIdResponse.newBuilder()
-                .setExists(exists)
-                .build();
-
-        responseObserver.onNext(response);
+    public void validateUserId(ValidateUserIdRequest request, StreamObserver<Empty> responseObserver){
+        userService.validateUserId(request);
+        responseObserver.onNext(Empty.getDefaultInstance());
         responseObserver.onCompleted();
     }
 }
