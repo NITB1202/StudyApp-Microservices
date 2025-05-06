@@ -27,13 +27,10 @@ public class TeamUserMapper {
                 .build();
     }
 
-    public static ListTeamMembersResponse toListTeamMemberResponse(List<TeamUser> teamUsers, long total, int requestSize) {
+    public static ListTeamMembersResponse toListTeamMemberResponse(List<TeamUser> teamUsers, long total, String nextCursor) {
         List<TeamMemberSummaryResponse> summaries = teamUsers.stream()
                 .map(TeamUserMapper::toTeamMemberSummaryResponse)
                 .toList();
-
-        String nextCursor = !teamUsers.isEmpty() && teamUsers.size() == requestSize ?
-                teamUsers.get(teamUsers.size() - 1).getJoinDate().toString() : "";
 
         return ListTeamMembersResponse.newBuilder()
                 .addAllMembers(summaries)
