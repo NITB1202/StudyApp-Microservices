@@ -1,4 +1,4 @@
-package com.study.teamservice.utils;
+package com.study.common.utils;
 
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;

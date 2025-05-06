@@ -37,7 +37,7 @@ public class TeamMemberMapper {
 
     public static ListTeamMemberResponseDto toListTeamMemberResponseDto(List<TeamMemberResponseDto> members,
                                                                         long total,
-                                                                        LocalDate nextCursor) {
+                                                                        String nextCursor) {
         return ListTeamMemberResponseDto.builder()
                 .members(members)
                 .total(total)

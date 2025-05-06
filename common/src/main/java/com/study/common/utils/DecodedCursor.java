@@ -1,4 +1,4 @@
-package com.study.teamservice.utils;
+package com.study.common.utils;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

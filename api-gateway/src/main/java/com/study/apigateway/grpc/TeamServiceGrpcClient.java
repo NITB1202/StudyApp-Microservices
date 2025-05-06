@@ -11,7 +11,6 @@ import com.study.teamservice.grpc.*;
 import net.devh.boot.grpc.client.inject.GrpcClient;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDate;
 import java.util.UUID;
 
 @Service
@@ -92,7 +91,7 @@ public class TeamServiceGrpcClient {
     }
 
     public ListTeamResponse getUserTeams(UUID userId, String cursor, int size){
-        String handledCursor = cursor.isEmpty() ?  "" : cursor;
+        String handledCursor = cursor == null || cursor.isEmpty() ? "" : cursor;
 
         GetUserTeamsRequest request = GetUserTeamsRequest.newBuilder()
                 .setUserId(userId.toString())
@@ -104,7 +103,7 @@ public class TeamServiceGrpcClient {
     }
 
     public ListTeamResponse searchUserTeamByName(UUID userId, String keyword, String cursor, int size){
-        String handledCursor = cursor.isEmpty() ? "" : cursor;
+        String handledCursor = cursor == null || cursor.isEmpty() ? "" : cursor;
 
         SearchUserTeamByNameRequest request = SearchUserTeamByNameRequest.newBuilder()
                 .setUserId(userId.toString())
@@ -125,12 +124,12 @@ public class TeamServiceGrpcClient {
         return stub.getTeamMember(request);
     }
 
-    public ListTeamMembersResponse getTeamMembers(UUID teamId, LocalDate cursor, int size){
-        String cursorDate = cursor != null ? cursor.toString() : "";
+    public ListTeamMembersResponse getTeamMembers(UUID teamId, String cursor, int size){
+        String handledCursor = cursor == null || cursor.isEmpty() ? "" : cursor;
 
         GetTeamMembersRequest request = GetTeamMembersRequest.newBuilder()
                 .setTeamId(teamId.toString())
-                .setCursor(cursorDate)
+                .setCursor(handledCursor)
                 .setSize(size)
                 .build();
 

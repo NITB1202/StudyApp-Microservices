@@ -10,7 +10,6 @@ import com.study.teamservice.grpc.TeamResponse;
 import com.study.teamservice.grpc.TeamSummaryResponse;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -52,13 +51,10 @@ public class TeamMapper {
                 .map(TeamMapper::toTeamSummaryResponseDto)
                 .toList();
 
-        LocalDate nextCursor = teams.getNextCursor().isEmpty() ?
-                null : LocalDate.parse(teams.getNextCursor());
-
         return ListTeamResponseDto.builder()
                 .teams(summaries)
                 .total(teams.getTotal())
-                .nextCursor(nextCursor)
+                .nextCursor(teams.getNextCursor())
                 .build();
     }
 }

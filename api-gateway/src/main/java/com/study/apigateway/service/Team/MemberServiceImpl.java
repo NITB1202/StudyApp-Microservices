@@ -12,6 +12,8 @@ import com.study.apigateway.grpc.UserServiceGrpcClient;
 import com.study.apigateway.mapper.ActionMapper;
 import com.study.apigateway.mapper.TeamMemberMapper;
 import com.study.common.grpc.ActionResponse;
+import com.study.common.utils.CursorUtil;
+import com.study.common.utils.DecodedCursor;
 import com.study.teamservice.grpc.AllTeamMembersResponse;
 import com.study.teamservice.grpc.ListTeamMembersResponse;
 import com.study.teamservice.grpc.TeamMemberResponse;
@@ -24,6 +26,7 @@ import reactor.core.scheduler.Schedulers;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.UUID;
 
@@ -58,58 +61,78 @@ public class MemberServiceImpl implements MemberService {
     }
 
     @Override
-    public Mono<ListTeamMemberResponseDto> getTeamMembers(UUID teamId, LocalDate cursor, int size) {
+    public Mono<ListTeamMemberResponseDto> getTeamMembers(UUID teamId, String cursor, int size) {
         return Mono.fromCallable(()->{
             ListTeamMembersResponse response = teamGrpcClient.getTeamMembers(teamId, cursor, size);
 
-            LocalDate nextCursor = response.getNextCursor().isEmpty() ?
-                    null : LocalDate.parse(response.getNextCursor());
-
             List<TeamMemberResponseDto> members = new ArrayList<>();
-
             for(TeamMemberSummaryResponse teamUser : response.getMembersList()) {
                 UserDetailResponse user = userGrpcClient.getUserById(UUID.fromString(teamUser.getUserId()));
                 TeamMemberResponseDto dto = TeamMemberMapper.toTeamMemberResponseDto(teamUser, user);
                 members.add(dto);
             }
 
-            return TeamMemberMapper.toListTeamMemberResponseDto(members, response.getTotal(), nextCursor);
+            return TeamMemberMapper.toListTeamMemberResponseDto(members, response.getTotal(), response.getNextCursor());
 
         }).subscribeOn(Schedulers.boundedElastic());
     }
 
     @Override
-    public Mono<ListTeamMemberResponseDto> searchTeamMembersByUsername(UUID teamId, String keyword, LocalDate cursor, int size) {
-        return Mono.fromCallable(()->{
+    public Mono<ListTeamMemberResponseDto> searchTeamMembersByUsername(UUID teamId, String keyword, String cursor, int size) {
+        return Mono.fromCallable(() -> {
             AllTeamMembersResponse response = teamGrpcClient.getAllTeamMembers(teamId);
 
-            int total = 0;
-            List<TeamMemberResponseDto> matchedMembers = new ArrayList<>();
             String handledKeyword = keyword.trim().toLowerCase();
+            List<TeamMemberResponseDto> paginated = new ArrayList<>();
 
-            for(TeamMemberResponse teamUser : response.getMembersList()) {
-                UserDetailResponse user = userGrpcClient.getUserById(UUID.fromString(teamUser.getUserId()));
-                if(user.getUsername().toLowerCase().contains(handledKeyword)) {
-                    LocalDate joinDate = LocalDate.parse(teamUser.getJoinDate());
-
-                    if(cursor == null || joinDate.isAfter(cursor)) {
-                        TeamMemberResponseDto dto = TeamMemberMapper.toTeamMemberResponseDto(teamUser, user);
-                        matchedMembers.add(dto);
-                    }
-
-                    total++;
-                }
+            // Parse cursor
+            LocalDate cursorJoinDate = null;
+            UUID cursorId = null;
+            if (cursor != null && !cursor.isEmpty()) {
+                DecodedCursor decodedCursor = CursorUtil.decodeCursor(cursor);
+                cursorJoinDate = decodedCursor.getDate();
+                cursorId = decodedCursor.getId();
             }
 
-            List<TeamMemberResponseDto> paginated = matchedMembers.stream()
-                    .limit(size)
+            // Sort by joinDate DESC, id ASC
+            List<TeamMemberResponse> sorted = response.getMembersList().stream()
+                    .sorted(Comparator
+                            .comparing((TeamMemberResponse m) -> LocalDate.parse(m.getJoinDate())).reversed()
+                            .thenComparing(m -> UUID.fromString(m.getUserId())))
                     .toList();
 
-            LocalDate nextCursor = null;
-            if(!paginated.isEmpty() && paginated.size() == size) {
-                TeamMemberResponseDto lastItem = paginated.get(paginated.size() - 1);
-                TeamMemberResponse info = teamGrpcClient.getTeamMember(lastItem.getUserId(), teamId);
-                nextCursor = LocalDate.parse(info.getJoinDate());
+            for (TeamMemberResponse teamUser : sorted) {
+                LocalDate joinDate = LocalDate.parse(teamUser.getJoinDate());
+                UUID userId = UUID.fromString(teamUser.getUserId());
+
+                UserDetailResponse user = userGrpcClient.getUserById(userId);
+                if (!user.getUsername().toLowerCase().contains(handledKeyword)) {
+                    continue;
+                }
+
+                // Apply cursor
+                if (cursorJoinDate != null) {
+                    if (joinDate.isAfter(cursorJoinDate)) continue;
+                    if (joinDate.isEqual(cursorJoinDate) && userId.compareTo(cursorId) <= 0) continue;
+                }
+
+                TeamMemberResponseDto dto = TeamMemberMapper.toTeamMemberResponseDto(teamUser, user);
+                paginated.add(dto);
+
+                if (paginated.size() == size) break;
+            }
+
+            int total = (int) response.getMembersList().stream()
+                    .map(teamUser -> userGrpcClient.getUserById(UUID.fromString(teamUser.getUserId())))
+                    .filter(user -> user.getUsername().toLowerCase().contains(handledKeyword))
+                    .count();
+
+            // Calculate next cursor
+            String nextCursor = null;
+            if (paginated.size() == size) {
+                TeamMemberResponseDto lastMember = paginated.get(paginated.size() - 1);
+                TeamMemberResponse info = teamGrpcClient.getTeamMember(lastMember.getUserId(), teamId);
+                nextCursor = CursorUtil.encodeCursor(LocalDate.parse(info.getJoinDate()), UUID.fromString(info.getUserId()));
             }
 
             return TeamMemberMapper.toListTeamMemberResponseDto(paginated, total, nextCursor);
