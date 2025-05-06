@@ -3,6 +3,7 @@ syntax = "proto3";
 package user;
 
 import "common.proto";
+import "google/protobuf/empty.proto";
 
 option java_multiple_files = true;
 option java_package = "com.study.userservice.grpc";
@@ -70,12 +71,8 @@ message UploadUserAvatarRequest {
   string avatarUrl = 2;
 }
 
-message ExistsByIdRequest {
+message ValidateUserIdRequest {
   string id = 1;
-}
-
-message ExistsByIdResponse {
-  bool exists = 1;
 }
 
 // gRPC Service
@@ -85,5 +82,5 @@ service UserService {
   rpc SearchUserByUsername(SearchUserRequest) returns (ListUserResponse);
   rpc UpdateUser(UpdateUserRequest) returns (UserResponse);
   rpc UploadUserAvatar(UploadUserAvatarRequest) returns (common.ActionResponse);
-  rpc ExistsById(ExistsByIdRequest) returns (ExistsByIdResponse);
+  rpc ValidateUserId(ValidateUserIdRequest) returns (google.protobuf.Empty);
 }
