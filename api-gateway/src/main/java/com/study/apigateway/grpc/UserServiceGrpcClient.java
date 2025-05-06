@@ -62,12 +62,12 @@ public class UserServiceGrpcClient {
         return userServiceStub.updateUser(request);
     }
 
-    public ExistsByIdResponse existsById(UUID id) {
-        ExistsByIdRequest request = ExistsByIdRequest.newBuilder()
+    public void validateUserId(UUID id) {
+        ValidateUserIdRequest request = ValidateUserIdRequest.newBuilder()
                 .setId(id.toString())
                 .build();
 
-        return userServiceStub.existsById(request);
+        userServiceStub.validateUserId(request);
     }
 
     public ActionResponse uploadUserAvatar(UUID id, String avatarUrl){

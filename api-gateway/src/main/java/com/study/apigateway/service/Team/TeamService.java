@@ -8,14 +8,13 @@ import com.study.apigateway.dto.Team.response.TeamDetailResponseDto;
 import com.study.apigateway.dto.Team.response.TeamResponseDto;
 import reactor.core.publisher.Mono;
 
-import java.time.LocalDate;
 import java.util.UUID;
 
 public interface TeamService {
     Mono<TeamResponseDto> createTeam(UUID userId, CreateTeamRequestDto request);
     Mono<TeamDetailResponseDto> getTeamById(UUID id);
-    Mono<ListTeamResponseDto> getUserTeams(UUID userId, LocalDate cursor, int size);
-    Mono<ListTeamResponseDto> searchUserTeamByName(UUID userId, String keyword, LocalDate cursor, int size);
+    Mono<ListTeamResponseDto> getUserTeams(UUID userId, String cursor, int size);
+    Mono<ListTeamResponseDto> searchUserTeamByName(UUID userId, String keyword, String cursor, int size);
     Mono<TeamResponseDto> updateTeam(UUID userId, UUID teamId, UpdateTeamRequestDto request);
     Mono<ActionResponseDto> deleteTeam(UUID id, UUID userId);
 }

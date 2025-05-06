@@ -10,7 +10,6 @@ import com.study.apigateway.grpc.TeamServiceGrpcClient;
 import com.study.apigateway.grpc.UserServiceGrpcClient;
 import com.study.apigateway.mapper.ActionMapper;
 import com.study.apigateway.mapper.TeamMapper;
-import com.study.common.exceptions.NotFoundException;
 import com.study.common.grpc.ActionResponse;
 import com.study.teamservice.grpc.ListTeamResponse;
 import com.study.teamservice.grpc.TeamDetailResponse;
@@ -20,8 +19,6 @@ import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
 
-import java.time.LocalDate;
-import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -33,9 +30,7 @@ public class TeamServiceImpl implements TeamService {
     @Override
     public Mono<TeamResponseDto> createTeam(UUID userId, CreateTeamRequestDto request) {
         return Mono.fromCallable(() -> {
-            if(!userClient.existsById(userId).getExists()){
-                throw new NotFoundException("User not found");
-            }
+            userClient.validateUserId(userId);
             TeamResponse team = grpcClient.createTeam(userId, request);
             return TeamMapper.toTeamResponseDto(team);
         }).subscribeOn(Schedulers.boundedElastic());
@@ -50,7 +45,7 @@ public class TeamServiceImpl implements TeamService {
     }
 
     @Override
-    public Mono<ListTeamResponseDto> getUserTeams(UUID userId, LocalDate cursor, int size) {
+    public Mono<ListTeamResponseDto> getUserTeams(UUID userId, String cursor, int size) {
         return Mono.fromCallable(() -> {
             ListTeamResponse teams = grpcClient.getUserTeams(userId, cursor, size);
             return TeamMapper.toListTeamResponseDto(teams);
@@ -58,7 +53,7 @@ public class TeamServiceImpl implements TeamService {
     }
 
     @Override
-    public Mono<ListTeamResponseDto> searchUserTeamByName(UUID userId, String keyword, LocalDate cursor, int size) {
+    public Mono<ListTeamResponseDto> searchUserTeamByName(UUID userId, String keyword, String cursor, int size) {
         return Mono.fromCallable(() -> {
             ListTeamResponse teams = grpcClient.searchUserTeamByName(userId, keyword, cursor, size);
             return TeamMapper.toListTeamResponseDto(teams);
