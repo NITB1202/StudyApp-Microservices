@@ -61,7 +61,7 @@ public class MemberController {
     @Operation(summary = "Get a list of team members.")
     @ApiResponse(responseCode = "200", description = "Get successfully.")
     public Mono<ResponseEntity<ListTeamMemberResponseDto>> getTeamMembers(@RequestParam UUID teamId,
-                                                                          @RequestParam(required = false) LocalDate cursor,
+                                                                          @RequestParam(required = false) String cursor,
                                                                           @RequestParam(defaultValue = "10") int size){
         return memberService.getTeamMembers(teamId, cursor, size).map(ResponseEntity::ok);
     }
@@ -71,7 +71,7 @@ public class MemberController {
     @ApiResponse(responseCode = "200", description = "Search successfully.")
     public Mono<ResponseEntity<ListTeamMemberResponseDto>> searchTeamMembersByUsername(@RequestParam UUID teamId,
                                                                                        @RequestParam String keyword,
-                                                                                       @RequestParam(required = false) LocalDate cursor,
+                                                                                       @RequestParam(required = false) String cursor,
                                                                                        @RequestParam(defaultValue = "10") int size){
         return memberService.searchTeamMembersByUsername(teamId, keyword, cursor, size).map(ResponseEntity::ok);
     }

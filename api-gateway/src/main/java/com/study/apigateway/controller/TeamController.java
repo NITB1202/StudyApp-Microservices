@@ -18,7 +18,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
 
-import java.time.LocalDate;
 import java.util.UUID;
 
 @RestController
@@ -52,7 +51,7 @@ public class TeamController {
     @ApiResponse(responseCode = "404", description = "Not found.",
             content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     public Mono<ResponseEntity<ListTeamResponseDto>> getUserTeams(@RequestParam UUID userId,
-                                                                  @RequestParam(required = false) LocalDate cursor,
+                                                                  @RequestParam(required = false) String cursor,
                                                                   @RequestParam(defaultValue = "10") int size){
         return teamService.getUserTeams(userId, cursor,size).map(ResponseEntity::ok);
     }
@@ -64,7 +63,7 @@ public class TeamController {
             content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     public Mono<ResponseEntity<ListTeamResponseDto>> searchTeams(@RequestParam UUID userId,
                                                                  @RequestParam String keyword,
-                                                                 @RequestParam(required = false) LocalDate cursor,
+                                                                 @RequestParam(required = false) String cursor,
                                                                  @RequestParam(defaultValue = "10") int size ){
         return teamService.searchUserTeamByName(userId, keyword, cursor, size).map(ResponseEntity::ok);
     }
