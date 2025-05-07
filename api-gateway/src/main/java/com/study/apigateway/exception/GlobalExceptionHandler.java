@@ -1,6 +1,7 @@
 package com.study.apigateway.exception;
 
 import io.grpc.StatusRuntimeException;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -12,10 +13,12 @@ import reactor.core.publisher.Mono;
 
 import java.io.IOException;
 
+@Slf4j
 @ControllerAdvice
 public class GlobalExceptionHandler {
     @ExceptionHandler(value = Exception.class)
     public Mono<ResponseEntity<ErrorResponse>> handleException(Exception e) {
+        log.error("Unhandled exception: {}", e.getMessage(), e);
         ErrorResponse response = new ErrorResponse(
                 HttpStatus.BAD_REQUEST.value(),
                 "Unexpected error",
@@ -33,6 +36,8 @@ public class GlobalExceptionHandler {
                .map(DefaultMessageSourceResolvable::getDefaultMessage)
                .orElse("Validation error");
 
+       log.warn("Validation error: {}", errorMessage);
+
        ErrorResponse errorResponse = new ErrorResponse(
                HttpStatus.BAD_REQUEST.value(),
                "Validation error",
@@ -44,6 +49,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(value = ServerWebInputException.class)
     public Mono<ResponseEntity<ErrorResponse>> handleServerWebInputException(ServerWebInputException e) {
+        log.warn("JSON parse error: {}", e.getMessage());
         ErrorResponse response = new ErrorResponse(
                 HttpStatus.BAD_REQUEST.value(),
                 "Json parse error",
@@ -54,6 +60,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(value = IOException.class)
     public Mono<ResponseEntity<ErrorResponse>> handleIOException(IOException e) {
+        log.error("I/O error: {}", e.getMessage(), e);
         ErrorResponse response = new ErrorResponse(
                 HttpStatus.INTERNAL_SERVER_ERROR.value(),
                 "I/O error",
@@ -84,6 +91,8 @@ public class GlobalExceptionHandler {
                 break;
             }
         }
+
+        log.warn("gRPC error: {} - {}", e.getStatus().getCode(), e.getMessage());
 
         ErrorResponse response = new ErrorResponse(
                 statusCode,
