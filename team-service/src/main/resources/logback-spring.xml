@@ -33,6 +33,9 @@
         <appender-ref ref="FILE"/>
     </logger>
 
+    <!-- Suppress Kafka logs -->
+    <logger name="org.apache.kafka" level="ERROR" />
+
     <!-- Root logger -->
     <root level="INFO">
         <appender-ref ref="CONSOLE"/>
