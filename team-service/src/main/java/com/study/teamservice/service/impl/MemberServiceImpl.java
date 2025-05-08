@@ -36,6 +36,8 @@ public class MemberServiceImpl implements MemberService {
         UUID inviterId = UUID.fromString(request.getInviterId());
         UUID inviteeId = UUID.fromString(request.getInviteeId());
 
+        validateUpdateMemberPermission(teamId, inviterId);
+
         if(!teamService.existsById(teamId)) {
             throw new NotFoundException("Team does not exist");
         }
@@ -180,15 +182,28 @@ public class MemberServiceImpl implements MemberService {
         UUID userId = UUID.fromString(request.getUserId());
         UUID memberId = UUID.fromString(request.getMemberId());
 
-        validateUpdateMemberRequest(teamId, userId, memberId);
+        TeamUser user = teamUserRepository.findByUserIdAndTeamId(userId, teamId);
+
+        if(user == null) {
+            throw new NotFoundException("User id or team id is incorrect");
+        }
+
+        if(user.getRole() != TeamRole.CREATOR){
+            throw new BusinessException("Only the creator can change a member's role");
+        }
 
         TeamUser member = teamUserRepository.findByUserIdAndTeamId(memberId, teamId);
 
-        if(request.getRole() == com.study.teamservice.grpc.TeamRole.CREATOR)
-            throw new BusinessException("Member role can't be updated to 'CREATOR'");
+        if(member == null) {
+            throw new NotFoundException("Member id or team id is incorrect");
+        }
+
+        if(request.getRole() == com.study.teamservice.grpc.TeamRole.CREATOR){
+            user.setRole(TeamRole.ADMIN);
+            teamUserRepository.save(user);
+        }
 
         member.setRole(TeamRoleMapper.toEnum(request.getRole()));
-
         teamUserRepository.save(member);
     }
 
@@ -203,7 +218,12 @@ public class MemberServiceImpl implements MemberService {
             throw new BusinessException("User id and member id are the same.");
         }
 
-        validateUpdateMemberRequest(teamId, userId, memberId);
+        if(!teamUserRepository.existsByUserIdAndTeamId(memberId, teamId)){
+            throw new NotFoundException("Member id or team id is incorrect.");
+        }
+
+        validateUpdateMemberPermission(teamId, userId);
+
         teamService.decreaseMember(teamId);
         teamUserRepository.deleteByUserIdAndTeamId(memberId, teamId);
     }
@@ -220,10 +240,8 @@ public class MemberServiceImpl implements MemberService {
             throw new NotFoundException("User is not part of the team");
         }
 
-        // Check if any non-member (ADMIN/CREATOR) exists in the team
-        long nonMemberCount = teamUserRepository.countNonMemberByTeamId(teamId);
-        if (nonMemberCount == 0) {
-            throw new BusinessException("You are the last manager of the team." +
+        if (teamUser.getRole() == TeamRole.CREATOR) {
+            throw new BusinessException("You are the creator of the team." +
                     " Please hand over your responsibilities before leaving.");
         }
 
@@ -292,21 +310,19 @@ public class MemberServiceImpl implements MemberService {
         if(teamUser == null)
             throw new NotFoundException("User is not part of this team");
 
-        if(teamUser.getRole() == TeamRole.MEMBER)
-            throw new BusinessException("User doesn't have permission to update this team");
+        if(teamUser.getRole() != TeamRole.CREATOR)
+            throw new BusinessException("Only the creator has permission to update this team");
     }
 
-    private void validateUpdateMemberRequest(UUID teamId, UUID userId, UUID memberId) {
-        validateUpdateTeamPermission(userId, teamId);
+    private void validateUpdateMemberPermission(UUID teamId, UUID userId) {
+        TeamUser user = teamUserRepository.findByUserIdAndTeamId(userId, teamId);
 
-        TeamUser member = teamUserRepository.findByUserIdAndTeamId(memberId, teamId);
-
-        if(member == null) {
-            throw new NotFoundException("Member id or team id is incorrect");
+        if(user == null){
+            throw new NotFoundException("User is not part of this team");
         }
 
-        if(member.getRole() == TeamRole.CREATOR) {
-            throw new BusinessException("Can't update the creator of the team");
+        if(user.getRole() == TeamRole.MEMBER){
+            throw new BusinessException("User doesn't have permission to update this team.");
         }
     }
 
