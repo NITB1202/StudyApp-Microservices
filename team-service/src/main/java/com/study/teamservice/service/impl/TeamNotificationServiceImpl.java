@@ -10,12 +10,14 @@ import com.study.teamservice.event.TeamEventPublisher;
 import com.study.teamservice.repository.TeamUserRepository;
 import com.study.teamservice.service.TeamNotificationService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class TeamNotificationServiceImpl implements TeamNotificationService {
@@ -38,7 +40,10 @@ public class TeamNotificationServiceImpl implements TeamNotificationService {
 
     @Override
     public void publishTeamUpdateNotification(UUID userId, UUID teamId, Set<String> updatedFields) {
-        if(updatedFields.isEmpty()) return;
+        if(updatedFields.isEmpty()) {
+            log.info("No fields updated for team {}. Skipping update notification.", teamId);
+            return;
+        }
 
         List<UUID> memberIds = getTeamMembersId(teamId);
 
@@ -49,6 +54,7 @@ public class TeamNotificationServiceImpl implements TeamNotificationService {
                 .memberIds(memberIds)
                 .build();
 
+        log.info("Publishing team update notification for team {}: fields updated: {}", teamId, updatedFields);
         teamEventPublisher.publishEvent(UPDATE_TOPIC, event);
     }
 
@@ -62,6 +68,7 @@ public class TeamNotificationServiceImpl implements TeamNotificationService {
                 .memberIds(memberIds)
                 .build();
 
+        log.info("Publishing team deletion notification for team {}: deleted by user {}", teamId, userId);
         teamEventPublisher.publishEvent(DELETE_TOPIC, event);
     }
 
@@ -73,6 +80,7 @@ public class TeamNotificationServiceImpl implements TeamNotificationService {
                 .toId(inviteeId)
                 .build();
 
+        log.info("Sending invitation from user {} to user {} for team {}", inviterId, inviteeId, teamId);
         teamEventPublisher.publishEvent(INVITATION_CREATED_TOPIC, event);
     }
 
@@ -86,6 +94,7 @@ public class TeamNotificationServiceImpl implements TeamNotificationService {
                 .memberIds(memberIds)
                 .build();
 
+        log.info("Publishing user joined team notification for user {}: team {}", userId, teamId);
         teamEventPublisher.publishEvent(USER_JOINED_TOPIC, event);
     }
 
@@ -99,6 +108,7 @@ public class TeamNotificationServiceImpl implements TeamNotificationService {
                 .memberIds(memberIds)
                 .build();
 
+        log.info("Publishing user left team notification for user {}: team {}", userId, teamId);
         teamEventPublisher.publishEvent(USER_LEFT_TOPIC, event);
     }
 }

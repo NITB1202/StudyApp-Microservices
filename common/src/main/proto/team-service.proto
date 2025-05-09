@@ -50,6 +50,17 @@ message UpdateTeamRequest {
   string description = 4;
 }
 
+message UploadTeamAvatarRequest {
+  string userId = 1;
+  string teamId = 2;
+  string avatarUrl = 3;
+}
+
+message ResetTeamCodeRequest {
+  string id = 1;
+  string userId = 2;
+}
+
 message DeleteTeamRequest {
   string id = 1;
   string userId = 2;
@@ -147,18 +158,13 @@ message LeaveTeamRequest {
   string userId = 2;
 }
 
-message UploadTeamAvatarRequest {
-  string userId = 1;
-  string teamId = 2;
-  string avatarUrl = 3;
-}
-
 service TeamService {
   //Team section
   rpc CreateTeam(CreateTeamRequest) returns (TeamResponse);
   rpc GetTeamById(GetTeamByIdRequest) returns (TeamDetailResponse);
   rpc UpdateTeam(UpdateTeamRequest) returns (TeamResponse); // -> notification
   rpc UploadTeamAvatar(UploadTeamAvatarRequest) returns (common.ActionResponse); // -> notification
+  rpc ResetTeamCode(ResetTeamCodeRequest) returns (common.ActionResponse);
   rpc DeleteTeam(DeleteTeamRequest) returns (common.ActionResponse); // -> notification
 
   //Team member section

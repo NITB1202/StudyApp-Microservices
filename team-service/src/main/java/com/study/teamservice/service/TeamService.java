@@ -12,6 +12,7 @@ public interface TeamService {
     Set<String> updateTeam(UpdateTeamRequest request);
     void uploadTeamAvatar(UploadTeamAvatarRequest request);
     void deleteTeam(DeleteTeamRequest request);
+    void resetTeamCode(ResetTeamCodeRequest request);
 
     boolean existsById(UUID id);
     Team getTeamById(UUID teamId);

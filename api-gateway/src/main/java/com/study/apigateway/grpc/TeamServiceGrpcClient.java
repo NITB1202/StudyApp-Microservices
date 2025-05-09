@@ -37,6 +37,31 @@ public class TeamServiceGrpcClient {
         return stub.getTeamById(request);
     }
 
+    public ListTeamResponse getUserTeams(UUID userId, String cursor, int size){
+        String handledCursor = cursor == null || cursor.isEmpty() ? "" : cursor;
+
+        GetUserTeamsRequest request = GetUserTeamsRequest.newBuilder()
+                .setUserId(userId.toString())
+                .setCursor(handledCursor)
+                .setSize(size)
+                .build();
+
+        return stub.getUserTeams(request);
+    }
+
+    public ListTeamResponse searchUserTeamByName(UUID userId, String keyword, String cursor, int size){
+        String handledCursor = cursor == null || cursor.isEmpty() ? "" : cursor;
+
+        SearchUserTeamByNameRequest request = SearchUserTeamByNameRequest.newBuilder()
+                .setUserId(userId.toString())
+                .setKeyword(keyword)
+                .setCursor(handledCursor)
+                .setSize(size)
+                .build();
+
+        return stub.searchUserTeamByName(request);
+    }
+
     public TeamResponse updateTeam(UUID userId, UUID teamId, UpdateTeamRequestDto dto){
         String name = dto.getName() != null ? dto.getName() : "";
         String description = dto.getDescription() != null ? dto.getDescription() : "";
@@ -59,6 +84,15 @@ public class TeamServiceGrpcClient {
                 .build();
 
         return stub.uploadTeamAvatar(request);
+    }
+
+    public ActionResponse resetTeamCode(UUID userId, UUID teamId){
+        ResetTeamCodeRequest request = ResetTeamCodeRequest.newBuilder()
+                .setId(teamId.toString())
+                .setUserId(userId.toString())
+                .build();
+
+        return stub.resetTeamCode(request);
     }
 
     public ActionResponse deleteTeam(UUID id, UUID userId){
@@ -88,31 +122,6 @@ public class TeamServiceGrpcClient {
                 .build();
 
         return stub.joinTeam(request);
-    }
-
-    public ListTeamResponse getUserTeams(UUID userId, String cursor, int size){
-        String handledCursor = cursor == null || cursor.isEmpty() ? "" : cursor;
-
-        GetUserTeamsRequest request = GetUserTeamsRequest.newBuilder()
-                .setUserId(userId.toString())
-                .setCursor(handledCursor)
-                .setSize(size)
-                .build();
-
-        return stub.getUserTeams(request);
-    }
-
-    public ListTeamResponse searchUserTeamByName(UUID userId, String keyword, String cursor, int size){
-        String handledCursor = cursor == null || cursor.isEmpty() ? "" : cursor;
-
-        SearchUserTeamByNameRequest request = SearchUserTeamByNameRequest.newBuilder()
-                .setUserId(userId.toString())
-                .setKeyword(keyword)
-                .setCursor(handledCursor)
-                .setSize(size)
-                .build();
-
-        return stub.searchUserTeamByName(request);
     }
 
     public TeamMemberResponse getTeamMember(UUID userId, UUID teamId) {
