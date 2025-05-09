@@ -117,6 +117,21 @@ public class TeamServiceImpl implements TeamService {
     }
 
     @Override
+    public void resetTeamCode(ResetTeamCodeRequest request) {
+        Team team = teamRepository.findById(UUID.fromString(request.getId())).orElseThrow(
+                () -> new NotFoundException("Team not found")
+        );
+
+        String teamCode = codeService.generateRandomCode();
+        while(teamRepository.existsByTeamCode(teamCode)){
+            teamCode = codeService.generateRandomCode();
+        }
+
+        team.setTeamCode(teamCode);
+        teamRepository.save(team);
+    }
+
+    @Override
     public boolean existsById(UUID teamId) {
         return teamRepository.existsById(teamId);
     }

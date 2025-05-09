@@ -8,4 +8,5 @@ import java.util.UUID;
 public interface TeamRepository extends JpaRepository<Team, UUID> {
     boolean existsByNameAndCreatorId(String name, UUID creatorId);
     Team findByTeamCode(String teamCode);
+    boolean existsByTeamCode(String teamCode);
 }
