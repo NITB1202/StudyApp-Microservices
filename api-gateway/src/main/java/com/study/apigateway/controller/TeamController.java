@@ -81,6 +81,16 @@ public class TeamController {
         return teamService.updateTeam(userId, teamId, request).map(ResponseEntity::ok);
     }
 
+    @PatchMapping("/reset/{teamId}")
+    @Operation(summary = "Reset team code.")
+    @ApiResponse(responseCode = "200", description = "Reset successfully.")
+    @ApiResponse(responseCode = "404", description = "Not found.",
+            content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+    public Mono<ResponseEntity<ActionResponseDto>> resetTeamCode(@PathVariable UUID teamId,
+                                                                 @RequestParam UUID userId) {
+        return teamService.resetTeamCode(userId, teamId).map(ResponseEntity::ok);
+    }
+
     @DeleteMapping("/{teamId}")
     @Operation(summary = "Delete a team.")
     @ApiResponse(responseCode = "200", description = "Delete successfully.")
