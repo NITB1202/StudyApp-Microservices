@@ -69,6 +69,14 @@ public class TeamServiceImpl implements TeamService {
     }
 
     @Override
+    public Mono<ActionResponseDto> resetTeamCode(UUID userId, UUID teamId) {
+        return Mono.fromCallable(()->{
+            ActionResponse response = grpcClient.resetTeamCode(userId, teamId);
+            return ActionMapper.toResponseDto(response);
+        });
+    }
+
+    @Override
     public Mono<ActionResponseDto> deleteTeam(UUID id, UUID userId) {
         return Mono.fromCallable(()->{
             ActionResponse response = grpcClient.deleteTeam(id, userId);
