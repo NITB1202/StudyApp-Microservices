@@ -145,6 +145,15 @@ public class PlanServiceImpl implements PlanService {
     }
 
     @Override
+    public boolean isPlanCompleted(UUID id) {
+        Plan plan = planRepository.findById(id).orElseThrow(
+                () -> new NotFoundException("Plan not found.")
+        );
+
+        return plan.getCompleteAt() != null;
+    }
+
+    @Override
     public void updateProgress(UUID id, float progress) {
         Plan plan = planRepository.findById(id).orElseThrow(
                 () -> new NotFoundException("Plan not found.")

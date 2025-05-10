@@ -23,6 +23,7 @@ public interface PlanService {
     List<Plan> getPlansByListOfIds(List<UUID> ids);
 
     boolean existsById(UUID id);
+    boolean isPlanCompleted(UUID id);
     void updateProgress(UUID id, float progress);
     void deletePlan(Plan plan);
 }
