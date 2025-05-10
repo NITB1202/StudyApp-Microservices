@@ -12,7 +12,21 @@ import java.util.List;
 import java.util.UUID;
 
 public interface TeamUserRepository extends JpaRepository<TeamUser, UUID> {
-    List<TeamUser> findByUserIdAndJoinDateBeforeAndIdGreaterThanOrderByJoinDateDescIdAsc(UUID userId, LocalDate cursorJoinDate, UUID cursorId, Pageable pageable);
+    @Query("""
+  SELECT tu FROM TeamUser tu
+  WHERE tu.userId = :userId
+    AND (
+      tu.joinDate < :cursorJoinDate
+      OR (tu.joinDate = :cursorJoinDate AND tu.id > :cursorId)
+    )
+  ORDER BY tu.joinDate DESC, tu.id ASC
+""")
+    List<TeamUser> findByUserIdWithCursor(
+            @Param("userId") UUID userId,
+            @Param("cursorJoinDate") LocalDate cursorJoinDate,
+            @Param("cursorId") UUID cursorId,
+            Pageable pageable
+    );
     List<TeamUser> findByUserIdOrderByJoinDateDescIdAsc(UUID userId, Pageable pageable);
     Long countByUserId(UUID userId);
     TeamUser findByUserIdAndTeamId(UUID userId, UUID teamId);
