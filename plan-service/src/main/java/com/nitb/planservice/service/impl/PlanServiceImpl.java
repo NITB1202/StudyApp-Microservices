@@ -4,6 +4,7 @@ import com.nitb.planservice.entity.Plan;
 import com.nitb.planservice.repository.PlanRepository;
 import com.nitb.planservice.service.PlanService;
 import com.study.common.exceptions.BusinessException;
+import com.study.common.exceptions.NotFoundException;
 import com.study.planservice.grpc.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -57,7 +58,7 @@ public class PlanServiceImpl implements PlanService {
     public Plan getPlanById(GetPlanByIdRequest request) {
         UUID planId = UUID.fromString(request.getId());
         return planRepository.findById(planId).orElseThrow(
-                () -> new BusinessException("Plan not found.")
+                () -> new NotFoundException("Plan not found.")
         );
     }
 
@@ -139,11 +140,34 @@ public class PlanServiceImpl implements PlanService {
     }
 
     @Override
+    public boolean existsById(UUID id) {
+        return planRepository.existsById(id);
+    }
+
+    @Override
+    public void updateProgress(UUID id, float progress) {
+        Plan plan = planRepository.findById(id).orElseThrow(
+                () -> new NotFoundException("Plan not found.")
+        );
+
+        plan.setProgress(progress);
+
+        if(progress == 1) {
+            plan.setCompleteAt(LocalDateTime.now());
+        }
+        else {
+            plan.setCompleteAt(null);
+        }
+
+        planRepository.save(plan);
+    }
+
+    @Override
     public Plan updatePlan(UpdatePlanRequest request) {
         UUID planId = UUID.fromString(request.getId());
 
         Plan plan = planRepository.findById(planId).orElseThrow(
-                () -> new BusinessException("Plan not found.")
+                () -> new NotFoundException("Plan not found.")
         );
 
         if(!request.getName().isEmpty()) {
@@ -184,7 +208,7 @@ public class PlanServiceImpl implements PlanService {
         UUID planId = UUID.fromString(request.getId());
 
         Plan plan = planRepository.findById(planId).orElseThrow(
-                () -> new BusinessException("Plan not found.")
+                () -> new NotFoundException("Plan not found.")
         );
 
         planRepository.delete(plan);
@@ -195,7 +219,7 @@ public class PlanServiceImpl implements PlanService {
         UUID planId = UUID.fromString(request.getId());
 
         Plan plan = planRepository.findById(planId).orElseThrow(
-                () -> new BusinessException("Plan not found.")
+                () -> new NotFoundException("Plan not found.")
         );
 
         LocalDateTime now = LocalDateTime.now();

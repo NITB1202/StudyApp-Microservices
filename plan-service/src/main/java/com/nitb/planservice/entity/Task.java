@@ -19,6 +19,9 @@ public class Task {
     @Column(name = "id", nullable = false)
     private UUID id;
 
+    @Column(name = "plan_id", nullable = false)
+    private UUID planId;
+
     @Column(name = "name", nullable = false)
     private String name;
 
@@ -27,7 +30,4 @@ public class Task {
 
     @Column(name = "is_completed", nullable = false)
     private Boolean isCompleted;
-
-    @Column(name = "complete_at")
-    private LocalDateTime completeAt;
 }

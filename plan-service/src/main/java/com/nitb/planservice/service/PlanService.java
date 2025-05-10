@@ -21,4 +21,7 @@ public interface PlanService {
     List<Plan> getTeamPlans(UUID teamId);
     List<Plan> getPersonalPlans(UUID userId);
     List<Plan> getPlansByListOfIds(List<UUID> ids);
+
+    boolean existsById(UUID id);
+    void updateProgress(UUID id, float progress);
 }

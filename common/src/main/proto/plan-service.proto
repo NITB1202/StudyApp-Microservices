@@ -125,15 +125,14 @@ message CreateTaskRequest {
 
 message CreateTasksRequest {
   string planId = 1;
-  repeated CreateTasksRequest tasks = 2;
+  repeated CreateTaskRequest tasks = 2;
 }
 
 message TaskResponse {
   string id = 1;
   string assigneeId = 2;
   string name = 3;
-  string isCompleted = 4;
-  string completeAt = 5;
+  bool isCompleted = 4;
 }
 
 message TasksResponse {
@@ -151,11 +150,12 @@ message UpdateTaskRequest {
 
 message UpdateTasksRequest {
   string userId = 1;
-  repeated UpdateTaskRequest requests = 2;
+  string planId = 2;
+  repeated UpdateTaskRequest requests = 3;
 }
 
 message DeleteTasksRequest {
-  string userId = 1;
+  string planId = 1;
   repeated string taskIds = 2;
 }
 

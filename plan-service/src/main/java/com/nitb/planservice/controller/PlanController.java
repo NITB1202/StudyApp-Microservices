@@ -1,7 +1,9 @@
 package com.nitb.planservice.controller;
 
 import com.nitb.planservice.entity.Plan;
+import com.nitb.planservice.entity.Task;
 import com.nitb.planservice.mapper.PlanMapper;
+import com.nitb.planservice.mapper.TaskMapper;
 import com.nitb.planservice.service.PlanService;
 import com.nitb.planservice.service.TaskService;
 import com.study.common.grpc.ActionResponse;
@@ -153,5 +155,53 @@ public class PlanController extends PlanServiceGrpc.PlanServiceImplBase {
         }
 
         return PlanMapper.toTeamPlansResponse(filteredPlans);
+    }
+
+    //Tasks
+    @Override
+    public void createTasks(CreateTasksRequest request, StreamObserver<ActionResponse> responseObserver) {
+        taskService.createTasks(request);
+
+        ActionResponse response = ActionResponse.newBuilder()
+                .setSuccess(true)
+                .setMessage("Create tasks successfully")
+                .build();
+
+        responseObserver.onNext(response);
+        responseObserver.onCompleted();
+    }
+
+    @Override
+    public void getAllTasksInPlan(GetAllTasksInPlanRequest request, StreamObserver<TasksResponse> responseObserver) {
+        List<Task> tasks = taskService.getAllTasksInPlan(request);
+        TasksResponse response = TaskMapper.toTasksResponse(tasks);
+        responseObserver.onNext(response);
+        responseObserver.onCompleted();
+    }
+
+    @Override
+    public void updateTasks(UpdateTasksRequest request, StreamObserver<ActionResponse> responseObserver) {
+        taskService.updateTasks(request);
+
+        ActionResponse response = ActionResponse.newBuilder()
+                .setSuccess(true)
+                .setMessage("Update tasks successfully")
+                .build();
+
+        responseObserver.onNext(response);
+        responseObserver.onCompleted();
+    }
+
+    @Override
+    public void deleteTasks(DeleteTasksRequest request, StreamObserver<ActionResponse> responseObserver) {
+        taskService.deleteTasks(request);
+
+        ActionResponse response = ActionResponse.newBuilder()
+                .setSuccess(true)
+                .setMessage("Delete tasks successfully.")
+                .build();
+
+        responseObserver.onNext(response);
+        responseObserver.onCompleted();
     }
 }
