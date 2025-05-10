@@ -1,0 +1,243 @@
+package com.nitb.planservice.service.impl;
+
+import com.nitb.planservice.entity.Plan;
+import com.nitb.planservice.repository.PlanRepository;
+import com.nitb.planservice.service.PlanService;
+import com.study.common.exceptions.BusinessException;
+import com.study.planservice.grpc.*;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.util.*;
+import java.util.regex.Pattern;
+
+@Service
+@RequiredArgsConstructor
+public class PlanServiceImpl implements PlanService {
+    private final PlanRepository planRepository;
+    private final int EXPIRE_DAYS = 3;
+
+    @Override
+    public Plan createPlan(CreatePlanRequest request) {
+        LocalDateTime startAt = LocalDateTime.parse(request.getStartAt());
+        LocalDateTime endAt = LocalDateTime.parse(request.getEndAt());
+
+        if(startAt.isAfter(endAt)) {
+            throw new BusinessException("Start date must be before end date.");
+        }
+
+        //Check remind time
+        List<String> remindTime = request.getRemindAtList();
+        validateRemindTime(remindTime, startAt, endAt);
+
+        if(request.getName().isEmpty()){
+            throw new BusinessException("Name cannot be empty.");
+        }
+
+        UUID teamId = request.getTeamId().isEmpty() ? null : UUID.fromString(request.getTeamId());
+
+        Plan plan = Plan.builder()
+                .creatorId(UUID.fromString(request.getUserId()))
+                .name(request.getName())
+                .description(request.getDescription())
+                .startAt(startAt)
+                .endAt(endAt)
+                .remindAt(String.join(",", remindTime))
+                .progress(0f)
+                .teamId(teamId)
+                .build();
+
+        return planRepository.save(plan);
+    }
+
+    @Override
+    public Plan getPlanById(GetPlanByIdRequest request) {
+        UUID planId = UUID.fromString(request.getId());
+        return planRepository.findById(planId).orElseThrow(
+                () -> new BusinessException("Plan not found.")
+        );
+    }
+
+    @Override
+    public List<Plan> getPlansOnDate(String dateStr, List<Plan> plans) {
+        LocalDate date = LocalDate.parse(dateStr);
+        LocalDateTime dateTime = date.atStartOfDay();
+
+        List<Plan> result = new ArrayList<>();
+
+        for(Plan plan : plans) {
+            if(dateTime.isAfter(plan.getStartAt()) && dateTime.isBefore(plan.getEndAt())) {
+                result.add(plan);
+            }
+        }
+
+        return result;
+    }
+
+    @Override
+    public List<LocalDate> getDatesWithDeadlineInMonth(List<Plan> plans , GetDatesWithDeadlineInMonthRequest request) {
+        int month = request.getMonth();
+        int year = request.getYear();
+
+        if(month < 1 || month > 12) {
+            throw new BusinessException("Month must be between 1 and 12.");
+        }
+
+        if(year <= 0) {
+            throw new BusinessException("Year must be greater than 0.");
+        }
+
+        LocalDateTime startOfMonth = LocalDate.of(year, month, 1).atStartOfDay();
+        LocalDateTime endOfMonth = LocalDate.of(year, month, 1)
+                .withDayOfMonth(LocalDate.of(year, month, 1).lengthOfMonth())
+                .atTime(LocalTime.MAX);
+
+        List<LocalDate> result = new ArrayList<>();
+
+        for(Plan plan : plans) {
+            LocalDateTime deadline = plan.getEndAt();
+            if(deadline.isAfter(startOfMonth) && deadline.isBefore(endOfMonth)){
+                result.add(deadline.toLocalDate());
+            }
+
+        }
+
+        return result;
+    }
+
+    @Override
+    public List<Plan> getMissedPlans(List<Plan> plans) {
+        List<Plan> result = new ArrayList<>();
+        LocalDateTime now = LocalDateTime.now();
+
+        for(Plan plan : plans) {
+            LocalDateTime expireAt = (plan.getEndAt().plusDays(EXPIRE_DAYS)).with(LocalTime.MAX);
+            if(now.isAfter(plan.getEndAt()) && now.isBefore(expireAt) ) {
+                result.add(plan);
+            }
+        }
+
+        return result;
+    }
+
+    @Override
+    public List<Plan> getTeamPlans(UUID teamId) {
+        return planRepository.findByTeamId(teamId);
+    }
+
+    @Override
+    public List<Plan> getPersonalPlans(UUID userId) {
+        return planRepository.findByCreatorIdAndTeamIdIsNull(userId);
+    }
+
+    @Override
+    public List<Plan> getPlansByListOfIds(List<UUID> ids) {
+        return planRepository.findAllById(ids);
+    }
+
+    @Override
+    public Plan updatePlan(UpdatePlanRequest request) {
+        UUID planId = UUID.fromString(request.getId());
+
+        Plan plan = planRepository.findById(planId).orElseThrow(
+                () -> new BusinessException("Plan not found.")
+        );
+
+        if(!request.getName().isEmpty()) {
+            plan.setName(request.getName());
+        }
+
+        if(!request.getDescription().isEmpty()) {
+            plan.setDescription(request.getDescription());
+        }
+
+        if(!request.getStartAt().isEmpty()) {
+            LocalDateTime startAt = LocalDateTime.parse(request.getStartAt());
+            if(startAt.isAfter(plan.getEndAt())) {
+                throw new BusinessException("Start date must be before end date.");
+            }
+            plan.setStartAt(startAt);
+        }
+
+        if(!request.getEndAt().isEmpty()) {
+            LocalDateTime endAt = LocalDateTime.parse(request.getEndAt());
+            if(endAt.isBefore(plan.getStartAt())) {
+                throw new BusinessException("End date must be before start date.");
+            }
+            plan.setEndAt(endAt);
+        }
+
+        List<String> remindTimes = request.getRemindAtList();
+        if(!remindTimes.isEmpty()) {
+            validateRemindTime(remindTimes, plan.getStartAt(), plan.getEndAt());
+            plan.setRemindAt(String.join(",", remindTimes));
+        }
+
+        return planRepository.save(plan);
+    }
+
+    @Override
+    public void deletePlan(DeletePlanRequest request) {
+        UUID planId = UUID.fromString(request.getId());
+
+        Plan plan = planRepository.findById(planId).orElseThrow(
+                () -> new BusinessException("Plan not found.")
+        );
+
+        planRepository.delete(plan);
+    }
+
+    @Override
+    public void restorePlan(RestorePlanRequest request) {
+        UUID planId = UUID.fromString(request.getId());
+
+        Plan plan = planRepository.findById(planId).orElseThrow(
+                () -> new BusinessException("Plan not found.")
+        );
+
+        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime expireAt = (plan.getEndAt().plusDays(EXPIRE_DAYS)).with(LocalTime.MAX);
+
+        if(now.isAfter(plan.getEndAt()) && now.isBefore(expireAt)) {
+            LocalDateTime newDeadline = LocalDateTime.parse(request.getEndAt());
+
+            if(!newDeadline.isAfter(now)) {
+                throw new BusinessException("End date must be after now.");
+            }
+
+            plan.setEndAt(newDeadline);
+            planRepository.save(plan);
+        }
+        else {
+            if(now.isAfter(expireAt)) {
+                throw new BusinessException("Plan has expired.");
+            }
+
+            throw new BusinessException("Plan is still ongoing.");
+        }
+    }
+
+    private boolean isValidDateTime(String dateTimeStr) {
+        //yyyy-MM-dd HH:mm
+        String regex = "^\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}$";
+        Pattern pattern = Pattern.compile(regex);
+        return pattern.matcher(dateTimeStr).matches();
+    }
+
+    private void validateRemindTime(List<String> remindTimes, LocalDateTime startAt, LocalDateTime endAt) {
+        for(String time : remindTimes) {
+            if(!isValidDateTime(time)) {
+                throw new BusinessException("Invalid date format in remind time.");
+            }
+
+            LocalDateTime remindAt = LocalDateTime.parse(time);
+
+            if(remindAt.isBefore(startAt) || remindAt.isAfter(endAt)) {
+                throw new BusinessException("Invalid remind time.");
+            }
+        }
+    }
+}

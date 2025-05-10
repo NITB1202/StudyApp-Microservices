@@ -9,8 +9,18 @@ option java_package = "com.study.planservice.grpc";
 option java_outer_classname = "PlanProto";
 
 //Plan
-message CreatePersonalPlanRequest {
+message CreatePlanRequest {
   string userId = 1;
+  string name = 2;
+  string description = 3;
+  string startAt = 4;
+  string endAt = 5;
+  repeated string remindAt = 6;
+  string teamId = 7;
+}
+
+message PlanResponse {
+  string id = 1;
   string name = 2;
   string description = 3;
   string startAt = 4;
@@ -18,7 +28,11 @@ message CreatePersonalPlanRequest {
   repeated string remindAt = 6;
 }
 
-message PlanResponse {
+message GetPlanByIdRequest {
+  string id = 1;
+}
+
+message PlanDetailResponse {
   string id = 1;
   string creatorId = 2;
   string name = 3;
@@ -28,43 +42,52 @@ message PlanResponse {
   repeated string remindAt = 7;
   float progress = 8;
   string completeAt = 9;
+  string teamId = 10;
 }
 
-message CreateTeamPlanRequest {
-  string teamId = 1;
-  CreatePersonalPlanRequest plan = 2;
-}
-
-message GetPlanByIdRequest {
-  string id = 1;
-}
-
-message GetAllPlansOnDateRequest {
+message GetAssignedPlansOnDateRequest {
   string userId = 1;
   string date = 2;
 }
 
+message PlanSummaryResponse {
+  string id = 1;
+  string name = 2;
+  string endAt = 3;
+  float progress = 4;
+}
+
 message PlansResponse {
-  repeated PlanResponse plans = 1;
+  repeated PlanSummaryResponse plans = 1;
 }
 
 message GetTeamPlansOnDateRequest {
-  string teamId = 1;
-  string date = 2;
+  string userId = 1;
+  string teamId = 2;
+  string date = 3;
+}
+
+message TeamPlanSummaryResponse {
+  string id = 1;
+  string name = 2;
+  string endAt = 3;
+  float progress = 4;
+  bool isAssigned = 5;
+}
+
+message TeamPlansResponse {
+  repeated TeamPlanSummaryResponse plans = 1;
 }
 
 message GetDatesWithDeadlineInMonthRequest {
   string userId = 1;
   int32 month = 2;
+  int32 year = 3;
+  string teamId = 4;
 }
 
 message DatesResponse {
   repeated string dates = 1;
-}
-
-message GetTeamPlansDatesWithDeadlineInMonthRequest {
-  string teamId = 1;
-  int32 month = 2;
 }
 
 message GetPersonalMissedPlansRequest {
@@ -72,22 +95,26 @@ message GetPersonalMissedPlansRequest {
 }
 
 message GetTeamMissedPlansRequest {
-  string teamId = 1;
+  string userId = 1;
+  string teamId = 2;
 }
 
 message UpdatePlanRequest {
-  string userId = 1;
-  string planId = 2;
-  string name = 3;
-  string description = 4;
-  string startAt = 5;
-  string endAt = 6;
-  repeated string remindAt = 7;
+  string id = 1;
+  string name = 2;
+  string description = 3;
+  string startAt = 4;
+  string endAt = 5;
+  repeated string remindAt = 6;
 }
 
 message DeletePlanRequest {
-  string userId = 1;
-  string planId = 2;
+  string id = 1;
+}
+
+message RestorePlanRequest {
+  string id = 1;
+  string endAt = 2;
 }
 
 //Task
@@ -96,18 +123,17 @@ message CreateTaskRequest {
   string name = 2;
 }
 
-message TaskResponse {
-  string id = 1;
-  string planId = 2;
-  string assigneeId = 3;
-  string name = 4;
-  string isCompleted = 5;
-  string completeAt = 6;
-}
-
 message CreateTasksRequest {
   string planId = 1;
   repeated CreateTasksRequest tasks = 2;
+}
+
+message TaskResponse {
+  string id = 1;
+  string assigneeId = 2;
+  string name = 3;
+  string isCompleted = 4;
+  string completeAt = 5;
 }
 
 message TasksResponse {
@@ -135,24 +161,20 @@ message DeleteTasksRequest {
 
 service PlanService {
   //Plan
-  rpc CreatePersonalPlan(CreatePersonalPlanRequest) returns (PlanResponse);
-  rpc CreateTeamPlan(CreateTeamPlanRequest) returns (PlanResponse);
-
-  rpc GetPlanById(GetPlanByIdRequest) returns (PlanResponse);
-  rpc GetAllPlansOnDate(GetAllPlansOnDateRequest) returns (PlansResponse);
-  rpc GetTeamPlansOnDate(GetTeamPlansOnDateRequest) returns (PlansResponse);
+  rpc CreatePlan(CreatePlanRequest) returns (PlanResponse);
+  rpc GetPlanById(GetPlanByIdRequest) returns (PlanDetailResponse);
+  rpc GetAssignedPlansOnDate(GetAssignedPlansOnDateRequest) returns (PlansResponse);
+  rpc GetTeamPlansOnDate(GetTeamPlansOnDateRequest) returns (TeamPlansResponse);
   rpc GetDatesWithDeadlineInMonth(GetDatesWithDeadlineInMonthRequest) returns (DatesResponse);
-  rpc GetTeamPlansDatesWithDeadlineInMonth(GetTeamPlansDatesWithDeadlineInMonthRequest) returns (DatesResponse);
-
   rpc GetPersonalMissedPlans(GetPersonalMissedPlansRequest) returns (PlansResponse);
-  rpc GetTeamMissedPlans(GetTeamMissedPlansRequest) returns (PlansResponse);
-
-  rpc UpdatePlan(UpdatePlanRequest) returns (PlansResponse);
+  rpc GetTeamMissedPlans(GetTeamMissedPlansRequest) returns (TeamPlansResponse);
+  rpc UpdatePlan(UpdatePlanRequest) returns (PlanResponse);
   rpc DeletePlan(DeletePlanRequest) returns (common.ActionResponse);
+  rpc RestorePlan(RestorePlanRequest) returns (common.ActionResponse);
 
   //Task
-  rpc CreateTasks(CreateTasksRequest) returns (TasksResponse);
+  rpc CreateTasks(CreateTasksRequest) returns (common.ActionResponse);
   rpc GetAllTasksInPlan(GetAllTasksInPlanRequest) returns (TasksResponse);
-  rpc UpdateTasks(UpdateTasksRequest) returns (TasksResponse);
+  rpc UpdateTasks(UpdateTasksRequest) returns (common.ActionResponse);
   rpc DeleteTasks(DeleteTasksRequest) returns (common.ActionResponse);
 }
