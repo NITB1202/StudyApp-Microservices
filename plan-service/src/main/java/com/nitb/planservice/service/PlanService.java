@@ -15,7 +15,7 @@ public interface PlanService {
     void restorePlan(RestorePlanRequest request);
 
     List<Plan> getPlansOnDate(String dateStr, List<Plan> plans);
-    List<LocalDate> getDatesWithDeadlineInMonth(List<Plan> plans , GetDatesWithDeadlineInMonthRequest request);
+    List<LocalDate> getDatesWithDeadlineInMonth(List<Plan> plans, GetDatesWithDeadlineInMonthRequest request);
     List<Plan> getMissedPlans(List<Plan> plans);
 
     List<Plan> getTeamPlans(UUID teamId);
@@ -24,4 +24,5 @@ public interface PlanService {
 
     boolean existsById(UUID id);
     void updateProgress(UUID id, float progress);
+    void deletePlan(Plan plan);
 }

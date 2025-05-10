@@ -18,4 +18,5 @@ public interface TaskService {
 
     List<Plan> getAssignedPlans(UUID userId);
     boolean isAssignedForPlan(UUID userId, UUID planId);
+    void deleteAllByPlanId(UUID planId);
 }

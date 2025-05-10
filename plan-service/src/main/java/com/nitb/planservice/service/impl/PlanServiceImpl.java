@@ -163,6 +163,11 @@ public class PlanServiceImpl implements PlanService {
     }
 
     @Override
+    public void deletePlan(Plan plan) {
+        planRepository.delete(plan);
+    }
+
+    @Override
     public Plan updatePlan(UpdatePlanRequest request) {
         UUID planId = UUID.fromString(request.getId());
 

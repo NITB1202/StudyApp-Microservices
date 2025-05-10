@@ -121,7 +121,10 @@ public class PlanController extends PlanServiceGrpc.PlanServiceImplBase {
 
     @Override
     public void deletePlan(DeletePlanRequest request, StreamObserver<ActionResponse> responseObserver) {
+        UUID planId = UUID.fromString(request.getId());
+
         planService.deletePlan(request);
+        taskService.deleteAllByPlanId(planId);
 
         ActionResponse response = ActionResponse.newBuilder()
                 .setSuccess(true)

@@ -126,6 +126,11 @@ public class TaskServiceImpl implements TaskService {
         return taskRepository.existsByPlanIdAndAssigneeId(planId, userId);
     }
 
+    @Override
+    public void deleteAllByPlanId(UUID planId) {
+        taskRepository.deleteAllByPlanId(planId);
+    }
+
     private float calculateProgress(UUID planId) {
         int totalTasks = taskRepository.countTaskByPlanId(planId);
         int completedTasks = taskRepository.countTaskByPlanIdAndIsCompletedTrue(planId);

@@ -16,4 +16,5 @@ public interface TaskRepository extends JpaRepository<Task, UUID> {
     boolean existsByPlanIdAndAssigneeId(UUID planId, UUID assigneeId);
     @Query("SELECT DISTINCT t.planId FROM Task t WHERE t.assigneeId = :userId")
     List<UUID> findPlanIdsByAssigneeId(@Param("userId") UUID userId);
+    void deleteAllByPlanId(UUID planId);
 }
