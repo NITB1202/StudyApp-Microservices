@@ -7,6 +7,7 @@ import lombok.extern.slf4j.Slf4j;
 import net.devh.boot.grpc.server.advice.GrpcAdvice;
 import net.devh.boot.grpc.server.advice.GrpcExceptionHandler;
 
+import java.time.format.DateTimeParseException;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -43,5 +44,11 @@ public class GrpcGlobalExceptionHandler {
                 .collect(Collectors.joining(" "));
         log.error("Constraint violation errors: {}", errors, ex);
         return Status.INVALID_ARGUMENT.withDescription(errors).asRuntimeException();
+    }
+
+    @GrpcExceptionHandler(DateTimeParseException.class)
+    public StatusRuntimeException handleDateTimeParseException(DateTimeParseException ex) {
+        log.error("DateTime parsing error: {}", ex.getMessage(), ex);
+        return Status.INVALID_ARGUMENT.withDescription(ex.getMessage()).asRuntimeException();
     }
 }

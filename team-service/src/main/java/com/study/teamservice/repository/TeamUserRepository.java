@@ -12,7 +12,21 @@ import java.util.List;
 import java.util.UUID;
 
 public interface TeamUserRepository extends JpaRepository<TeamUser, UUID> {
-    List<TeamUser> findByUserIdAndJoinDateBeforeAndIdGreaterThanOrderByJoinDateDescIdAsc(UUID userId, LocalDate cursorJoinDate, UUID cursorId, Pageable pageable);
+    @Query("""
+  SELECT tu FROM TeamUser tu
+  WHERE tu.userId = :userId
+    AND (
+      tu.joinDate < :cursorJoinDate
+      OR (tu.joinDate = :cursorJoinDate AND tu.id > :cursorId)
+    )
+  ORDER BY tu.joinDate DESC, tu.id ASC
+""")
+    List<TeamUser> findByUserIdWithCursor(
+            @Param("userId") UUID userId,
+            @Param("cursorJoinDate") LocalDate cursorJoinDate,
+            @Param("cursorId") UUID cursorId,
+            Pageable pageable
+    );
     List<TeamUser> findByUserIdOrderByJoinDateDescIdAsc(UUID userId, Pageable pageable);
     Long countByUserId(UUID userId);
     TeamUser findByUserIdAndTeamId(UUID userId, UUID teamId);
@@ -21,18 +35,11 @@ public interface TeamUserRepository extends JpaRepository<TeamUser, UUID> {
     List<TeamUser> findByTeamIdAndRoleInAndJoinDateGreaterThanAndIdGreaterThan(UUID teamId, List<TeamRole> roles, LocalDate joinDate, UUID cursorId, Pageable pageable);
     List<TeamUser> findByTeamIdAndRoleIn(UUID teamId, List<TeamRole> roleOrder, Pageable pageable);
     Long countByTeamId(UUID teamId);
-    @Query("""
-    SELECT COUNT(tu) 
-    FROM TeamUser tu 
-    WHERE tu.teamId = :teamId 
-      AND tu.role <> 'MEMBER'
-    """)
-    long countNonMemberByTeamId(@Param("teamId") UUID teamId);
     @Query("SELECT tu FROM TeamUser tu " +
             "JOIN Team t ON tu.teamId = t.id " +
             "WHERE tu.userId = :userId " +
             "AND LOWER(t.name) LIKE LOWER(:keyword) " +
-            "AND (tu.joinDate < :cursorJoinDate OR (tu.joinDate = :cursorJoinDate AND tu.id < :cursorId)) " +
+            "AND (tu.joinDate < :cursorJoinDate OR (tu.joinDate = :cursorJoinDate AND tu.id > :cursorId)) " +
             "ORDER BY tu.joinDate DESC, tu.id ASC")
     List<TeamUser> searchTeamsByUserAndNameWithCursor(
             @Param("userId") UUID userId,

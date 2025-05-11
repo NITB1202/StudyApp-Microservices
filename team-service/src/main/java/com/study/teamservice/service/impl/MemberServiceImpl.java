@@ -80,41 +80,33 @@ public class MemberServiceImpl implements MemberService {
         Pageable pageable = PageRequest.of(0, size, Sort.by("joinDate").descending()
                 .and(Sort.by("id").ascending()));
 
-        // Get cursor parameters (joinDate and id)
-        LocalDate cursorJoinDate = null;
-        UUID cursorId = null;
         if (!cursor.isEmpty()) {
             DecodedCursor decodedCursor = CursorUtil.decodeCursor(cursor);
-            cursorJoinDate = decodedCursor.getDate();
-            cursorId = decodedCursor.getId();
+            return teamUserRepository.findByUserIdWithCursor(
+                    userId, decodedCursor.getDate(), decodedCursor.getId(), pageable
+            );
         }
 
-        //Get result
-        return cursorJoinDate != null && cursorId != null ?
-                teamUserRepository.findByUserIdAndJoinDateBeforeAndIdGreaterThanOrderByJoinDateDescIdAsc(userId, cursorJoinDate, cursorId, pageable) :
-                teamUserRepository.findByUserIdOrderByJoinDateDescIdAsc(userId, pageable);
+        return teamUserRepository.findByUserIdOrderByJoinDateDescIdAsc(userId, pageable);
     }
 
     @Override
     public List<TeamUser> searchUserTeamsByName(SearchUserTeamByNameRequest request) {
         int size = request.getSize() > 0 ? request.getSize() : DEFAULT_SIZE;
-        UUID userId = UUID.fromString(request.getUserId());
-        String keyword = "%" + request.getKeyword().trim() + "%";
-
         String cursor = request.getCursor();
-        LocalDate cursorJoinDate = null;
-        UUID cursorId = null;
-        if (!cursor.isEmpty()) {
-            DecodedCursor decodedCursor = CursorUtil.decodeCursor(cursor);
-            cursorJoinDate = decodedCursor.getDate();
-            cursorId = decodedCursor.getId();
-        }
+        String keyword = "%" + request.getKeyword().trim() + "%";
+        UUID userId = UUID.fromString(request.getUserId());
 
         Pageable pageable = PageRequest.of(0, size, Sort.by("tu.joinDate").descending().and(Sort.by("tu.id").ascending()));
 
-        return cursorJoinDate != null && cursorId != null ?
-            teamUserRepository.searchTeamsByUserAndNameWithCursor(userId, keyword, cursorJoinDate, cursorId, pageable) :
-            teamUserRepository.searchTeamsByUserAndName(userId, keyword, pageable);
+        if (!cursor.isEmpty()) {
+            DecodedCursor decodedCursor = CursorUtil.decodeCursor(cursor);
+            teamUserRepository.searchTeamsByUserAndNameWithCursor(
+                    userId, keyword, decodedCursor.getDate(), decodedCursor.getId(), pageable
+            );
+        }
+
+        return teamUserRepository.searchTeamsByUserAndName(userId, keyword, pageable);
     }
 
     @Override
@@ -136,38 +128,29 @@ public class MemberServiceImpl implements MemberService {
         int size = request.getSize() > 0 ? request.getSize() : DEFAULT_SIZE;
         String cursor = request.getCursor();
 
-        LocalDate cursorJoinDate = null;
-        UUID cursorId = null;
-        if (!cursor.isEmpty()) {
-            DecodedCursor decodedCursor = CursorUtil.decodeCursor(cursor);
-            cursorJoinDate = decodedCursor.getDate();
-            cursorId = decodedCursor.getId();
-        }
-
         List<TeamRole> roleOrder = Arrays.asList(TeamRole.CREATOR, TeamRole.ADMIN, TeamRole.MEMBER);
-
         Pageable pageable = PageRequest.of(0, size, Sort.by(
                 Sort.Order.asc("role").ignoreCase(),
                 Sort.Order.asc("joinDate"),
                 Sort.Order.asc("id")
         ));
 
-        if (cursorJoinDate != null && cursorId != null) {
+        if (!cursor.isEmpty()) {
+            DecodedCursor decodedCursor = CursorUtil.decodeCursor(cursor);
             return teamUserRepository.findByTeamIdAndRoleInAndJoinDateGreaterThanAndIdGreaterThan(
                     UUID.fromString(request.getTeamId()),
                     roleOrder,
-                    cursorJoinDate,
-                    cursorId,
+                    decodedCursor.getDate(),
+                    decodedCursor.getId(),
                     pageable
             );
         }
-        else {
-            return teamUserRepository.findByTeamIdAndRoleIn(
-                    UUID.fromString(request.getTeamId()),
-                    roleOrder,
-                    pageable
-            );
-        }
+
+        return teamUserRepository.findByTeamIdAndRoleIn(
+                UUID.fromString(request.getTeamId()),
+                roleOrder,
+                pageable
+        );
     }
 
     @Override
