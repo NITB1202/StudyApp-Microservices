@@ -27,7 +27,7 @@ public class PlanReminderJob implements Job {
         UUID planId = UUID.fromString(dataMap.getString("planId"));
 
         //If plan is completed, doesn't need to send notification
-        if(planService.isPlanCompleted(planId)) return;
+        if(planService.getPlanProgress(planId) == 1f) return;
 
         String receiverIdsStr = dataMap.getString("receiverIds");
         List<UUID> receiverIds = Arrays.stream(receiverIdsStr.split(","))

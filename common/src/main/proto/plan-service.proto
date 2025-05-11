@@ -102,6 +102,7 @@ message UpdatePlanRequest {
   string description = 3;
   string startAt = 4;
   string endAt = 5;
+  string userId = 6;
 }
 
 message DeletePlanRequest {
@@ -111,6 +112,7 @@ message DeletePlanRequest {
 message RestorePlanRequest {
   string id = 1;
   string endAt = 2;
+  string userId = 3;
 }
 
 message IsAssignedForOngoingPlanRequest {
@@ -127,6 +129,7 @@ message CreateTaskRequest {
 message CreateTasksRequest {
   string planId = 1;
   repeated CreateTaskRequest tasks = 2;
+  string userId = 3;
 }
 
 message TaskResponse {

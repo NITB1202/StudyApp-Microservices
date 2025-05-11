@@ -6,6 +6,7 @@ import com.nitb.planservice.entity.Task;
 import com.nitb.planservice.mapper.PlanMapper;
 import com.nitb.planservice.mapper.PlanReminderMapper;
 import com.nitb.planservice.mapper.TaskMapper;
+import com.nitb.planservice.service.PlanNotificationService;
 import com.nitb.planservice.service.PlanReminderService;
 import com.nitb.planservice.service.PlanService;
 import com.nitb.planservice.service.TaskService;
@@ -18,6 +19,7 @@ import net.devh.boot.grpc.server.service.GrpcService;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 @GrpcService
@@ -26,6 +28,7 @@ public class PlanController extends PlanServiceGrpc.PlanServiceImplBase {
     private final PlanService planService;
     private final TaskService taskService;
     private final PlanReminderService planReminderService;
+    private final PlanNotificationService planNotificationService;
 
     //Plans
     @Override
@@ -118,6 +121,16 @@ public class PlanController extends PlanServiceGrpc.PlanServiceImplBase {
     @Override
     public void updatePlan(UpdatePlanRequest request, StreamObserver<PlanResponse> responseObserver) {
         Plan plan = planService.updatePlan(request);
+
+        //Notification if update team plan
+        if(plan.getTeamId() != null) {
+            UUID userId = UUID.fromString(request.getUserId());
+            List<UUID> assigneeIds = taskService.getAllAssigneeForPlan(plan.getId());
+            planNotificationService.publishPlanUpdatedNotification(
+                    userId, plan.getId(), plan.getName(), assigneeIds
+            );
+        }
+
         PlanResponse response = PlanMapper.toPlanResponse(plan);
         responseObserver.onNext(response);
         responseObserver.onCompleted();
@@ -126,6 +139,13 @@ public class PlanController extends PlanServiceGrpc.PlanServiceImplBase {
     @Override
     public void deletePlan(DeletePlanRequest request, StreamObserver<ActionResponse> responseObserver) {
         UUID planId = UUID.fromString(request.getId());
+
+        //Notification if delete team plan
+        if (planService.isTeamPlan(planId)) {
+            String planName = planService.getPlanName(planId);
+            List<UUID> assigneeIds = taskService.getAllAssigneeForPlan(planId);
+            planNotificationService.publishPlanDeletedNotification(planName, assigneeIds);
+        }
 
         planService.deletePlan(request);
         taskService.deleteAllByPlanId(planId);
@@ -141,7 +161,19 @@ public class PlanController extends PlanServiceGrpc.PlanServiceImplBase {
 
     @Override
     public void restorePlan(RestorePlanRequest request, StreamObserver<ActionResponse> responseObserver) {
+        UUID planId = UUID.fromString(request.getId());
+
         planService.restorePlan(request);
+
+        //Notification if restore team plan
+        if(planService.isTeamPlan(planId)) {
+            UUID userId = UUID.fromString(request.getUserId());
+            String planName = planService.getPlanName(planId);
+            List<UUID> assigneeIds = taskService.getAllAssigneeForPlan(planId);
+            planNotificationService.publishPlanRestoredNotification(
+                userId, planId, planName, assigneeIds
+            );
+        }
 
         ActionResponse response = ActionResponse.newBuilder()
                 .setSuccess(true)
@@ -190,7 +222,25 @@ public class PlanController extends PlanServiceGrpc.PlanServiceImplBase {
     //Tasks
     @Override
     public void createTasks(CreateTasksRequest request, StreamObserver<ActionResponse> responseObserver) {
-        taskService.createTasks(request);
+        UUID planId = UUID.fromString(request.getPlanId());
+        float progress = planService.getPlanProgress(planId);
+
+        Set<UUID> assigneeIds = taskService.createTasks(request);
+
+        //Notification if create/update teamPlan
+        if(planService.isTeamPlan(planId)) {
+            String planName = planService.getPlanName(planId);
+            planNotificationService.publishPlanAssignedNotification(
+                    planId, planName, new ArrayList<>(assigneeIds)
+            );
+
+            if(progress == 1) {
+                UUID userId = UUID.fromString(request.getUserId());
+                planNotificationService.publishPlanIncompleteNotification(
+                        userId, planId, planName, taskService.getAllAssigneeForPlan(planId)
+                );
+            }
+        }
 
         ActionResponse response = ActionResponse.newBuilder()
                 .setSuccess(true)
@@ -211,7 +261,30 @@ public class PlanController extends PlanServiceGrpc.PlanServiceImplBase {
 
     @Override
     public void updateTasks(UpdateTasksRequest request, StreamObserver<ActionResponse> responseObserver) {
+        UUID planId = UUID.fromString(request.getPlanId());
+        float progress = planService.getPlanProgress(planId);
+
         taskService.updateTasks(request);
+
+        //Notification if update team plan
+        if(planService.isTeamPlan(planId)) {
+            float newProgress = planService.getPlanProgress(planId);
+            String planName = planService.getPlanName(planId);
+            List<UUID> assigneeIds = taskService.getAllAssigneeForPlan(planId);
+
+            if(newProgress == 1) {
+                planNotificationService.publishPlanCompletedNotification(
+                        planId, planName, assigneeIds
+                );
+            }
+
+            if(progress == 1 && newProgress < 1) {
+                UUID userId = UUID.fromString(request.getUserId());
+                planNotificationService.publishPlanIncompleteNotification(
+                        userId, planId, planName, assigneeIds
+                );
+            }
+        }
 
         ActionResponse response = ActionResponse.newBuilder()
                 .setSuccess(true)
@@ -224,23 +297,26 @@ public class PlanController extends PlanServiceGrpc.PlanServiceImplBase {
 
     @Override
     public void deleteTasks(DeleteTasksRequest request, StreamObserver<ActionResponse> responseObserver) {
+        UUID planId = UUID.fromString(request.getPlanId());
         taskService.deleteTasks(request);
+
+        //Notification if update team plan
+        if(planService.isTeamPlan(planId)) {
+            float progress = planService.getPlanProgress(planId);
+            if(progress == 1) {
+                String planName = planService.getPlanName(planId);
+                List<UUID> assigneeIds = taskService.getAllAssigneeForPlan(planId);
+                planNotificationService.publishPlanCompletedNotification(
+                        planId, planName, assigneeIds
+                );
+            }
+        }
 
         ActionResponse response = ActionResponse.newBuilder()
                 .setSuccess(true)
                 .setMessage("Delete tasks successfully.")
                 .build();
 
-        responseObserver.onNext(response);
-        responseObserver.onCompleted();
-    }
-
-    @Override
-    public void getAllAssigneeForPlan(GetAllAssigneesForPlanRequest request, StreamObserver<GetAllAssigneesForPlanResponse> responseObserver) {
-        List<UUID> assigneeIds = taskService.getAllAssigneeForPlan(request);
-        GetAllAssigneesForPlanResponse response = GetAllAssigneesForPlanResponse.newBuilder()
-                .addAllIds(assigneeIds.stream().map(UUID::toString).toList())
-                .build();
         responseObserver.onNext(response);
         responseObserver.onCompleted();
     }

@@ -17,4 +17,4 @@ public class PlanIncompleteEvent {
     private List<UUID> assigneeIds;
 }
 
-//Message: Plan "PLAN01" has been moved back to "In Progress" as User01 updated a task to incomplete. -> Linked: planId
+//Message: Plan "PLAN01" has been moved back to "In Progress" as User01 updated tasks -> Linked: planId

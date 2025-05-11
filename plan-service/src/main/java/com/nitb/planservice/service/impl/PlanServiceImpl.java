@@ -153,12 +153,12 @@ public class PlanServiceImpl implements PlanService {
     }
 
     @Override
-    public boolean isPlanCompleted(UUID id) {
-        Plan plan = planRepository.findById(id).orElseThrow(
+    public boolean isTeamPlan(UUID planId) {
+        Plan plan = planRepository.findById(planId).orElseThrow(
                 () -> new NotFoundException("Plan not found.")
         );
 
-        return plan.getCompleteAt() != null;
+        return plan.getTeamId() != null;
     }
 
     @Override
@@ -225,6 +225,15 @@ public class PlanServiceImpl implements PlanService {
         );
 
         return plan.getEndAt().toString();
+    }
+
+    @Override
+    public float getPlanProgress(UUID planId) {
+        Plan plan = planRepository.findById(planId).orElseThrow(
+                () -> new NotFoundException("Plan not found.")
+        );
+
+        return plan.getProgress();
     }
 
     @Override

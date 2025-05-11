@@ -25,7 +25,7 @@ public interface PlanService {
     List<Plan> getPlansByListOfIds(List<UUID> ids);
 
     boolean existsById(UUID id);
-    boolean isPlanCompleted(UUID id);
+    boolean isTeamPlan(UUID planId);
 
     void validateRemindTimesList(UUID planId, List<String> remindTime);
     void updateProgress(UUID id, float progress);
@@ -33,4 +33,5 @@ public interface PlanService {
 
     String getPlanName(UUID planId);
     String getPlanEndAt(UUID planId);
+    float getPlanProgress(UUID planId);
 }

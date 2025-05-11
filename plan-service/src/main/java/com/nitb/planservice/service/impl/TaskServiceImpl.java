@@ -20,7 +20,7 @@ public class TaskServiceImpl implements TaskService {
     private final PlanService planService;
 
     @Override
-    public void createTasks(CreateTasksRequest request) {
+    public Set<UUID> createTasks(CreateTasksRequest request) {
         UUID planId = UUID.fromString(request.getPlanId());
 
         if(!planService.existsById(planId)) {
@@ -28,7 +28,8 @@ public class TaskServiceImpl implements TaskService {
         }
 
         Set<String> names = new LinkedHashSet<>();
-        List<Task> tasks = new ArrayList<>();
+        Set<Task> tasks = new LinkedHashSet<>();
+        Set<UUID> assignees = new LinkedHashSet<>();
 
         for(CreateTaskRequest createRequest : request.getTasksList()){
             String name = createRequest.getName();
@@ -49,6 +50,7 @@ public class TaskServiceImpl implements TaskService {
                     .build();
 
             tasks.add(task);
+            assignees.add(assigneeId);
         }
 
         taskRepository.saveAll(tasks);
@@ -56,6 +58,8 @@ public class TaskServiceImpl implements TaskService {
         //Update progress
         float progress = calculateProgress(planId);
         planService.updateProgress(planId, progress);
+
+        return assignees;
     }
 
     @Override
@@ -96,6 +100,11 @@ public class TaskServiceImpl implements TaskService {
     @Override
     public void deleteTasks(DeleteTasksRequest request) {
         UUID planId = UUID.fromString(request.getPlanId());
+        int taskCount = taskRepository.countTaskByPlanId(planId);
+
+        if(taskCount <= request.getTaskIdsCount()){
+            throw new BusinessException("The plan must have at least one task.");
+        }
 
         for(String idStr : request.getTaskIdsList()){
             UUID taskId = UUID.fromString(idStr);
@@ -116,8 +125,7 @@ public class TaskServiceImpl implements TaskService {
     }
 
     @Override
-    public List<UUID> getAllAssigneeForPlan(GetAllAssigneesForPlanRequest request) {
-        UUID planId = UUID.fromString(request.getPlanId());
+    public List<UUID> getAllAssigneeForPlan(UUID planId) {
         return taskRepository.findAllAssigneeIdsByPlanId(planId);
     }
 
