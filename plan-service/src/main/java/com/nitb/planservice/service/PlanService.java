@@ -21,9 +21,10 @@ public interface PlanService {
     List<Plan> getTeamPlans(UUID teamId);
     List<Plan> getPersonalPlans(UUID userId);
     List<Plan> getPlansByListOfIds(List<UUID> ids);
+    List<Plan> getAllExpiredPlans();
 
     boolean existsById(UUID id);
     boolean isPlanCompleted(UUID id);
     void updateProgress(UUID id, float progress);
-    void deletePlan(Plan plan);
+    void delete(Plan plan);
 }

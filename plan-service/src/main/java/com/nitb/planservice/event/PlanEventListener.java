@@ -1,6 +1,7 @@
 package com.nitb.planservice.event;
 
 import com.nitb.planservice.entity.Plan;
+import com.nitb.planservice.service.PlanReminderService;
 import com.nitb.planservice.service.PlanService;
 import com.nitb.planservice.service.TaskService;
 import com.study.common.events.Team.TeamDeletedEvent;
@@ -16,6 +17,7 @@ import java.util.UUID;
 public class PlanEventListener {
     private final PlanService planService;
     private final TaskService taskService;
+    private final PlanReminderService planReminderService;
 
     @KafkaListener(topics = "team-deleted", groupId = "plan-service-group")
     public void consumeTeamDeletedEvent(TeamDeletedEvent event) {
@@ -24,7 +26,8 @@ public class PlanEventListener {
 
         for(Plan plan : teamPlans) {
             taskService.deleteAllByPlanId(plan.getId());
-            planService.deletePlan(plan);
+            planReminderService.deleteAllByPlanId(plan.getId());
+            planService.delete(plan);
         }
     }
 }

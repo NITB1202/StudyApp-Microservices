@@ -15,8 +15,7 @@ message CreatePlanRequest {
   string description = 3;
   string startAt = 4;
   string endAt = 5;
-  repeated string remindAt = 6;
-  string teamId = 7;
+  string teamId = 6;
 }
 
 message PlanResponse {
@@ -25,7 +24,6 @@ message PlanResponse {
   string description = 3;
   string startAt = 4;
   string endAt = 5;
-  repeated string remindAt = 6;
 }
 
 message GetPlanByIdRequest {
@@ -39,10 +37,9 @@ message PlanDetailResponse {
   string description = 4;
   string startAt = 5;
   string endAt = 6;
-  repeated string remindAt = 7;
-  float progress = 8;
-  string completeAt = 9;
-  string teamId = 10;
+  float progress = 7;
+  string completeAt = 8;
+  string teamId = 9;
 }
 
 message GetAssignedPlansOnDateRequest {
@@ -159,6 +156,41 @@ message DeleteTasksRequest {
   repeated string taskIds = 2;
 }
 
+//Plan Reminder
+message CreatePlanRemindersRequest {
+  string planId = 1;
+  repeated string receiverIds = 2;
+  string remindAt = 3;
+}
+
+message GetAllPlanRemindersInPlanRequest {
+  string planId = 1;
+}
+
+message PlanReminderResponse {
+  string id = 1;
+  string remindAt = 2;
+}
+
+message PlanRemindersResponse {
+  repeated PlanRemindersResponse reminder = 1;
+}
+
+message UpdatePlanReminderRequest {
+  string id = 1;
+  string remindAt = 2;
+}
+
+message UpdatePlanRemindersRequest {
+  string planId = 1;
+  UpdatePlanReminderRequest request = 2;
+}
+
+message DeletePlanRemindersRequest {
+  string planId = 1;
+  repeated string reminderIds = 2;
+}
+
 service PlanService {
   //Plan
   rpc CreatePlan(CreatePlanRequest) returns (PlanResponse);
@@ -177,4 +209,10 @@ service PlanService {
   rpc GetAllTasksInPlan(GetAllTasksInPlanRequest) returns (TasksResponse);
   rpc UpdateTasks(UpdateTasksRequest) returns (common.ActionResponse);
   rpc DeleteTasks(DeleteTasksRequest) returns (common.ActionResponse);
+
+  //Plan reminder
+  rpc CreatePlanReminders(CreatePlanRemindersRequest) returns (common.ActionResponse);
+  rpc GetAllPlanRemindersInPlan(GetAllPlanRemindersInPlanRequest) returns (PlanRemindersResponse);
+  rpc UpdatePlanReminder(UpdatePlanRemindersRequest) returns (common.ActionResponse);
+  rpc DeletePlanReminders(DeletePlanRemindersRequest) returns (common.ActionResponse);
 }

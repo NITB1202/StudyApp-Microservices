@@ -35,9 +35,6 @@ public class Plan {
     @Column(name = "end_at", nullable = false)
     private LocalDateTime endAt;
 
-    @Column(name = "remind_at")
-    private String remindAt;
-
     @Column(name = "progress", nullable = false)
     private Float progress;
 

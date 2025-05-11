@@ -13,7 +13,6 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.*;
-import java.util.regex.Pattern;
 
 @Service
 @RequiredArgsConstructor
@@ -30,9 +29,6 @@ public class PlanServiceImpl implements PlanService {
             throw new BusinessException("Start date must be before end date.");
         }
 
-        //Check remind time
-        List<String> remindTime = request.getRemindAtList();
-        validateRemindTime(remindTime, startAt, endAt);
 
         if(request.getName().isEmpty()){
             throw new BusinessException("Name cannot be empty.");
@@ -46,7 +42,6 @@ public class PlanServiceImpl implements PlanService {
                 .description(request.getDescription())
                 .startAt(startAt)
                 .endAt(endAt)
-                .remindAt(String.join(",", remindTime))
                 .progress(0f)
                 .teamId(teamId)
                 .build();
@@ -140,6 +135,13 @@ public class PlanServiceImpl implements PlanService {
     }
 
     @Override
+    public List<Plan> getAllExpiredPlans() {
+        //Plan expire when endAt + 3days < now -> endAt < now - 3days
+        LocalDateTime now = LocalDateTime.now();
+        return planRepository.findAllByCompleteAtNullAndEndAtBefore(now.minusDays(EXPIRE_DAYS));
+    }
+
+    @Override
     public boolean existsById(UUID id) {
         return planRepository.existsById(id);
     }
@@ -172,7 +174,7 @@ public class PlanServiceImpl implements PlanService {
     }
 
     @Override
-    public void deletePlan(Plan plan) {
+    public void delete(Plan plan) {
         planRepository.delete(plan);
     }
 
@@ -206,12 +208,6 @@ public class PlanServiceImpl implements PlanService {
                 throw new BusinessException("End date must be before start date.");
             }
             plan.setEndAt(endAt);
-        }
-
-        List<String> remindTimes = request.getRemindAtList();
-        if(!remindTimes.isEmpty()) {
-            validateRemindTime(remindTimes, plan.getStartAt(), plan.getEndAt());
-            plan.setRemindAt(String.join(",", remindTimes));
         }
 
         return planRepository.save(plan);
@@ -255,27 +251,6 @@ public class PlanServiceImpl implements PlanService {
             }
 
             throw new BusinessException("Plan is still ongoing.");
-        }
-    }
-
-    private boolean isValidDateTime(String dateTimeStr) {
-        //yyyy-MM-dd HH:mm
-        String regex = "^\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}$";
-        Pattern pattern = Pattern.compile(regex);
-        return pattern.matcher(dateTimeStr).matches();
-    }
-
-    private void validateRemindTime(List<String> remindTimes, LocalDateTime startAt, LocalDateTime endAt) {
-        for(String time : remindTimes) {
-            if(!isValidDateTime(time)) {
-                throw new BusinessException("Invalid date format in remind time.");
-            }
-
-            LocalDateTime remindAt = LocalDateTime.parse(time);
-
-            if(remindAt.isBefore(startAt) || remindAt.isAfter(endAt)) {
-                throw new BusinessException("Invalid remind time.");
-            }
         }
     }
 }
