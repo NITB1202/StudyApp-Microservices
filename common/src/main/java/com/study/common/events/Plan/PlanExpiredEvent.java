@@ -2,7 +2,6 @@ package com.study.common.events.Plan;
 
 import lombok.*;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -11,11 +10,10 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class PlanRemindedEvent {
+public class PlanExpiredEvent {
     private UUID planId;
     private String planName;
-    private LocalDateTime endAt;
-    private List<UUID> receiverIds;
+    private List<UUID> assigneeIds;
 }
 
-//Message: Plan "PLAN01" will expire at 10:00:00 on 12/02/2025 -> Linked: planId
+//Message: Plan "PLAN01" has expired. -> Linked: planId
