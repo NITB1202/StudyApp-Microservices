@@ -13,6 +13,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.*;
+import java.util.regex.Pattern;
 
 @Service
 @RequiredArgsConstructor
@@ -156,6 +157,31 @@ public class PlanServiceImpl implements PlanService {
     }
 
     @Override
+    public void validateRemindTimesList(UUID planId, List<String> remindTime) {
+        Plan plan = planRepository.findById(planId).orElseThrow(
+                ()-> new NotFoundException("Plan not found.")
+        );
+
+        Set<LocalDateTime> times = new LinkedHashSet<>();
+
+        for(String time : remindTime){
+            if(!isValidDateTime(time)) {
+                throw new BusinessException("Invalid date format in remind time.");
+            }
+
+            LocalDateTime remindAt = LocalDateTime.parse(time);
+
+            if(remindAt.isBefore(plan.getStartAt()) || remindAt.isAfter(plan.getEndAt())) {
+                throw new BusinessException("Invalid remind time.");
+            }
+
+            if(!times.add(remindAt)){
+                throw new BusinessException("Duplicated remind time.");
+            }
+        }
+    }
+
+    @Override
     public void updateProgress(UUID id, float progress) {
         Plan plan = planRepository.findById(id).orElseThrow(
                 () -> new NotFoundException("Plan not found.")
@@ -252,5 +278,12 @@ public class PlanServiceImpl implements PlanService {
 
             throw new BusinessException("Plan is still ongoing.");
         }
+    }
+
+    private boolean isValidDateTime(String dateTimeStr) {
+        //yyyy-MM-dd HH:mm
+        String regex = "^\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}$";
+        Pattern pattern = Pattern.compile(regex);
+        return pattern.matcher(dateTimeStr).matches();
     }
 }

@@ -114,6 +114,11 @@ message RestorePlanRequest {
   string endAt = 2;
 }
 
+message IsAssignedForOngoingPlanRequest {
+  string teamId = 1;
+  string userId = 2;
+}
+
 //Task
 message CreateTaskRequest {
   string assigneeId = 1;
@@ -160,7 +165,7 @@ message DeleteTasksRequest {
 message CreatePlanRemindersRequest {
   string planId = 1;
   repeated string receiverIds = 2;
-  string remindAt = 3;
+  repeated string remindTimes = 3;
 }
 
 message GetAllPlanRemindersInPlanRequest {
@@ -183,7 +188,7 @@ message UpdatePlanReminderRequest {
 
 message UpdatePlanRemindersRequest {
   string planId = 1;
-  UpdatePlanReminderRequest request = 2;
+  repeated UpdatePlanReminderRequest requests = 2;
 }
 
 message DeletePlanRemindersRequest {
@@ -203,6 +208,7 @@ service PlanService {
   rpc UpdatePlan(UpdatePlanRequest) returns (PlanResponse);
   rpc DeletePlan(DeletePlanRequest) returns (common.ActionResponse);
   rpc RestorePlan(RestorePlanRequest) returns (common.ActionResponse);
+  rpc IsAssignedForOngoingPlan(IsAssignedForOngoingPlanRequest) returns (common.ActionResponse);
 
   //Task
   rpc CreateTasks(CreateTasksRequest) returns (common.ActionResponse);

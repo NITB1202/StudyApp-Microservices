@@ -20,11 +20,12 @@ public interface PlanService {
 
     List<Plan> getTeamPlans(UUID teamId);
     List<Plan> getPersonalPlans(UUID userId);
-    List<Plan> getPlansByListOfIds(List<UUID> ids);
     List<Plan> getAllExpiredPlans();
+    List<Plan> getPlansByListOfIds(List<UUID> ids);
 
     boolean existsById(UUID id);
     boolean isPlanCompleted(UUID id);
+    void validateRemindTimesList(UUID planId, List<String> remindTime);
     void updateProgress(UUID id, float progress);
     void delete(Plan plan);
 }
