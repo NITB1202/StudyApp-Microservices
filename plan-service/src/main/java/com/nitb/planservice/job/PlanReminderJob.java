@@ -9,6 +9,7 @@ import org.quartz.JobDataMap;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 
+import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
@@ -32,7 +33,9 @@ public class PlanReminderJob implements Job {
         List<UUID> receiverIds = Arrays.stream(receiverIdsStr.split(","))
                 .map(UUID::fromString)
                 .toList();
+        String planName = dataMap.getString("planName");
+        LocalDateTime endAt = LocalDateTime.parse(dataMap.getString("endAt"));
 
-        planNotificationService.publishPlanRemindedNotification(planId, receiverIds);
+        planNotificationService.publishPlanRemindedNotification(planId, planName, endAt, receiverIds);
     }
 }

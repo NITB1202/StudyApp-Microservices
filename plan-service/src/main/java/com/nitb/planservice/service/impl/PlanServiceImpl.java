@@ -210,6 +210,24 @@ public class PlanServiceImpl implements PlanService {
     }
 
     @Override
+    public String getPlanName(UUID planId) {
+        Plan plan = planRepository.findById(planId).orElseThrow(
+                () -> new NotFoundException("Plan not found.")
+        );
+
+        return plan.getName();
+    }
+
+    @Override
+    public String getPlanEndAt(UUID planId) {
+        Plan plan = planRepository.findById(planId).orElseThrow(
+                () -> new NotFoundException("Plan not found.")
+        );
+
+        return plan.getEndAt().toString();
+    }
+
+    @Override
     public Plan updatePlan(UpdatePlanRequest request) {
         UUID planId = UUID.fromString(request.getId());
 
