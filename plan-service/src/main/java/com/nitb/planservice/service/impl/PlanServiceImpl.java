@@ -235,6 +235,10 @@ public class PlanServiceImpl implements PlanService {
                 () -> new NotFoundException("Plan not found.")
         );
 
+        if(plan.getEndAt().isBefore(LocalDateTime.now())){
+            throw new BusinessException("Plan has expired.");
+        }
+
         if(!request.getName().isEmpty()) {
             plan.setName(request.getName());
         }
