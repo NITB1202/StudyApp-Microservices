@@ -15,7 +15,6 @@ import org.springframework.stereotype.Service;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
@@ -27,7 +26,7 @@ public class PlanReminderServiceImpl implements PlanReminderService {
     private final Scheduler scheduler;
 
     @Override
-    public void createPlanReminders(CreatePlanRemindersRequest request) throws SchedulerException {
+    public void createPlanReminders(CreatePlanRemindersRequest request) {
         UUID planId = UUID.fromString(request.getPlanId());
         planService.validateRemindTimesList(planId, request.getRemindTimesList());
 
@@ -57,7 +56,7 @@ public class PlanReminderServiceImpl implements PlanReminderService {
     }
 
     @Override
-    public void updatePlanReminders(UpdatePlanRemindersRequest request) throws SchedulerException {
+    public void updatePlanReminders(UpdatePlanRemindersRequest request) {
         UUID planId = UUID.fromString(request.getPlanId());
         List<String> updatedTime = request.getRequestsList().stream()
                 .map(UpdatePlanReminderRequest::getRemindAt)
@@ -89,7 +88,7 @@ public class PlanReminderServiceImpl implements PlanReminderService {
     }
 
     @Override
-    public void deletePlanReminders(DeletePlanRemindersRequest request) throws SchedulerException {
+    public void deletePlanReminders(DeletePlanRemindersRequest request) {
         UUID planId = UUID.fromString(request.getPlanId());
 
         for(String idStr : request.getReminderIdsList()){
@@ -113,7 +112,7 @@ public class PlanReminderServiceImpl implements PlanReminderService {
     }
 
     @Override
-    public void updateReceivers(UUID planId, List<UUID> receiverIds) throws SchedulerException {
+    public void updateReceivers(UUID planId, List<UUID> receiverIds) {
         List<PlanReminder> reminders = planReminderRepository.findAllByPlanId(planId);
         String receiverIdsStr = String.join(",", receiverIds.stream().map(UUID::toString).toList());
 
@@ -126,7 +125,7 @@ public class PlanReminderServiceImpl implements PlanReminderService {
         }
     }
 
-    private void scheduleReminder(PlanReminder reminder) throws SchedulerException {
+    private void scheduleReminder(PlanReminder reminder) {
         JobDetail jobDetail = JobBuilder.newJob(PlanReminderJob.class)
                 .withIdentity("reminder_" + reminder.getId())
                 .usingJobData("planId", reminder.getPlanId().toString())
@@ -138,13 +137,21 @@ public class PlanReminderServiceImpl implements PlanReminderService {
                 .startAt(Timestamp.valueOf(reminder.getRemindAt()))
                 .build();
 
-        scheduler.scheduleJob(jobDetail, trigger);
+        try {
+            scheduler.scheduleJob(jobDetail, trigger);
+        } catch (SchedulerException e) {
+            throw new BusinessException(e.getMessage());
+        }
     }
 
-    private void cancelReminder(UUID reminderId) throws SchedulerException {
-        JobKey key = new JobKey("reminder_" + reminderId);
-        if (scheduler.checkExists(key)) {
-            scheduler.deleteJob(key);
+    private void cancelReminder(UUID reminderId) {
+        try {
+            JobKey key = new JobKey("reminder_" + reminderId);
+            if (scheduler.checkExists(key)) {
+                scheduler.deleteJob(key);
+            }
+        } catch (SchedulerException e) {
+            throw new BusinessException(e.getMessage());
         }
     }
 }

@@ -126,6 +126,11 @@ public class PlanServiceImpl implements PlanService {
     }
 
     @Override
+    public List<Plan> getTeamOngoingPlan(UUID teamId) {
+        return planRepository.findByTeamIdAndEndAtBefore(teamId, LocalDateTime.now());
+    }
+
+    @Override
     public List<Plan> getPersonalPlans(UUID userId) {
         return planRepository.findByCreatorIdAndTeamIdIsNull(userId);
     }

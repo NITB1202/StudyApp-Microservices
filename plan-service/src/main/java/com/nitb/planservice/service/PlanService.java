@@ -19,6 +19,7 @@ public interface PlanService {
     List<Plan> getMissedPlans(List<Plan> plans);
 
     List<Plan> getTeamPlans(UUID teamId);
+    List<Plan> getTeamOngoingPlan(UUID teamId);
     List<Plan> getPersonalPlans(UUID userId);
     List<Plan> getAllExpiredPlans();
     List<Plan> getPlansByListOfIds(List<UUID> ids);

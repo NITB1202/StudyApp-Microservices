@@ -17,4 +17,6 @@ public interface TaskRepository extends JpaRepository<Task, UUID> {
     @Query("SELECT DISTINCT t.planId FROM Task t WHERE t.assigneeId = :userId")
     List<UUID> findPlanIdsByAssigneeId(@Param("userId") UUID userId);
     void deleteAllByPlanId(UUID planId);
+    @Query("SELECT DISTINCT t.assigneeId FROM Task t WHERE t.planId = :planId")
+    List<UUID> findAllAssigneeIdsByPlanId(@Param("planId") UUID planId);
 }

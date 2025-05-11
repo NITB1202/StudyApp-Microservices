@@ -11,4 +11,5 @@ public interface PlanRepository extends JpaRepository<Plan, UUID> {
     List<Plan> findByTeamId(UUID teamId);
     List<Plan> findByCreatorIdAndTeamIdIsNull(UUID creatorId);
     List<Plan> findAllByCompleteAtNullAndEndAtBefore(LocalDateTime time);
+    List<Plan> findByTeamIdAndEndAtBefore(UUID teamId, LocalDateTime time);
 }

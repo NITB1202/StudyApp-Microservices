@@ -116,6 +116,12 @@ public class TaskServiceImpl implements TaskService {
     }
 
     @Override
+    public List<UUID> getAllAssigneeForPlan(GetAllAssigneesForPlanRequest request) {
+        UUID planId = UUID.fromString(request.getPlanId());
+        return taskRepository.findAllAssigneeIdsByPlanId(planId);
+    }
+
+    @Override
     public List<Plan> getAssignedPlans(UUID userId) {
         List<UUID> planIds = taskRepository.findPlanIdsByAssigneeId(userId);
         return planService.getPlansByListOfIds(planIds);

@@ -161,6 +161,14 @@ message DeleteTasksRequest {
   repeated string taskIds = 2;
 }
 
+message GetAllAssigneesForPlanRequest {
+  string planId = 1;
+}
+
+message GetAllAssigneesForPlanResponse {
+  repeated string ids = 1;
+}
+
 //Plan Reminder
 message CreatePlanRemindersRequest {
   string planId = 1;
@@ -178,7 +186,7 @@ message PlanReminderResponse {
 }
 
 message PlanRemindersResponse {
-  repeated PlanRemindersResponse reminder = 1;
+  repeated PlanReminderResponse reminder = 1;
 }
 
 message UpdatePlanReminderRequest {
@@ -215,10 +223,11 @@ service PlanService {
   rpc GetAllTasksInPlan(GetAllTasksInPlanRequest) returns (TasksResponse);
   rpc UpdateTasks(UpdateTasksRequest) returns (common.ActionResponse);
   rpc DeleteTasks(DeleteTasksRequest) returns (common.ActionResponse);
+  rpc GetAllAssigneesForPlan(GetAllAssigneesForPlanRequest) returns (GetAllAssigneesForPlanResponse);
 
   //Plan reminder
   rpc CreatePlanReminders(CreatePlanRemindersRequest) returns (common.ActionResponse);
   rpc GetAllPlanRemindersInPlan(GetAllPlanRemindersInPlanRequest) returns (PlanRemindersResponse);
-  rpc UpdatePlanReminder(UpdatePlanRemindersRequest) returns (common.ActionResponse);
+  rpc UpdatePlanReminders(UpdatePlanRemindersRequest) returns (common.ActionResponse);
   rpc DeletePlanReminders(DeletePlanRemindersRequest) returns (common.ActionResponse);
 }

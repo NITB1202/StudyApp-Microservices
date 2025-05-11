@@ -1,9 +1,12 @@
 package com.nitb.planservice.controller;
 
 import com.nitb.planservice.entity.Plan;
+import com.nitb.planservice.entity.PlanReminder;
 import com.nitb.planservice.entity.Task;
 import com.nitb.planservice.mapper.PlanMapper;
+import com.nitb.planservice.mapper.PlanReminderMapper;
 import com.nitb.planservice.mapper.TaskMapper;
+import com.nitb.planservice.service.PlanReminderService;
 import com.nitb.planservice.service.PlanService;
 import com.nitb.planservice.service.TaskService;
 import com.study.common.grpc.ActionResponse;
@@ -22,6 +25,7 @@ import java.util.UUID;
 public class PlanController extends PlanServiceGrpc.PlanServiceImplBase {
     private final PlanService planService;
     private final TaskService taskService;
+    private final PlanReminderService planReminderService;
 
     //Plans
     @Override
@@ -148,6 +152,29 @@ public class PlanController extends PlanServiceGrpc.PlanServiceImplBase {
         responseObserver.onCompleted();
     }
 
+    @Override
+    public void isAssignedForOngoingPlan(IsAssignedForOngoingPlanRequest request, StreamObserver<ActionResponse> responseObserver) {
+        UUID teamId = UUID.fromString(request.getTeamId());
+        UUID userId = UUID.fromString(request.getUserId());
+
+        List<Plan> teamOngoingPlans = planService.getTeamOngoingPlan(teamId);
+        List<String> assignedPlan = new ArrayList<>();
+
+        for(Plan plan : teamOngoingPlans) {
+            if(taskService.isAssignedForPlan(userId, plan.getId())){
+                assignedPlan.add(plan.getName());
+            }
+        }
+
+        ActionResponse response = ActionResponse.newBuilder()
+                .setSuccess(!assignedPlan.isEmpty())
+                .setMessage("Assigned plans: " + String.join(",", assignedPlan))
+                .build();
+
+        responseObserver.onNext(response);
+        responseObserver.onCompleted();
+    }
+
     private TeamPlansResponse filterAssignedPlans(UUID userId, List<Plan> plans) {
         List<TeamPlanSummaryResponse> filteredPlans = new ArrayList<>();
 
@@ -202,6 +229,64 @@ public class PlanController extends PlanServiceGrpc.PlanServiceImplBase {
         ActionResponse response = ActionResponse.newBuilder()
                 .setSuccess(true)
                 .setMessage("Delete tasks successfully.")
+                .build();
+
+        responseObserver.onNext(response);
+        responseObserver.onCompleted();
+    }
+
+    @Override
+    public void getAllAssigneeForPlan(GetAllAssigneesForPlanRequest request, StreamObserver<GetAllAssigneesForPlanResponse> responseObserver) {
+        List<UUID> assigneeIds = taskService.getAllAssigneeForPlan(request);
+        GetAllAssigneesForPlanResponse response = GetAllAssigneesForPlanResponse.newBuilder()
+                .addAllIds(assigneeIds.stream().map(UUID::toString).toList())
+                .build();
+        responseObserver.onNext(response);
+        responseObserver.onCompleted();
+    }
+
+    //PlanReminders
+    @Override
+    public void createPlanReminders(CreatePlanRemindersRequest request, StreamObserver<ActionResponse> responseObserver) {
+        planReminderService.createPlanReminders(request);
+
+        ActionResponse response = ActionResponse.newBuilder()
+                .setSuccess(true)
+                .setMessage("Create reminders successfully.")
+                .build();
+
+        responseObserver.onNext(response);
+        responseObserver.onCompleted();
+    }
+
+    @Override
+    public void getAllPlanRemindersInPlan(GetAllPlanRemindersInPlanRequest request, StreamObserver<PlanRemindersResponse> responseObserver) {
+        List<PlanReminder> reminders = planReminderService.getAllPlanRemindersInPlan(request);
+        PlanRemindersResponse response = PlanReminderMapper.toPlanRemindersResponse(reminders);
+        responseObserver.onNext(response);
+        responseObserver.onCompleted();
+    }
+
+    @Override
+    public void updatePlanReminders(UpdatePlanRemindersRequest request, StreamObserver<ActionResponse> responseObserver) {
+        planReminderService.updatePlanReminders(request);
+
+        ActionResponse response = ActionResponse.newBuilder()
+                .setSuccess(true)
+                .setMessage("Update reminders successfully.")
+                .build();
+
+        responseObserver.onNext(response);
+        responseObserver.onCompleted();
+    }
+
+    @Override
+    public void deletePlanReminders(DeletePlanRemindersRequest request, StreamObserver<ActionResponse> responseObserver) {
+        planReminderService.deletePlanReminders(request);
+
+        ActionResponse response = ActionResponse.newBuilder()
+                .setSuccess(true)
+                .setMessage("Delete reminders successfully.")
                 .build();
 
         responseObserver.onNext(response);
