@@ -72,6 +72,8 @@ public class TaskServiceImpl implements TaskService {
 
         planService.validateUpdatePlanRequest(planId);
 
+        List<Task> updatedTasks = new ArrayList<>();
+
         for(UpdateTaskStatusRequest updateRequest : request.getRequestsList()){
             UUID taskId = UUID.fromString(updateRequest.getTaskId());
 
@@ -88,8 +90,10 @@ public class TaskServiceImpl implements TaskService {
             }
 
             task.setIsCompleted(updateRequest.getIsCompleted());
-            taskRepository.save(task);
+            updatedTasks.add(task);
         }
+
+        taskRepository.saveAll(updatedTasks);
 
         //Update progress
         float progress = calculateProgress(planId);
@@ -141,6 +145,8 @@ public class TaskServiceImpl implements TaskService {
             throw new BusinessException("The plan must have at least one task.");
         }
 
+        List<Task> deletedTasks = new ArrayList<>();
+
         for(String idStr : request.getTaskIdsList()){
             UUID taskId = UUID.fromString(idStr);
 
@@ -152,8 +158,10 @@ public class TaskServiceImpl implements TaskService {
                 throw new BusinessException("Task with id " + taskId + " does not belong to plan.");
             }
 
-            taskRepository.delete(task);
+            deletedTasks.add(task);
         }
+
+        taskRepository.deleteAll(deletedTasks);
 
         float progress = calculateProgress(planId);
         planService.updateProgress(planId, progress);

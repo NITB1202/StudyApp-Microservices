@@ -249,21 +249,14 @@ public class PlanServiceImpl implements PlanService {
                 ()-> new NotFoundException("Plan not found.")
         );
 
-        Set<LocalDateTime> times = new LinkedHashSet<>();
+        if(plan.getEndAt().isBefore(LocalDateTime.now())){
+            throw new BusinessException("Plan has expired.");
+        }
 
         for(String time : remindTime){
-            if(!isValidDateTime(time)) {
-                throw new BusinessException("Invalid date format in remind time.");
-            }
-
             LocalDateTime remindAt = LocalDateTime.parse(time);
-
             if(remindAt.isBefore(plan.getStartAt()) || remindAt.isAfter(plan.getEndAt())) {
                 throw new BusinessException("Invalid remind time.");
-            }
-
-            if(!times.add(remindAt)){
-                throw new BusinessException("Duplicated remind time.");
             }
         }
     }
@@ -320,12 +313,5 @@ public class PlanServiceImpl implements PlanService {
         );
 
         return plan.getProgress();
-    }
-
-    private boolean isValidDateTime(String dateTimeStr) {
-        //yyyy-MM-dd HH:mm
-        String regex = "^\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}$";
-        Pattern pattern = Pattern.compile(regex);
-        return pattern.matcher(dateTimeStr).matches();
     }
 }

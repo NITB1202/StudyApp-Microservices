@@ -14,9 +14,7 @@ import org.springframework.stereotype.Service;
 
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -28,13 +26,19 @@ public class PlanReminderServiceImpl implements PlanReminderService {
     @Override
     public void createPlanReminders(CreatePlanRemindersRequest request) {
         UUID planId = UUID.fromString(request.getPlanId());
+        String receiverIds = String.join(",", request.getReceiverIdsList());
+
         planService.validateRemindTimesList(planId, request.getRemindTimesList());
 
+        Set<LocalDateTime> times = new LinkedHashSet<>();
         List<PlanReminder> reminders = new ArrayList<>();
 
         for(String time : request.getRemindTimesList()) {
             LocalDateTime remindAt = LocalDateTime.parse(time);
-            String receiverIds = String.join(",", request.getReceiverIdsList());
+
+            if(!times.add(remindAt) || planReminderRepository.existsByPlanIdAndRemindAt(planId, remindAt)) {
+                throw new BusinessException("Duplicated reminder " + time);
+            }
 
             PlanReminder reminder = PlanReminder.builder()
                     .planId(planId)
@@ -61,14 +65,17 @@ public class PlanReminderServiceImpl implements PlanReminderService {
         List<String> updatedTime = request.getRequestsList().stream()
                 .map(UpdatePlanReminderRequest::getRemindAt)
                 .toList();
+
         planService.validateRemindTimesList(planId, updatedTime);
 
+        List<PlanReminder> reminders = new ArrayList<>();
+
         for(UpdatePlanReminderRequest updateRequest : request.getRequestsList()) {
-            LocalDateTime remindAt = LocalDateTime.parse(updateRequest.getRemindAt());
             UUID id = UUID.fromString(updateRequest.getId());
+            LocalDateTime remindAt = LocalDateTime.parse(updateRequest.getRemindAt());
 
             if(planReminderRepository.existsByPlanIdAndRemindAt(planId, remindAt)){
-                throw new BusinessException("This reminder has already existed in this plan.");
+                throw new BusinessException("Reminder " + remindAt + " has already existed in this plan.");
             }
 
             PlanReminder reminder = planReminderRepository.findById(id).orElseThrow(
@@ -80,19 +87,26 @@ public class PlanReminderServiceImpl implements PlanReminderService {
             }
 
             reminder.setRemindAt(remindAt);
-            planReminderRepository.save(reminder);
+            reminders.add(reminder);
 
             cancelReminder(id);
             scheduleReminder(reminder);
         }
+
+        planReminderRepository.saveAll(reminders);
     }
 
     @Override
     public void deletePlanReminders(DeletePlanRemindersRequest request) {
         UUID planId = UUID.fromString(request.getPlanId());
 
+        planService.validateUpdatePlanRequest(planId);
+
+        List<PlanReminder> deletedReminders = new ArrayList<>();
+
         for(String idStr : request.getReminderIdsList()){
             UUID id = UUID.fromString(idStr);
+
             PlanReminder reminder = planReminderRepository.findById(id).orElseThrow(
                     ()-> new NotFoundException("Reminder with id " + id + " not found.")
             );
@@ -101,9 +115,11 @@ public class PlanReminderServiceImpl implements PlanReminderService {
                 throw new BusinessException("Reminder with id " + id + " does not belong to the plan");
             }
 
-            planReminderRepository.delete(reminder);
+            deletedReminders.add(reminder);
             cancelReminder(id);
         }
+
+        planReminderRepository.deleteAll(deletedReminders);
     }
 
     @Override
@@ -131,13 +147,17 @@ public class PlanReminderServiceImpl implements PlanReminderService {
         List<PlanReminder> reminders = planReminderRepository.findAllByPlanId(planId);
         String receiverIdsStr = String.join(",", receiverIds.stream().map(UUID::toString).toList());
 
+        List<PlanReminder> updatedReminders = new ArrayList<>();
+
         for(PlanReminder reminder : reminders) {
             reminder.setReceiverIds(receiverIdsStr);
-            planReminderRepository.save(reminder);
+            updatedReminders.add(reminder);
 
             cancelReminder(reminder.getId());
             scheduleReminder(reminder);
         }
+
+        planReminderRepository.saveAll(updatedReminders);
     }
 
     @Override
