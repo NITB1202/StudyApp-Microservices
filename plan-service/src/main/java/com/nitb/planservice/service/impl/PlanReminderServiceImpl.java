@@ -127,7 +127,7 @@ public class PlanReminderServiceImpl implements PlanReminderService {
     }
 
     @Override
-    public void updateReceivers(UUID planId, List<UUID> receiverIds) {
+    public void updateReceiversForAllPlanReminders(UUID planId, List<UUID> receiverIds) {
         List<PlanReminder> reminders = planReminderRepository.findAllByPlanId(planId);
         String receiverIdsStr = String.join(",", receiverIds.stream().map(UUID::toString).toList());
 

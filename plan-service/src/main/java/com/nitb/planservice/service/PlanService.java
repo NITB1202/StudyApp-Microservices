@@ -19,14 +19,13 @@ public interface PlanService {
     Plan updatePlan(UpdatePlanRequest request);
     void deletePlan(DeletePlanRequest request);
     Plan restorePlan(RestorePlanRequest request);
-    List<Plan> getAssignedTeamPlansFromNowOn(UUID userId, UUID teamId);
 
-    List<Plan> getTeamPlans(UUID teamId);
+    List<Plan> getAssignedTeamPlansFromNowOn(UUID userId, UUID teamId);
+    List<Plan> getAllTeamPlans(UUID teamId);
     List<Plan> getAllExpiredPlans();
 
-    boolean existsById(UUID id);
     boolean isTeamPlan(UUID planId);
-
+    void validateUpdatePlanRequest(UUID planId);
     void validateRemindTimesList(UUID planId, List<String> remindTime);
     void updateProgress(UUID id, float progress);
     void delete(Plan plan);

@@ -148,21 +148,33 @@ message GetAllTasksInPlanRequest {
   string planId = 1;
 }
 
-message UpdateTaskRequest {
+message UpdateTaskStatusRequest {
   string taskId = 1;
-  string assigneeId = 2;
-  bool isCompleted = 3;
+  bool isCompleted = 2;
 }
 
-message UpdateTasksRequest {
+message UpdateTasksStatusRequest {
   string userId = 1;
   string planId = 2;
-  repeated UpdateTaskRequest requests = 3;
+  repeated UpdateTaskStatusRequest requests = 3;
+}
+
+message UpdateTaskAssigneeRequest {
+  string taskId = 1;
+  string assigneeId = 2;
+
+}
+
+message UpdateTasksAssigneeRequest {
+  string userId = 1;
+  string planId = 2;
+  repeated UpdateTaskAssigneeRequest requests = 3;
 }
 
 message DeleteTasksRequest {
-  string planId = 1;
-  repeated string taskIds = 2;
+  string userId = 1;
+  string planId = 2;
+  repeated string taskIds = 3;
 }
 
 //Plan Reminder
@@ -217,7 +229,8 @@ service PlanService {
   //Task
   rpc CreateTasks(CreateTasksRequest) returns (common.ActionResponse);
   rpc GetAllTasksInPlan(GetAllTasksInPlanRequest) returns (TasksResponse);
-  rpc UpdateTasks(UpdateTasksRequest) returns (common.ActionResponse);
+  rpc UpdateTasksStatus(UpdateTasksStatusRequest) returns (common.ActionResponse);
+  rpc UpdateTasksAssignee(UpdateTasksAssigneeRequest) returns (common.ActionResponse);
   rpc DeleteTasks(DeleteTasksRequest) returns (common.ActionResponse);
 
   //Plan reminder

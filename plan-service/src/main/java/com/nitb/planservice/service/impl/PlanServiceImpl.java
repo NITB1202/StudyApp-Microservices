@@ -212,7 +212,7 @@ public class PlanServiceImpl implements PlanService {
     }
 
     @Override
-    public List<Plan> getTeamPlans(UUID teamId) {
+    public List<Plan> getAllTeamPlans(UUID teamId) {
         return planRepository.findByTeamId(teamId);
     }
 
@@ -224,17 +224,23 @@ public class PlanServiceImpl implements PlanService {
     }
 
     @Override
-    public boolean existsById(UUID id) {
-        return planRepository.existsById(id);
-    }
-
-    @Override
     public boolean isTeamPlan(UUID planId) {
         Plan plan = planRepository.findById(planId).orElseThrow(
                 () -> new NotFoundException("Plan not found.")
         );
 
         return plan.getTeamId() != null;
+    }
+
+    @Override
+    public void validateUpdatePlanRequest(UUID planId) {
+        Plan plan = planRepository.findById(planId).orElseThrow(
+                () -> new NotFoundException("Plan not found.")
+        );
+
+        if(plan.getEndAt().isBefore(LocalDateTime.now())){
+            throw new BusinessException("Plan has expired.");
+        }
     }
 
     @Override
@@ -267,6 +273,10 @@ public class PlanServiceImpl implements PlanService {
         Plan plan = planRepository.findById(id).orElseThrow(
                 () -> new NotFoundException("Plan not found.")
         );
+
+        if(progress < 0 || progress > 1){
+            throw new BusinessException("Invalid progress.");
+        }
 
         plan.setProgress(progress);
 

@@ -22,7 +22,7 @@ public class PlanEventListener {
     @KafkaListener(topics = "team-deleted", groupId = "plan-service-group")
     public void consumeTeamDeletedEvent(TeamDeletedEvent event) {
         UUID teamId = event.getId();
-        List<Plan> teamPlans = planService.getTeamPlans(teamId);
+        List<Plan> teamPlans = planService.getAllTeamPlans(teamId);
 
         for(Plan plan : teamPlans) {
             taskService.deleteAllByPlanId(plan.getId());

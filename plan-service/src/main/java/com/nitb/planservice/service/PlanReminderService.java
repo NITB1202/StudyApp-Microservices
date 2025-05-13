@@ -17,7 +17,7 @@ public interface PlanReminderService {
     void deletePlanReminders(DeletePlanRemindersRequest request);
 
     void createPlanReminder(UUID planId, LocalDateTime remindAt, List<UUID> assigneeIds);
-    void updateReceivers(UUID planId, List<UUID> receiverIds);
+    void updateReceiversForAllPlanReminders(UUID planId, List<UUID> receiverIds);
     void updateRemindTime(UUID planId, LocalDateTime oldRemindAt, LocalDateTime newRemindAt);
     void deleteAllByPlanId(UUID planId);
 }

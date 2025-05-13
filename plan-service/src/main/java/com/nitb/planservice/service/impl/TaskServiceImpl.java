@@ -22,12 +22,10 @@ public class TaskServiceImpl implements TaskService {
     public Set<UUID> createTasks(CreateTasksRequest request) {
         UUID planId = UUID.fromString(request.getPlanId());
 
-        if(!planService.existsById(planId)) {
-            throw new NotFoundException("Plan not found.");
-        }
+        planService.validateUpdatePlanRequest(planId);
 
-        Set<String> names = new LinkedHashSet<>();
         Set<Task> tasks = new LinkedHashSet<>();
+        Set<String> names = new LinkedHashSet<>();
         Set<UUID> assignees = new LinkedHashSet<>();
 
         for(CreateTaskRequest createRequest : request.getTasksList()){
@@ -68,11 +66,13 @@ public class TaskServiceImpl implements TaskService {
     }
 
     @Override
-    public void updateTasks(UpdateTasksRequest request) {
+    public void updateTasksStatus(UpdateTasksStatusRequest request) {
         UUID userId = UUID.fromString(request.getUserId());
         UUID planId = UUID.fromString(request.getPlanId());
 
-        for(UpdateTaskRequest updateRequest : request.getRequestsList()){
+        planService.validateUpdatePlanRequest(planId);
+
+        for(UpdateTaskStatusRequest updateRequest : request.getRequestsList()){
             UUID taskId = UUID.fromString(updateRequest.getTaskId());
 
             Task task = taskRepository.findById(taskId).orElseThrow(
@@ -97,10 +97,46 @@ public class TaskServiceImpl implements TaskService {
     }
 
     @Override
+    public Set<UUID> updateTasksAssignee(UpdateTasksAssigneeRequest request) {
+        UUID userId = UUID.fromString(request.getUserId());
+        UUID planId = UUID.fromString(request.getPlanId());
+
+        planService.validateUpdatePlanRequest(planId);
+
+        Set<UUID> assignees = new LinkedHashSet<>();
+
+        for(UpdateTaskAssigneeRequest updateRequest : request.getRequestsList()){
+            UUID taskId = UUID.fromString(updateRequest.getTaskId());
+
+            Task task = taskRepository.findById(taskId).orElseThrow(
+                    ()->new NotFoundException("Task not found.")
+            );
+
+            if(!task.getPlanId().equals(planId)){
+                throw new BusinessException("Task with id " + taskId + " does not belong to plan.");
+            }
+
+            //If change assignee -> reset task status
+            task.setAssigneeId(userId);
+            task.setIsCompleted(false);
+
+            taskRepository.save(task);
+            assignees.add(userId);
+        }
+
+        //Update progress
+        float progress = calculateProgress(planId);
+        planService.updateProgress(planId, progress);
+
+        return assignees;
+    }
+
+    @Override
     public void deleteTasks(DeleteTasksRequest request) {
         UUID planId = UUID.fromString(request.getPlanId());
-        int taskCount = taskRepository.countTaskByPlanId(planId);
+        planService.validateUpdatePlanRequest(planId);
 
+        int taskCount = taskRepository.countTaskByPlanId(planId);
         if(taskCount <= request.getTaskIdsCount()){
             throw new BusinessException("The plan must have at least one task.");
         }
@@ -140,6 +176,7 @@ public class TaskServiceImpl implements TaskService {
 
     private float calculateProgress(UUID planId) {
         int totalTasks = taskRepository.countTaskByPlanId(planId);
+        if(totalTasks == 0) return 0;
         int completedTasks = taskRepository.countTaskByPlanIdAndIsCompletedTrue(planId);
         return (float)completedTasks/totalTasks;
     }
