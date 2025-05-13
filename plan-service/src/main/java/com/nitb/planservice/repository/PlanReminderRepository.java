@@ -11,4 +11,5 @@ public interface PlanReminderRepository extends JpaRepository<PlanReminder, UUID
     List<PlanReminder> findAllByPlanId(UUID planId);
     void deleteAllByPlanId(UUID planId);
     boolean existsByPlanIdAndRemindAt(UUID planId, LocalDateTime remindAt);
+    PlanReminder findByPlanIdAndRemindAt(UUID planId, LocalDateTime remindAt);
 }

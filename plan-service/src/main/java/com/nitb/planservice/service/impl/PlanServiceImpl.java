@@ -14,6 +14,7 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.*;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -59,23 +60,27 @@ public class PlanServiceImpl implements PlanService {
     }
 
     @Override
-    public List<Plan> getPlansOnDate(String dateStr, List<Plan> plans) {
-        LocalDate date = LocalDate.parse(dateStr);
+    public List<Plan> getAssignedPlansOnDate(GetAssignedPlansOnDateRequest request) {
+        LocalDate date = LocalDate.parse(request.getDate());
         LocalDateTime dateTime = date.atStartOfDay();
 
-        List<Plan> result = new ArrayList<>();
+        UUID userId = UUID.fromString(request.getUserId());
 
-        for(Plan plan : plans) {
-            if(dateTime.isAfter(plan.getStartAt()) && dateTime.isBefore(plan.getEndAt())) {
-                result.add(plan);
-            }
-        }
-
-        return result;
+        return planRepository.findAssignedPlansByUserIdAndDate(userId, dateTime);
     }
 
     @Override
-    public List<LocalDate> getDatesWithDeadlineInMonth(List<Plan> plans , GetDatesWithDeadlineInMonthRequest request) {
+    public List<Plan> getTeamPlansOnDate(GetTeamPlansOnDateRequest request) {
+        LocalDate date = LocalDate.parse(request.getDate());
+        LocalDateTime dateTime = date.atStartOfDay();
+
+        UUID teamId = UUID.fromString(request.getTeamId());
+
+        return planRepository.findTeamPlansByTeamIdAndDate(teamId, dateTime);
+    }
+
+    @Override
+    public Set<LocalDate> getDatesWithDeadlineInMonth(GetDatesWithDeadlineInMonthRequest request) {
         int month = request.getMonth();
         int year = request.getYear();
 
@@ -92,52 +97,123 @@ public class PlanServiceImpl implements PlanService {
                 .withDayOfMonth(LocalDate.of(year, month, 1).lengthOfMonth())
                 .atTime(LocalTime.MAX);
 
-        List<LocalDate> result = new ArrayList<>();
+        List<Plan> plans = new ArrayList<>();
 
-        for(Plan plan : plans) {
-            LocalDateTime deadline = plan.getEndAt();
-            if(deadline.isAfter(startOfMonth) && deadline.isBefore(endOfMonth)){
-                result.add(deadline.toLocalDate());
-            }
-
+        if(request.getTeamId().isEmpty()) {
+            //Get assigned plans for the month
+            UUID userId = UUID.fromString(request.getUserId());
+            List<Plan> assignedPlans = planRepository.findAssignedPlansByUserIdAndEndAtBetween(userId, startOfMonth, endOfMonth);
+            plans.addAll(assignedPlans);
+        }
+        else {
+            //Get team plans for the month
+            UUID teamId = UUID.fromString(request.getTeamId());
+            List<Plan> teamPlans = planRepository.findPlansByTeamIdAndEndAtBetween(teamId, startOfMonth, endOfMonth);
+            plans.addAll(teamPlans);
         }
 
-        return result;
+        return plans.stream().map(plan -> plan.getEndAt().toLocalDate()).collect(Collectors.toSet());
     }
 
     @Override
-    public List<Plan> getMissedPlans(List<Plan> plans) {
-        List<Plan> result = new ArrayList<>();
+    public List<Plan> getPersonalMissedPlans(GetPersonalMissedPlansRequest request) {
+        UUID userId = UUID.fromString(request.getUserId());
         LocalDateTime now = LocalDateTime.now();
+        return planRepository.findPlansByCreatorIdAndTeamIdIsNullAndCompleteAtIsNullAndEndAtBefore(userId, now);
+    }
 
-        for(Plan plan : plans) {
-            LocalDateTime expireAt = (plan.getEndAt().plusDays(EXPIRE_DAYS)).with(LocalTime.MAX);
-            if(now.isAfter(plan.getEndAt()) && now.isBefore(expireAt) ) {
-                result.add(plan);
-            }
+    @Override
+    public List<Plan> getTeamMissedPlans(GetTeamMissedPlansRequest request) {
+        UUID teamId = UUID.fromString(request.getTeamId());
+        LocalDateTime now = LocalDateTime.now();
+        return planRepository.findPlansByTeamIdAndCompleteAtIsNullAndEndAtBefore(teamId, now);
+    }
+
+    @Override
+    public Plan updatePlan(UpdatePlanRequest request) {
+        UUID planId = UUID.fromString(request.getId());
+
+        Plan plan = planRepository.findById(planId).orElseThrow(
+                () -> new NotFoundException("Plan not found.")
+        );
+
+        if(plan.getEndAt().isBefore(LocalDateTime.now())){
+            throw new BusinessException("Plan has expired.");
         }
 
-        return result;
+        if(!request.getName().isEmpty()) {
+            plan.setName(request.getName());
+        }
+
+        if(!request.getDescription().isEmpty()) {
+            plan.setDescription(request.getDescription());
+        }
+
+        if(!request.getStartAt().isEmpty()) {
+            LocalDateTime startAt = LocalDateTime.parse(request.getStartAt());
+            if(startAt.isAfter(plan.getEndAt())) {
+                throw new BusinessException("Start date must be before end date.");
+            }
+            plan.setStartAt(startAt);
+        }
+
+        if(!request.getEndAt().isEmpty()) {
+            LocalDateTime endAt = LocalDateTime.parse(request.getEndAt());
+            if(endAt.isBefore(plan.getStartAt())) {
+                throw new BusinessException("End date must be after start date.");
+            }
+            plan.setEndAt(endAt);
+        }
+
+        return planRepository.save(plan);
+    }
+
+    @Override
+    public void deletePlan(DeletePlanRequest request) {
+        UUID planId = UUID.fromString(request.getId());
+
+        Plan plan = planRepository.findById(planId).orElseThrow(
+                () -> new NotFoundException("Plan not found.")
+        );
+
+        planRepository.delete(plan);
+    }
+
+    @Override
+    public Plan restorePlan(RestorePlanRequest request) {
+        UUID planId = UUID.fromString(request.getId());
+
+        Plan plan = planRepository.findById(planId).orElseThrow(
+                () -> new NotFoundException("Plan not found.")
+        );
+
+        LocalDateTime now = LocalDateTime.now();
+
+        if(plan.getCompleteAt() == null && now.isAfter(plan.getEndAt())) {
+            LocalDateTime newDeadline = LocalDateTime.parse(request.getEndAt());
+
+            if(!newDeadline.isAfter(now)) {
+                throw new BusinessException("End date must be after now.");
+            }
+
+            plan.setEndAt(newDeadline);
+            planRepository.save(plan);
+
+            return plan;
+        }
+        else {
+            throw new BusinessException("Plan is still ongoing.");
+        }
+    }
+
+    @Override
+    public List<Plan> getAssignedTeamPlansFromNowOn(UUID userId, UUID teamId) {
+        return planRepository.findAssignedTeamPlansFromNowOn(userId, teamId, LocalDateTime.now());
     }
 
     @Override
     public List<Plan> getTeamPlans(UUID teamId) {
         return planRepository.findByTeamId(teamId);
-    }
-
-    @Override
-    public List<Plan> getTeamOngoingPlan(UUID teamId) {
-        return planRepository.findByTeamIdAndEndAtBefore(teamId, LocalDateTime.now());
-    }
-
-    @Override
-    public List<Plan> getPersonalPlans(UUID userId) {
-        return planRepository.findByCreatorIdAndTeamIdIsNull(userId);
-    }
-
-    @Override
-    public List<Plan> getPlansByListOfIds(List<UUID> ids) {
-        return planRepository.findAllById(ids);
     }
 
     @Override
@@ -234,86 +310,6 @@ public class PlanServiceImpl implements PlanService {
         );
 
         return plan.getProgress();
-    }
-
-    @Override
-    public Plan updatePlan(UpdatePlanRequest request) {
-        UUID planId = UUID.fromString(request.getId());
-
-        Plan plan = planRepository.findById(planId).orElseThrow(
-                () -> new NotFoundException("Plan not found.")
-        );
-
-        if(plan.getEndAt().isBefore(LocalDateTime.now())){
-            throw new BusinessException("Plan has expired.");
-        }
-
-        if(!request.getName().isEmpty()) {
-            plan.setName(request.getName());
-        }
-
-        if(!request.getDescription().isEmpty()) {
-            plan.setDescription(request.getDescription());
-        }
-
-        if(!request.getStartAt().isEmpty()) {
-            LocalDateTime startAt = LocalDateTime.parse(request.getStartAt());
-            if(startAt.isAfter(plan.getEndAt())) {
-                throw new BusinessException("Start date must be before end date.");
-            }
-            plan.setStartAt(startAt);
-        }
-
-        if(!request.getEndAt().isEmpty()) {
-            LocalDateTime endAt = LocalDateTime.parse(request.getEndAt());
-            if(endAt.isBefore(plan.getStartAt())) {
-                throw new BusinessException("End date must be before start date.");
-            }
-            plan.setEndAt(endAt);
-        }
-
-        return planRepository.save(plan);
-    }
-
-    @Override
-    public void deletePlan(DeletePlanRequest request) {
-        UUID planId = UUID.fromString(request.getId());
-
-        Plan plan = planRepository.findById(planId).orElseThrow(
-                () -> new NotFoundException("Plan not found.")
-        );
-
-        planRepository.delete(plan);
-    }
-
-    @Override
-    public void restorePlan(RestorePlanRequest request) {
-        UUID planId = UUID.fromString(request.getId());
-
-        Plan plan = planRepository.findById(planId).orElseThrow(
-                () -> new NotFoundException("Plan not found.")
-        );
-
-        LocalDateTime now = LocalDateTime.now();
-        LocalDateTime expireAt = (plan.getEndAt().plusDays(EXPIRE_DAYS)).with(LocalTime.MAX);
-
-        if(now.isAfter(plan.getEndAt()) && now.isBefore(expireAt)) {
-            LocalDateTime newDeadline = LocalDateTime.parse(request.getEndAt());
-
-            if(!newDeadline.isAfter(now)) {
-                throw new BusinessException("End date must be after now.");
-            }
-
-            plan.setEndAt(newDeadline);
-            planRepository.save(plan);
-        }
-        else {
-            if(now.isAfter(expireAt)) {
-                throw new BusinessException("Plan has expired.");
-            }
-
-            throw new BusinessException("Plan is still ongoing.");
-        }
     }
 
     private boolean isValidDateTime(String dateTimeStr) {

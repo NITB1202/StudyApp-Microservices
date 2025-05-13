@@ -18,4 +18,6 @@ public class PlanRemindedEvent {
     private List<UUID> receiverIds;
 }
 
-//Message: Plan "PLAN01" will expire at 10:00:00 on 12/02/2025 -> Linked: planId
+//Message:
+// if(now < endAt) Plan "PLAN01" will expire at 10:00:00 on 12/02/2025 -> Linked: planId
+// else Plan "PLAN01" has expired. -> Linked: planId

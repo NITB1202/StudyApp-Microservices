@@ -97,25 +97,26 @@ message GetTeamMissedPlansRequest {
 }
 
 message UpdatePlanRequest {
-  string id = 1;
-  string name = 2;
-  string description = 3;
-  string startAt = 4;
-  string endAt = 5;
-  string userId = 6;
+  string userId = 1;
+  string id = 2;
+  string name = 3;
+  string description = 4;
+  string startAt = 5;
+  string endAt = 6;
 }
 
 message DeletePlanRequest {
-  string id = 1;
+  string userId = 1;
+  string id = 2;
 }
 
 message RestorePlanRequest {
-  string id = 1;
-  string endAt = 2;
-  string userId = 3;
+  string userId = 1;
+  string id = 2;
+  string endAt = 3;
 }
 
-message IsAssignedForOngoingPlanRequest {
+message IsAssignedForTeamPlansFromNowOnRequest {
   string teamId = 1;
   string userId = 2;
 }
@@ -149,7 +150,8 @@ message GetAllTasksInPlanRequest {
 
 message UpdateTaskRequest {
   string taskId = 1;
-  bool isCompleted = 2;
+  string assigneeId = 2;
+  bool isCompleted = 3;
 }
 
 message UpdateTasksRequest {
@@ -210,7 +212,7 @@ service PlanService {
   rpc UpdatePlan(UpdatePlanRequest) returns (PlanResponse);
   rpc DeletePlan(DeletePlanRequest) returns (common.ActionResponse);
   rpc RestorePlan(RestorePlanRequest) returns (common.ActionResponse);
-  rpc IsAssignedForOngoingPlan(IsAssignedForOngoingPlanRequest) returns (common.ActionResponse);
+  rpc IsAssignedForTeamPlansFromNowOn(IsAssignedForTeamPlansFromNowOnRequest) returns (common.ActionResponse);
 
   //Task
   rpc CreateTasks(CreateTasksRequest) returns (common.ActionResponse);

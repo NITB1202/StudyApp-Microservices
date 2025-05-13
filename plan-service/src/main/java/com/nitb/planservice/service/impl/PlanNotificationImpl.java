@@ -21,7 +21,6 @@ public class PlanNotificationImpl implements PlanNotificationService {
     private static final String ASSIGN_TOPIC = "plan-assigned";
     private static final String COMPLETE_TOPIC = "plan-completed";
     private static final String DELETE_TOPIC = "plan-deleted";
-    private static final String EXPIRE_TOPIC = "plan-expired";
     private static final String INCOMPLETE_TOPIC = "plan-incomplete";
     private static final String RESTORE_TOPIC = "plan-restored";
     private static final String UPDATE_TOPIC = "plan-updated";
@@ -51,26 +50,15 @@ public class PlanNotificationImpl implements PlanNotificationService {
     }
 
     @Override
-    public void publishPlanDeletedNotification(String planName, List<UUID> assigneeIds) {
+    public void publishPlanDeletedNotification(UUID userId, String planName, List<UUID> assigneeIds) {
         PlanDeletedEvent event = PlanDeletedEvent.builder()
+                .userId(userId)
                 .planName(planName)
                 .assigneeIds(assigneeIds)
                 .build();
 
         log.info("Publishing delete notification for plan {}", planName);
         publisher.publishEvent(DELETE_TOPIC, event);
-    }
-
-    @Override
-    public void publishPlanExpiredNotification(UUID planId, String planName, List<UUID> assigneeIds) {
-        PlanExpiredEvent event = PlanExpiredEvent.builder()
-                .planId(planId)
-                .planName(planName)
-                .assigneeIds(assigneeIds)
-                .build();
-
-        log.info("Publishing expire notification for plan {}", planId);
-        publisher.publishEvent(EXPIRE_TOPIC, event);
     }
 
     @Override
@@ -124,6 +112,4 @@ public class PlanNotificationImpl implements PlanNotificationService {
         log.info("Publishing update notification for plan {}", planId);
         publisher.publishEvent(UPDATE_TOPIC, event);
     }
-
-
 }

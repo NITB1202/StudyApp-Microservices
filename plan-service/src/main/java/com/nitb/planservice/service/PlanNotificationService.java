@@ -7,8 +7,7 @@ import java.util.UUID;
 public interface PlanNotificationService {
     void publishPlanAssignedNotification(UUID planId, String planName, List<UUID> assigneeIds);
     void publishPlanCompletedNotification(UUID planId, String planName, List<UUID> assigneeIds);
-    void publishPlanDeletedNotification(String planName, List<UUID> assigneeIds);
-    void publishPlanExpiredNotification(UUID planId, String planName, List<UUID> assigneeIds);
+    void publishPlanDeletedNotification(UUID userId, String planName, List<UUID> assigneeIds);
     void publishPlanIncompleteNotification(UUID userId, UUID planId, String planName, List<UUID> assigneeIds);
     void publishPlanRemindedNotification(UUID planId, String planName, LocalDateTime endAt, List<UUID> receiverIds);
     void publishPlanRestoredNotification(UUID userId, UUID planId, String planName, List<UUID> assigneeIds);

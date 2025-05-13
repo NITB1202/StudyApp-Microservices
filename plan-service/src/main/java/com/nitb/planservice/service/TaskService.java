@@ -1,6 +1,5 @@
 package com.nitb.planservice.service;
 
-import com.nitb.planservice.entity.Plan;
 import com.nitb.planservice.entity.Task;
 import com.study.planservice.grpc.*;
 
@@ -14,7 +13,6 @@ public interface TaskService {
     void updateTasks(UpdateTasksRequest request);
     void deleteTasks(DeleteTasksRequest request);
 
-    List<Plan> getAssignedPlans(UUID userId);
     List<UUID> getAllAssigneeForPlan(UUID planId);
     boolean isAssignedForPlan(UUID userId, UUID planId);
     void deleteAllByPlanId(UUID planId);

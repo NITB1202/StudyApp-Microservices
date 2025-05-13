@@ -1,6 +1,5 @@
 package com.nitb.planservice.service.impl;
 
-import com.nitb.planservice.entity.Plan;
 import com.nitb.planservice.entity.Task;
 import com.nitb.planservice.repository.TaskRepository;
 import com.nitb.planservice.service.PlanService;
@@ -127,12 +126,6 @@ public class TaskServiceImpl implements TaskService {
     @Override
     public List<UUID> getAllAssigneeForPlan(UUID planId) {
         return taskRepository.findAllAssigneeIdsByPlanId(planId);
-    }
-
-    @Override
-    public List<Plan> getAssignedPlans(UUID userId) {
-        List<UUID> planIds = taskRepository.findPlanIdsByAssigneeId(userId);
-        return planService.getPlansByListOfIds(planIds);
     }
 
     @Override

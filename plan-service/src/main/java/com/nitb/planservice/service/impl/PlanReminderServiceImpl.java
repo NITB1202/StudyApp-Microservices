@@ -107,6 +107,21 @@ public class PlanReminderServiceImpl implements PlanReminderService {
     }
 
     @Override
+    public void createPlanReminder(UUID planId, LocalDateTime remindAt, List<UUID> assigneeIds) {
+        planService.validateRemindTimesList(planId, List.of(remindAt.toString()));
+        String idsStr = String.join(",", assigneeIds.stream().map(UUID::toString).toList());
+
+        PlanReminder reminder = PlanReminder.builder()
+                .planId(planId)
+                .receiverIds(idsStr)
+                .remindAt(remindAt)
+                .build();
+
+        planReminderRepository.save(reminder);
+        scheduleReminder(reminder);
+    }
+
+    @Override
     public void deleteAllByPlanId(UUID planId) {
         planReminderRepository.deleteAllByPlanId(planId);
     }
@@ -123,6 +138,21 @@ public class PlanReminderServiceImpl implements PlanReminderService {
             cancelReminder(reminder.getId());
             scheduleReminder(reminder);
         }
+    }
+
+    @Override
+    public void updateRemindTime(UUID planId, LocalDateTime oldRemindAt, LocalDateTime newRemindAt) {
+        PlanReminder reminder = planReminderRepository.findByPlanIdAndRemindAt(planId, oldRemindAt);
+
+        if(reminder == null){
+            throw new NotFoundException("Reminder not found.");
+        }
+
+        reminder.setRemindAt(newRemindAt);
+        planReminderRepository.save(reminder);
+
+        cancelReminder(reminder.getId());
+        scheduleReminder(reminder);
     }
 
     private void scheduleReminder(PlanReminder reminder) {
