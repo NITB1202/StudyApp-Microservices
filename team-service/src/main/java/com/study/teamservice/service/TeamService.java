@@ -15,6 +15,7 @@ public interface TeamService {
     void resetTeamCode(ResetTeamCodeRequest request);
 
     boolean existsById(UUID id);
+    String getTeamName(UUID teamId);
     Team getTeamById(UUID teamId);
     Team getTeamByTeamCode(String teamCode);
     List<Team> getTeamsByListOfIds(List<UUID> ids);

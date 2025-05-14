@@ -223,7 +223,9 @@ public class MemberServiceImpl implements MemberService {
             throw new NotFoundException("User is not part of the team");
         }
 
-        if (teamUser.getRole() == TeamRole.CREATOR) {
+        long memberCount = teamUserRepository.countByTeamId(teamId);
+
+        if (teamUser.getRole() == TeamRole.CREATOR && memberCount > 1) {
             throw new BusinessException("You are the creator of the team." +
                     " Please hand over your responsibilities before leaving.");
         }
@@ -245,6 +247,13 @@ public class MemberServiceImpl implements MemberService {
                 .build();
 
         teamUserRepository.save(teamUser);
+    }
+
+    @Override
+    public List<UUID> getTeamMemberIds(UUID teamId) {
+        return teamUserRepository.findByTeamId(teamId).stream()
+                .map(TeamUser::getUserId)
+                .toList();
     }
 
     @Override

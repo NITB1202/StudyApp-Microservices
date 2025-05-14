@@ -12,7 +12,10 @@ import java.util.UUID;
 @Builder
 public class TeamUpdatedEvent {
     private UUID id;
+    private String teamName;
     private UUID updatedBy;
     private List<UUID> memberIds;
     private Set<String> updatedFields;
 }
+
+//Message: User01 updated "TEAM01"’s name and avatar. -> Linked: teamId

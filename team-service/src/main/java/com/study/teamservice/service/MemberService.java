@@ -26,7 +26,8 @@ public interface MemberService {
     void leaveTeam(LeaveTeamRequest request);
 
     boolean isTeamManagedByUser(UUID teamId, UUID userId);
-    void saveMember(UUID teamId, UUID userId, TeamRole role);
     void validateUpdateTeamPermission(UUID userId, UUID teamId);
+    void saveMember(UUID teamId, UUID userId, TeamRole role);
+    List<UUID> getTeamMemberIds(UUID teamId);
     void deleteAllMembers(UUID teamId);
 }

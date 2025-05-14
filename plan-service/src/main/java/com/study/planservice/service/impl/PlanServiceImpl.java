@@ -311,12 +311,12 @@ public class PlanServiceImpl implements PlanService {
     }
 
     @Override
-    public String getPlanEndAt(UUID planId) {
+    public LocalDateTime getPlanEndAt(UUID planId) {
         Plan plan = planRepository.findById(planId).orElseThrow(
                 () -> new NotFoundException("Plan not found.")
         );
 
-        return plan.getEndAt().toString();
+        return plan.getEndAt();
     }
 
     @Override

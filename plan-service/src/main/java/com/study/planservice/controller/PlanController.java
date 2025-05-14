@@ -99,7 +99,7 @@ public class PlanController extends PlanServiceGrpc.PlanServiceImplBase {
     @Override
     public void updatePlan(UpdatePlanRequest request, StreamObserver<PlanResponse> responseObserver) {
         UUID planId = UUID.fromString(request.getId());
-        LocalDateTime oldEndAt = LocalDateTime.parse(planService.getPlanEndAt(planId));
+        LocalDateTime oldEndAt = planService.getPlanEndAt(planId);
 
         Plan plan = planService.updatePlan(request);
 
@@ -114,7 +114,7 @@ public class PlanController extends PlanServiceGrpc.PlanServiceImplBase {
             UUID userId = UUID.fromString(request.getUserId());
             List<UUID> assigneeIds = taskService.getAllAssigneeForPlan(planId);
             planNotificationService.publishPlanUpdatedNotification(
-                    userId, planId, plan.getName(), assigneeIds
+                    userId, planId, assigneeIds
             );
         }
 
@@ -127,14 +127,12 @@ public class PlanController extends PlanServiceGrpc.PlanServiceImplBase {
     @Override
     @Transactional
     public void deletePlan(DeletePlanRequest request, StreamObserver<ActionResponse> responseObserver) {
+        UUID userId = UUID.fromString(request.getUserId());
         UUID planId = UUID.fromString(request.getId());
 
         //Notify assignees if delete team plan
         if (planService.isTeamPlan(planId)) {
-            UUID userId = UUID.fromString(request.getUserId());
-            String planName = planService.getPlanName(planId);
-            List<UUID> assigneeIds = taskService.getAllAssigneeForPlan(planId);
-            planNotificationService.publishPlanDeletedNotification(userId, planName, assigneeIds);
+            planNotificationService.publishPlanDeletedNotification(userId, planId);
         }
 
         planService.deletePlan(request);
@@ -163,9 +161,7 @@ public class PlanController extends PlanServiceGrpc.PlanServiceImplBase {
         //Notify assignees if restore team plan
         if(planService.isTeamPlan(planId)) {
             UUID userId = UUID.fromString(request.getUserId());
-            planNotificationService.publishPlanRestoredNotification(
-                userId, planId, plan.getName(), assigneeIds
-            );
+            planNotificationService.publishPlanRestoredNotification(userId, planId);
         }
 
         ActionResponse response = ActionResponse.newBuilder()
@@ -209,6 +205,7 @@ public class PlanController extends PlanServiceGrpc.PlanServiceImplBase {
     //Tasks
     @Override
     public void createTasks(CreateTasksRequest request, StreamObserver<ActionResponse> responseObserver) {
+        UUID userId = UUID.fromString(request.getUserId());
         UUID planId = UUID.fromString(request.getPlanId());
         float progress = planService.getPlanProgress(planId);
 
@@ -217,35 +214,30 @@ public class PlanController extends PlanServiceGrpc.PlanServiceImplBase {
 
         //Expiry reminder for newly created plan
         if(progress == 0){
-            LocalDateTime remindAt = LocalDateTime.parse(planService.getPlanEndAt(planId));
+            LocalDateTime remindAt = planService.getPlanEndAt(planId);
             planReminderService.createPlanReminder(planId, remindAt, planAssigneeIds);
         }
 
         //Notify assignees if create/update team plan
         if(planService.isTeamPlan(planId)) {
-            UUID userId = UUID.fromString(request.getUserId());
-            String planName = planService.getPlanName(planId);
-
             //If plan is updated
             if(progress != 0) {
                 //Update expiry reminder receivers, if plan is added with tasks
                 planReminderService.updateReceiversForAllPlanReminders(planId, planAssigneeIds);
                 //Notify assignees about the update
                 planNotificationService.publishPlanUpdatedNotification(
-                        userId, planId, planName, planAssigneeIds
+                        userId, planId, planAssigneeIds
                 );
             }
 
             //Notify task assignees
             planNotificationService.publishPlanAssignedNotification(
-                    planId, planName, new ArrayList<>(taskAssigneeIds)
+                    planId, new ArrayList<>(taskAssigneeIds)
             );
 
             //Completed plan + more tasks -> Incomplete plan
             if(progress == 1) {
-                planNotificationService.publishPlanIncompleteNotification(
-                        userId, planId, planName, planAssigneeIds
-                );
+                planNotificationService.publishPlanIncompleteNotification(userId, planId);
             }
         }
 
@@ -276,22 +268,16 @@ public class PlanController extends PlanServiceGrpc.PlanServiceImplBase {
         //Notify assignees if update team plan
         if(planService.isTeamPlan(planId)) {
             float newProgress = planService.getPlanProgress(planId);
-            String planName = planService.getPlanName(planId);
-            List<UUID> assigneeIds = taskService.getAllAssigneeForPlan(planId);
 
             //If all tasks status are updated to completed
             if(newProgress == 1) {
-                planNotificationService.publishPlanCompletedNotification(
-                        planId, planName, assigneeIds
-                );
+                planNotificationService.publishPlanCompletedNotification(planId);
             }
 
             //If after updating, completed plan become incomplete
             if(oldProgress == 1 && newProgress < 1) {
                 UUID userId = UUID.fromString(request.getUserId());
-                planNotificationService.publishPlanIncompleteNotification(
-                        userId, planId, planName, assigneeIds
-                );
+                planNotificationService.publishPlanIncompleteNotification(userId, planId);
             }
         }
 
@@ -306,7 +292,9 @@ public class PlanController extends PlanServiceGrpc.PlanServiceImplBase {
 
     @Override
     public void updateTasksAssignee(UpdateTasksAssigneeRequest request, StreamObserver<ActionResponse> responseObserver) {
+        UUID userId = UUID.fromString(request.getUserId());
         UUID planId = UUID.fromString(request.getPlanId());
+
         float oldProgress = planService.getPlanProgress(planId);
         List<UUID> oldPlanAssigneeIds = taskService.getAllAssigneeForPlan(planId);
 
@@ -314,20 +302,19 @@ public class PlanController extends PlanServiceGrpc.PlanServiceImplBase {
 
         //Notify assignees if update team plan
         if(planService.isTeamPlan(planId)) {
-            UUID userId = UUID.fromString(request.getUserId());
             float newProgress = planService.getPlanProgress(planId);
-            String planName = planService.getPlanName(planId);
+
             List<UUID> taskAssigneeIds = new ArrayList<>(assigneeIds);
             List<UUID> newPlanAssigneeIds = taskService.getAllAssigneeForPlan(planId);
 
             //Notify old assignees about the update
             planNotificationService.publishPlanUpdatedNotification(
-                    userId, planId, planName, oldPlanAssigneeIds
+                    userId, planId, oldPlanAssigneeIds
             );
 
             //Notify task assignees
             planNotificationService.publishPlanAssignedNotification(
-                    planId, planName, taskAssigneeIds
+                    planId, taskAssigneeIds
             );
 
             //Update reminders receivers
@@ -335,9 +322,7 @@ public class PlanController extends PlanServiceGrpc.PlanServiceImplBase {
 
             //If after updating, completed plan become incomplete
             if(oldProgress == 1 && newProgress < 1) {
-                planNotificationService.publishPlanIncompleteNotification(
-                        userId, planId, planName, newPlanAssigneeIds
-                );
+                planNotificationService.publishPlanIncompleteNotification(userId, planId);
             }
         }
 
@@ -352,6 +337,7 @@ public class PlanController extends PlanServiceGrpc.PlanServiceImplBase {
 
     @Override
     public void deleteTasks(DeleteTasksRequest request, StreamObserver<ActionResponse> responseObserver) {
+        UUID userId = UUID.fromString(request.getUserId());
         UUID planId = UUID.fromString(request.getPlanId());
 
         taskService.deleteTasks(request);
@@ -359,13 +345,11 @@ public class PlanController extends PlanServiceGrpc.PlanServiceImplBase {
         //Notify assignees if update team plan
         if(planService.isTeamPlan(planId)) {
             float progress = planService.getPlanProgress(planId);
-            UUID userId = UUID.fromString(request.getUserId());
-            String planName = planService.getPlanName(planId);
             List<UUID> assigneeIds = taskService.getAllAssigneeForPlan(planId);
 
             //Notify assignees about the update
             planNotificationService.publishPlanUpdatedNotification(
-                userId, planId, planName, assigneeIds
+                userId, planId, assigneeIds
             );
 
             //Update reminders receivers
@@ -373,9 +357,7 @@ public class PlanController extends PlanServiceGrpc.PlanServiceImplBase {
 
             //If delete all incomplete plan -> completed plan
             if(progress == 1) {
-                planNotificationService.publishPlanCompletedNotification(
-                        planId, planName, assigneeIds
-                );
+                planNotificationService.publishPlanCompletedNotification(planId);
             }
         }
 

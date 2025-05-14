@@ -137,6 +137,15 @@ public class TeamServiceImpl implements TeamService {
     }
 
     @Override
+    public String getTeamName(UUID teamId) {
+        Team team = teamRepository.findById(teamId).orElseThrow(
+                ()-> new NotFoundException("Team not found.")
+        );
+
+        return team.getName();
+    }
+
+    @Override
     public Team getTeamById(UUID teamId) {
         return teamRepository.findById(teamId).orElseThrow(
                 () -> new NotFoundException("Team not found.")

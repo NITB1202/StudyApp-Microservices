@@ -11,6 +11,9 @@ import java.util.UUID;
 @Builder
 public class TeamDeletedEvent {
     private UUID id;
+    private String teamName;
     private UUID deletedBy;
     private List<UUID> memberIds;
 }
+
+//Message: Team "TEAM01" has been deleted by User01
