@@ -15,25 +15,25 @@ import java.util.stream.Collectors;
 public class GrpcGlobalExceptionHandler {
     @GrpcExceptionHandler(Exception.class)
     public StatusRuntimeException handleDefaultException(Exception ex) {
-        log.error("Internal server error occurred", ex);
+        log.warn("Internal server error occurred: {}", ex.getMessage());
         return Status.INTERNAL.withDescription("Internal server error").asRuntimeException();
     }
 
     @GrpcExceptionHandler(BusinessException.class)
     public StatusRuntimeException handleBusinessException(BusinessException ex) {
-        log.error("Business exception occurred: {}", ex.getMessage(), ex);
+        log.warn("Business exception occurred: {}", ex.getMessage());
         return Status.INVALID_ARGUMENT.withDescription(ex.getMessage()).asRuntimeException();
     }
 
     @GrpcExceptionHandler(NotFoundException.class)
     public StatusRuntimeException handleNotFoundException(NotFoundException ex) {
-        log.error("Resource not found: {}", ex.getMessage(), ex);
+        log.warn("Resource not found: {}", ex.getMessage());
         return Status.NOT_FOUND.withDescription(ex.getMessage()).asRuntimeException();
     }
 
     @GrpcExceptionHandler(IllegalArgumentException.class)
     public StatusRuntimeException handleIllegalArgumentException(IllegalArgumentException ex) {
-        log.error("Invalid argument: {}", ex.getMessage(), ex);
+        log.warn("Invalid argument: {}", ex.getMessage());
         return Status.INVALID_ARGUMENT.withDescription(ex.getMessage()).asRuntimeException();
     }
 
@@ -42,13 +42,13 @@ public class GrpcGlobalExceptionHandler {
         String errors = ex.getConstraintViolations().stream()
                 .map(cv -> String.format("[%s: %s]", cv.getPropertyPath(), cv.getMessage()))
                 .collect(Collectors.joining(" "));
-        log.error("Constraint violation errors: {}", errors, ex);
+        log.warn("Constraint violation errors: {}", errors);
         return Status.INVALID_ARGUMENT.withDescription(errors).asRuntimeException();
     }
 
     @GrpcExceptionHandler(DateTimeParseException.class)
     public StatusRuntimeException handleDateTimeParseException(DateTimeParseException ex) {
-        log.error("DateTime parsing error: {}", ex.getMessage(), ex);
+        log.warn("DateTime parsing error: {}", ex.getMessage());
         return Status.INVALID_ARGUMENT.withDescription(ex.getMessage()).asRuntimeException();
     }
 }

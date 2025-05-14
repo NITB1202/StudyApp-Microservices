@@ -180,8 +180,7 @@ message DeleteTasksRequest {
 //Plan Reminder
 message CreatePlanRemindersRequest {
   string planId = 1;
-  repeated string receiverIds = 2;
-  repeated string remindTimes = 3;
+  repeated string remindTimes = 2;
 }
 
 message GetAllPlanRemindersInPlanRequest {
