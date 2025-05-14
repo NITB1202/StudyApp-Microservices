@@ -12,6 +12,9 @@ import java.util.UUID;
 @Builder
 public class UserLeftTeamEvent {
     private UUID teamId;
+    private String teamName;
     private UUID userId;
     private List<UUID> memberIds;
 }
+
+//Message: User01 left team "TEAM01" -> Linked: teamId

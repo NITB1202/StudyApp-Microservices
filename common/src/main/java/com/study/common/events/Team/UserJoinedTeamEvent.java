@@ -13,5 +13,8 @@ import java.util.UUID;
 public class UserJoinedTeamEvent {
     private UUID userId;
     private UUID teamId;
+    private String teamName;
     private List<UUID> memberIds;
 }
+
+//Message: User01 has joined team "TEAM01". -> Linked: teamId
