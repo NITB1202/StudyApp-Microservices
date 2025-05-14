@@ -97,25 +97,26 @@ message GetTeamMissedPlansRequest {
 }
 
 message UpdatePlanRequest {
-  string id = 1;
-  string name = 2;
-  string description = 3;
-  string startAt = 4;
-  string endAt = 5;
-  string userId = 6;
+  string userId = 1;
+  string id = 2;
+  string name = 3;
+  string description = 4;
+  string startAt = 5;
+  string endAt = 6;
 }
 
 message DeletePlanRequest {
-  string id = 1;
+  string userId = 1;
+  string id = 2;
 }
 
 message RestorePlanRequest {
-  string id = 1;
-  string endAt = 2;
-  string userId = 3;
+  string userId = 1;
+  string id = 2;
+  string endAt = 3;
 }
 
-message IsAssignedForOngoingPlanRequest {
+message IsAssignedForTeamPlansFromNowOnRequest {
   string teamId = 1;
   string userId = 2;
 }
@@ -147,27 +148,39 @@ message GetAllTasksInPlanRequest {
   string planId = 1;
 }
 
-message UpdateTaskRequest {
+message UpdateTaskStatusRequest {
   string taskId = 1;
   bool isCompleted = 2;
 }
 
-message UpdateTasksRequest {
+message UpdateTasksStatusRequest {
   string userId = 1;
   string planId = 2;
-  repeated UpdateTaskRequest requests = 3;
+  repeated UpdateTaskStatusRequest requests = 3;
+}
+
+message UpdateTaskAssigneeRequest {
+  string taskId = 1;
+  string assigneeId = 2;
+
+}
+
+message UpdateTasksAssigneeRequest {
+  string userId = 1;
+  string planId = 2;
+  repeated UpdateTaskAssigneeRequest requests = 3;
 }
 
 message DeleteTasksRequest {
-  string planId = 1;
-  repeated string taskIds = 2;
+  string userId = 1;
+  string planId = 2;
+  repeated string taskIds = 3;
 }
 
 //Plan Reminder
 message CreatePlanRemindersRequest {
   string planId = 1;
-  repeated string receiverIds = 2;
-  repeated string remindTimes = 3;
+  repeated string remindTimes = 2;
 }
 
 message GetAllPlanRemindersInPlanRequest {
@@ -210,12 +223,13 @@ service PlanService {
   rpc UpdatePlan(UpdatePlanRequest) returns (PlanResponse);
   rpc DeletePlan(DeletePlanRequest) returns (common.ActionResponse);
   rpc RestorePlan(RestorePlanRequest) returns (common.ActionResponse);
-  rpc IsAssignedForOngoingPlan(IsAssignedForOngoingPlanRequest) returns (common.ActionResponse);
+  rpc IsAssignedForTeamPlansFromNowOn(IsAssignedForTeamPlansFromNowOnRequest) returns (common.ActionResponse);
 
   //Task
   rpc CreateTasks(CreateTasksRequest) returns (common.ActionResponse);
   rpc GetAllTasksInPlan(GetAllTasksInPlanRequest) returns (TasksResponse);
-  rpc UpdateTasks(UpdateTasksRequest) returns (common.ActionResponse);
+  rpc UpdateTasksStatus(UpdateTasksStatusRequest) returns (common.ActionResponse);
+  rpc UpdateTasksAssignee(UpdateTasksAssigneeRequest) returns (common.ActionResponse);
   rpc DeleteTasks(DeleteTasksRequest) returns (common.ActionResponse);
 
   //Plan reminder

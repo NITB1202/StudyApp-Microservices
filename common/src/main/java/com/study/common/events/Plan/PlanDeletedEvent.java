@@ -11,6 +11,7 @@ import java.util.UUID;
 @AllArgsConstructor
 @Builder
 public class PlanDeletedEvent {
+    private UUID userId;
     private String planName;
     private List<UUID> assigneeIds;
 }

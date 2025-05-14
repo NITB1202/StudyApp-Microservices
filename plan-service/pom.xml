@@ -8,7 +8,7 @@
         <version>3.4.4</version>
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
-    <groupId>com.nitb</groupId>
+    <groupId>com.study</groupId>
     <artifactId>plan-service</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <name>plan-service</name>
@@ -65,12 +65,6 @@
             <scope>test</scope>
         </dependency>
 
-        <dependency>
-            <groupId>org.springframework.kafka</groupId>
-            <artifactId>spring-kafka-test</artifactId>
-            <scope>test</scope>
-        </dependency>
-
         <!-- Javax Annotation -->
         <dependency>
             <groupId>javax.annotation</groupId>
@@ -111,6 +105,13 @@
             <version>${grpc.version}</version>
         </dependency>
 
+        <!-- JSON Serializer/Deserializer -->
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+        </dependency>
+
+        <!-- Quartz -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-quartz</artifactId>
