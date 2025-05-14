@@ -146,9 +146,9 @@ public class TeamController extends TeamServiceGrpc.TeamServiceImplBase {
         UUID teamId = UUID.fromString(request.getId());
 
         memberService.validateUpdateTeamPermission(userId, teamId);
+        teamNotificationService.publishTeamDeletionNotification(userId, teamId);
         teamService.deleteTeam(request);
         memberService.deleteAllMembers(teamId);
-        teamNotificationService.publishTeamDeletionNotification(userId, teamId);
 
         ActionResponse response = ActionResponse.newBuilder()
                 .setSuccess(true)

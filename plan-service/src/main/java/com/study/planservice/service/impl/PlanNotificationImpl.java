@@ -3,6 +3,8 @@ package com.study.planservice.service.impl;
 import com.study.planservice.event.PlanEventPublisher;
 import com.study.planservice.service.PlanNotificationService;
 import com.study.common.events.Plan.*;
+import com.study.planservice.service.PlanService;
+import com.study.planservice.service.TaskService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -15,6 +17,8 @@ import java.util.UUID;
 @Service
 @RequiredArgsConstructor
 public class PlanNotificationImpl implements PlanNotificationService {
+    private final PlanService planService;
+    private final TaskService taskService;
     private final PlanEventPublisher publisher;
 
     private static final String REMIND_TOPIC = "plan-reminded";
@@ -26,7 +30,9 @@ public class PlanNotificationImpl implements PlanNotificationService {
     private static final String UPDATE_TOPIC = "plan-updated";
 
     @Override
-    public void publishPlanAssignedNotification(UUID planId, String planName, List<UUID> assigneeIds) {
+    public void publishPlanAssignedNotification(UUID planId, List<UUID> assigneeIds) {
+        String planName = planService.getPlanName(planId);
+
         PlanAssignedEvent event = PlanAssignedEvent.builder()
                 .planId(planId)
                 .planName(planName)
@@ -38,7 +44,10 @@ public class PlanNotificationImpl implements PlanNotificationService {
     }
 
     @Override
-    public void publishPlanCompletedNotification(UUID planId, String planName, List<UUID> assigneeIds) {
+    public void publishPlanCompletedNotification(UUID planId) {
+        String planName = planService.getPlanName(planId);
+        List<UUID> assigneeIds = taskService.getAllAssigneeForPlan(planId);
+
         PlanCompletedEvent event = PlanCompletedEvent.builder()
                 .planId(planId)
                 .planName(planName)
@@ -50,7 +59,10 @@ public class PlanNotificationImpl implements PlanNotificationService {
     }
 
     @Override
-    public void publishPlanDeletedNotification(UUID userId, String planName, List<UUID> assigneeIds) {
+    public void publishPlanDeletedNotification(UUID userId, UUID planId) {
+        String planName = planService.getPlanName(planId);
+        List<UUID> assigneeIds = taskService.getAllAssigneeForPlan(planId);
+
         PlanDeletedEvent event = PlanDeletedEvent.builder()
                 .userId(userId)
                 .planName(planName)
@@ -62,7 +74,10 @@ public class PlanNotificationImpl implements PlanNotificationService {
     }
 
     @Override
-    public void publishPlanIncompleteNotification(UUID userId, UUID planId, String planName, List<UUID> assigneeIds) {
+    public void publishPlanIncompleteNotification(UUID userId, UUID planId) {
+        String planName = planService.getPlanName(planId);
+        List<UUID> assigneeIds = taskService.getAllAssigneeForPlan(planId);
+
         PlanIncompleteEvent event = PlanIncompleteEvent.builder()
                 .userId(userId)
                 .planId(planId)
@@ -75,7 +90,10 @@ public class PlanNotificationImpl implements PlanNotificationService {
     }
 
     @Override
-    public void publishPlanRemindedNotification(UUID planId, String planName, LocalDateTime endAt, List<UUID> receiverIds) {
+    public void publishPlanRemindedNotification(UUID planId, List<UUID> receiverIds) {
+        String planName = planService.getPlanName(planId);
+        LocalDateTime endAt = planService.getPlanEndAt(planId);
+
         PlanRemindedEvent event = PlanRemindedEvent.builder()
                 .planId(planId)
                 .planName(planName)
@@ -88,7 +106,10 @@ public class PlanNotificationImpl implements PlanNotificationService {
     }
 
     @Override
-    public void publishPlanRestoredNotification(UUID userId, UUID planId, String planName, List<UUID> assigneeIds) {
+    public void publishPlanRestoredNotification(UUID userId, UUID planId) {
+        String planName = planService.getPlanName(planId);
+        List<UUID> assigneeIds = taskService.getAllAssigneeForPlan(planId);
+
         PlanRestoredEvent event = PlanRestoredEvent.builder()
                 .userId(userId)
                 .planId(planId)
@@ -101,12 +122,14 @@ public class PlanNotificationImpl implements PlanNotificationService {
     }
 
     @Override
-    public void publishPlanUpdatedNotification(UUID userId, UUID planId, String planName, List<UUID> assigneeIds) {
+    public void publishPlanUpdatedNotification(UUID userId, UUID planId, List<UUID> receiverIds) {
+        String planName = planService.getPlanName(planId);
+
         PlanUpdatedEvent event = PlanUpdatedEvent.builder()
                 .userId(userId)
                 .planId(planId)
                 .planName(planName)
-                .assigneeIds(assigneeIds)
+                .assigneeIds(receiverIds)
                 .build();
 
         log.info("Publishing update notification for plan {}", planId);

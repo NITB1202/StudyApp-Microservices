@@ -4,6 +4,7 @@ import com.study.planservice.entity.Plan;
 import com.study.planservice.grpc.*;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
@@ -31,6 +32,6 @@ public interface PlanService {
     void delete(Plan plan);
 
     String getPlanName(UUID planId);
-    String getPlanEndAt(UUID planId);
+    LocalDateTime getPlanEndAt(UUID planId);
     float getPlanProgress(UUID planId);
 }

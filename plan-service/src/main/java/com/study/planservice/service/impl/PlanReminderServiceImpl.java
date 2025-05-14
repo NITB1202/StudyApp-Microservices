@@ -176,14 +176,9 @@ public class PlanReminderServiceImpl implements PlanReminderService {
     }
 
     private void scheduleReminder(PlanReminder reminder) {
-        String planName = planService.getPlanName(reminder.getPlanId());
-        String endAt = planService.getPlanEndAt(reminder.getPlanId());
-
         JobDetail jobDetail = JobBuilder.newJob(PlanReminderJob.class)
                 .withIdentity("reminder_" + reminder.getId())
                 .usingJobData("planId", reminder.getPlanId().toString())
-                .usingJobData("planName", planName)
-                .usingJobData("endAt", endAt)
                 .usingJobData("receiverIds", reminder.getReceiverIds())
                 .build();
 
