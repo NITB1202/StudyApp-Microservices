@@ -31,7 +31,6 @@ public class PlanReminderServiceImpl implements PlanReminderService {
         planService.validateRemindTimesList(planId, request.getRemindTimesList());
 
         Set<LocalDateTime> times = new LinkedHashSet<>();
-        List<PlanReminder> reminders = new ArrayList<>();
 
         for(String time : request.getRemindTimesList()) {
             LocalDateTime remindAt = LocalDateTime.parse(time);
@@ -46,11 +45,9 @@ public class PlanReminderServiceImpl implements PlanReminderService {
                     .remindAt(remindAt)
                     .build();
 
-            reminders.add(reminder);
+            planReminderRepository.save(reminder);
             scheduleReminder(reminder);
         }
-
-        planReminderRepository.saveAll(reminders);
     }
 
     @Override

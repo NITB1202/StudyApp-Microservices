@@ -7,6 +7,7 @@ import com.study.apigateway.dto.Team.Member.request.UpdateMemberRoleRequestDto;
 import com.study.apigateway.dto.Team.Member.response.ListTeamMemberResponseDto;
 import com.study.apigateway.dto.Team.Member.response.TeamMemberResponseDto;
 import com.study.apigateway.dto.Team.Member.response.TeamMemberProfileResponseDto;
+import com.study.apigateway.grpc.PlanServiceGrpcClient;
 import com.study.apigateway.grpc.TeamServiceGrpcClient;
 import com.study.apigateway.grpc.UserServiceGrpcClient;
 import com.study.apigateway.mapper.ActionMapper;
@@ -35,6 +36,7 @@ import java.util.UUID;
 public class MemberServiceImpl implements MemberService {
     private final TeamServiceGrpcClient teamGrpcClient;
     private final UserServiceGrpcClient userGrpcClient;
+    private final PlanServiceGrpcClient planGrpcClient;
 
     @Override
     public Mono<ActionResponseDto> createInvitation(UUID userId, CreateInvitationRequestDto request) {
@@ -158,6 +160,10 @@ public class MemberServiceImpl implements MemberService {
     @Override
     public Mono<ActionResponseDto> leaveTeam(UUID userId, UUID teamId) {
         return Mono.fromCallable(()->{
+            ActionResponse isAssigned = planGrpcClient.isAssignedForTeamPlansFromNowOn(userId, teamId);
+            if(isAssigned.getSuccess()) {
+                return ActionMapper.toResponseDto(isAssigned);
+            }
             ActionResponse response = teamGrpcClient.leaveTeam(userId, teamId);
             return ActionMapper.toResponseDto(response);
         }).subscribeOn(Schedulers.boundedElastic());

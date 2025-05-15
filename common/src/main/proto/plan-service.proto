@@ -128,9 +128,9 @@ message CreateTaskRequest {
 }
 
 message CreateTasksRequest {
-  string planId = 1;
-  repeated CreateTaskRequest tasks = 2;
-  string userId = 3;
+  string userId = 1;
+  string planId = 2;
+  repeated CreateTaskRequest tasks = 3;
 }
 
 message TaskResponse {
