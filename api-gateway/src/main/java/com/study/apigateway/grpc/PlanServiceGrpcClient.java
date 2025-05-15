@@ -3,7 +3,10 @@ package com.study.apigateway.grpc;
 import com.study.apigateway.dto.Plan.Plan.request.CreatePlanRequestDto;
 import com.study.apigateway.dto.Plan.Plan.request.RestorePlanRequestDto;
 import com.study.apigateway.dto.Plan.Plan.request.UpdatePlanRequestDto;
+import com.study.apigateway.dto.Plan.Reminder.request.DeletePlanRemindersRequestDto;
+import com.study.apigateway.dto.Plan.Reminder.request.UpdatePlanRemindersRequestDto;
 import com.study.apigateway.dto.Plan.Task.request.*;
+import com.study.apigateway.mapper.PlanReminderMapper;
 import com.study.apigateway.mapper.TaskMapper;
 import com.study.common.grpc.ActionResponse;
 import com.study.planservice.grpc.*;
@@ -237,5 +240,31 @@ public class PlanServiceGrpcClient {
                 .build();
 
         return planStub.getAllPlanRemindersInPlan(request);
+    }
+
+    public ActionResponse updatePlanReminders(UpdatePlanRemindersRequestDto dto) {
+        List<UpdatePlanReminderRequest> reminderRequests = dto.getReminders().stream()
+                .map(PlanReminderMapper::toUpdatePlanReminderRequest)
+                .toList();
+
+        UpdatePlanRemindersRequest request = UpdatePlanRemindersRequest.newBuilder()
+                .setPlanId(dto.getPlanId().toString())
+                .addAllRequests(reminderRequests)
+                .build();
+
+        return planStub.updatePlanReminders(request);
+    }
+
+    public ActionResponse deletePlanReminders(DeletePlanRemindersRequestDto dto) {
+        List<String> idsStr = dto.getReminderIds().stream()
+                .map(UUID::toString)
+                .toList();
+
+        DeletePlanRemindersRequest request = DeletePlanRemindersRequest.newBuilder()
+                .setPlanId(dto.getPlanId().toString())
+                .addAllReminderIds(idsStr)
+                .build();
+
+        return planStub.deletePlanReminders(request);
     }
 }
