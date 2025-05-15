@@ -1,6 +1,8 @@
 package com.study.apigateway.grpc;
 
 import com.study.apigateway.dto.Plan.Plan.request.CreatePlanRequestDto;
+import com.study.apigateway.dto.Plan.Plan.request.RestorePlanRequestDto;
+import com.study.apigateway.dto.Plan.Plan.request.UpdatePlanRequestDto;
 import com.study.apigateway.dto.Plan.Task.request.CreateTaskRequestDto;
 import com.study.apigateway.mapper.TaskMapper;
 import com.study.common.grpc.ActionResponse;
@@ -21,7 +23,7 @@ public class PlanServiceGrpcClient {
    //Plan
     public PlanResponse createPlan(UUID userId, UUID teamId, CreatePlanRequestDto dto) {
         String teamIdStr = teamId == null ? "" : teamId.toString();
-        String description = dto.getDescription() == null ? "" : dto.getDescription();
+        String description = dto.getDescription() == null ? "" : dto.getDescription().trim();
 
         CreatePlanRequest request = CreatePlanRequest.newBuilder()
                 .setUserId(userId.toString())
@@ -99,6 +101,43 @@ public class PlanServiceGrpcClient {
                 .build();
 
         return planStub.getTeamMissedPlans(request);
+    }
+
+    public PlanResponse updatePlan(UUID userId, UUID planId, UpdatePlanRequestDto dto) {
+        String name = dto.getName() == null ? "" : dto.getName().trim();
+        String description = dto.getDescription() == null ? "" : dto.getDescription().trim();
+        String startAt = dto.getStartAt() == null ? "" : dto.getStartAt().toString();
+        String endAt = dto.getEndAt() == null ? "" : dto.getEndAt().toString();
+
+        UpdatePlanRequest request = UpdatePlanRequest.newBuilder()
+                .setUserId(userId.toString())
+                .setId(planId.toString())
+                .setName(name)
+                .setDescription(description)
+                .setStartAt(startAt)
+                .setEndAt(endAt)
+                .build();
+
+        return planStub.updatePlan(request);
+    }
+
+    public ActionResponse deletePlan(UUID userId, UUID planId) {
+        DeletePlanRequest request = DeletePlanRequest.newBuilder()
+                .setUserId(userId.toString())
+                .setId(planId.toString())
+                .build();
+
+        return planStub.deletePlan(request);
+    }
+
+    public ActionResponse restorePlan(UUID userId, UUID planId, RestorePlanRequestDto dto) {
+        RestorePlanRequest request = RestorePlanRequest.newBuilder()
+                .setUserId(userId.toString())
+                .setId(planId.toString())
+                .setEndAt(dto.getEndAt().toString())
+                .build();
+
+        return planStub.restorePlan(request);
     }
 
     //Task

@@ -18,6 +18,10 @@ public class PlanMapper {
     public static PlanResponseDto toPlanResponseDto(PlanResponse plan) {
         return PlanResponseDto.builder()
                 .id(UUID.fromString(plan.getId()))
+                .name(plan.getName())
+                .description(plan.getDescription())
+                .startAt(LocalDateTime.parse(plan.getStartAt()))
+                .endAt(LocalDateTime.parse(plan.getEndAt()))
                 .build();
     }
 

@@ -1,8 +1,7 @@
 package com.study.apigateway.service.Plan;
 
-import com.study.apigateway.dto.Plan.Plan.request.CreatePersonalPlanRequestDto;
-import com.study.apigateway.dto.Plan.Plan.request.CreatePlanRequestDto;
-import com.study.apigateway.dto.Plan.Plan.request.CreateTeamPlanRequestDto;
+import com.study.apigateway.dto.Action.ActionResponseDto;
+import com.study.apigateway.dto.Plan.Plan.request.*;
 import com.study.apigateway.dto.Plan.Plan.response.PlanSummaryResponseDto;
 import com.study.apigateway.dto.Plan.Plan.response.PlanDetailResponseDto;
 import com.study.apigateway.dto.Plan.Plan.response.PlanResponseDto;
@@ -12,8 +11,10 @@ import com.study.apigateway.dto.Plan.Task.response.TaskResponseDto;
 import com.study.apigateway.grpc.PlanServiceGrpcClient;
 import com.study.apigateway.grpc.TeamServiceGrpcClient;
 import com.study.apigateway.grpc.UserServiceGrpcClient;
+import com.study.apigateway.mapper.ActionMapper;
 import com.study.apigateway.mapper.PlanMapper;
 import com.study.apigateway.mapper.TaskMapper;
+import com.study.common.grpc.ActionResponse;
 import com.study.planservice.grpc.*;
 import com.study.userservice.grpc.UserDetailResponse;
 import lombok.RequiredArgsConstructor;
@@ -160,5 +161,41 @@ public class PlanServiceImpl implements PlanService {
             TeamPlansResponse plans = planServiceGrpc.getTeamMissedPlans(userId, teamIdS);
             return plans.getPlansList().stream().map(PlanMapper::toTeamPlanSummaryResponseDto).toList();
         }).subscribeOn(Schedulers.boundedElastic());
+    }
+
+    @Override
+    public Mono<PlanResponseDto> updatePlan(UUID userId, UUID planId, UpdatePlanRequestDto request) {
+        return Mono.fromCallable(()->{
+            validateIfUpdateTeamPlan(userId, planId);
+            PlanResponse response = planServiceGrpc.updatePlan(userId, planId, request);
+            return PlanMapper.toPlanResponseDto(response);
+        }).subscribeOn(Schedulers.boundedElastic());
+    }
+
+    @Override
+    public Mono<ActionResponseDto> deletePlan(UUID userId, UUID planId) {
+        return Mono.fromCallable(()->{
+            validateIfUpdateTeamPlan(userId, planId);
+            ActionResponse response = planServiceGrpc.deletePlan(userId, planId);
+            return ActionMapper.toResponseDto(response);
+        }).subscribeOn(Schedulers.boundedElastic());
+    }
+
+    @Override
+    public Mono<ActionResponseDto> restorePlan(UUID userId, UUID planId, RestorePlanRequestDto request) {
+        return Mono.fromCallable(()->{
+            validateIfUpdateTeamPlan(userId, planId);
+            ActionResponse response = planServiceGrpc.restorePlan(userId, planId, request);
+            return ActionMapper.toResponseDto(response);
+        }).subscribeOn(Schedulers.boundedElastic());
+    }
+
+    private void validateIfUpdateTeamPlan(UUID userId, UUID planId) {
+        PlanDetailResponse detail = planServiceGrpc.getPlanById(planId);
+
+        if(!detail.getTeamId().isEmpty()) {
+            UUID teamId = UUID.fromString(detail.getTeamId());
+            teamServiceGrpc.validateUpdateTeamResource(userId, teamId);
+        }
     }
 }

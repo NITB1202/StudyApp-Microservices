@@ -23,7 +23,7 @@ public class TeamServiceGrpcClient {
         CreateTeamRequest request = CreateTeamRequest.newBuilder()
                 .setCreatorId(userId.toString())
                 .setName(dto.getName())
-                .setDescription(dto.getDescription() != null ? dto.getDescription() : "")
+                .setDescription(dto.getDescription() != null ? dto.getDescription().trim() : "")
                 .build();
 
         return stub.createTeam(request);
@@ -71,8 +71,8 @@ public class TeamServiceGrpcClient {
     }
 
     public TeamResponse updateTeam(UUID userId, UUID teamId, UpdateTeamRequestDto dto){
-        String name = dto.getName() != null ? dto.getName() : "";
-        String description = dto.getDescription() != null ? dto.getDescription() : "";
+        String name = dto.getName() != null ? dto.getName().trim() : "";
+        String description = dto.getDescription() != null ? dto.getDescription().trim() : "";
 
         UpdateTeamRequest request = UpdateTeamRequest.newBuilder()
                 .setId(teamId.toString())

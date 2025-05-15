@@ -1,7 +1,10 @@
 package com.study.apigateway.controller;
 
+import com.study.apigateway.dto.Action.ActionResponseDto;
 import com.study.apigateway.dto.Plan.Plan.request.CreatePersonalPlanRequestDto;
 import com.study.apigateway.dto.Plan.Plan.request.CreateTeamPlanRequestDto;
+import com.study.apigateway.dto.Plan.Plan.request.RestorePlanRequestDto;
+import com.study.apigateway.dto.Plan.Plan.request.UpdatePlanRequestDto;
 import com.study.apigateway.dto.Plan.Plan.response.PlanDetailResponseDto;
 import com.study.apigateway.dto.Plan.Plan.response.PlanResponseDto;
 import com.study.apigateway.dto.Plan.Plan.response.PlanSummaryResponseDto;
@@ -60,53 +63,88 @@ public class PlanController {
     @GetMapping("/date")
     @Operation(summary = "Get assigned plans for a specific date.")
     @ApiResponse(responseCode = "200", description = "Get successfully.")
-    public Mono<List<PlanSummaryResponseDto>> getAssignedPlansOnDate(@RequestParam UUID userId,
-                                                                     @RequestParam LocalDate date) {
-        return planService.getAssignedPlansOnDate(userId, date);
+    public Mono<ResponseEntity<List<PlanSummaryResponseDto>>> getAssignedPlansOnDate(@RequestParam UUID userId,
+                                                                                     @RequestParam LocalDate date) {
+        return planService.getAssignedPlansOnDate(userId, date).map(ResponseEntity::ok);
     }
 
     @GetMapping("/team/date")
     @Operation(summary = "Get team plans for a specific date.")
     @ApiResponse(responseCode = "200", description = "Get successfully.")
-    public Mono<List<TeamPlanSummaryResponseDto>> getTeamPlansOnDate(@RequestParam UUID userId,
-                                                                     @RequestParam UUID teamId,
-                                                                     @RequestParam LocalDate date) {
-        return planService.getTeamPlansOnDate(userId, teamId, date);
+    public Mono<ResponseEntity<List<TeamPlanSummaryResponseDto>>> getTeamPlansOnDate(@RequestParam UUID userId,
+                                                                                     @RequestParam UUID teamId,
+                                                                                     @RequestParam LocalDate date) {
+        return planService.getTeamPlansOnDate(userId, teamId, date).map(ResponseEntity::ok);
     }
 
     @GetMapping("/month")
     @Operation(summary = "Get dates with assigned plan deadlines in a month.")
     @ApiResponse(responseCode = "200", description = "Get successfully.")
-    public Mono<List<LocalDate>> getDatesWithAssignedPlanDeadlineInMonth(@RequestParam UUID userId,
-                                                                         @RequestParam int month,
-                                                                         @RequestParam int year) {
-        return planService.getDatesWithAssignedPlanDeadlineInMonth(userId, month, year);
+    public Mono<ResponseEntity<List<LocalDate>>> getDatesWithAssignedPlanDeadlineInMonth(@RequestParam UUID userId,
+                                                                                         @RequestParam int month,
+                                                                                         @RequestParam int year) {
+        return planService.getDatesWithAssignedPlanDeadlineInMonth(userId, month, year).map(ResponseEntity::ok);
     }
 
 
     @GetMapping("/team/month")
     @Operation(summary = "Get dates with team plan deadlines in a month.")
     @ApiResponse(responseCode = "200", description = "Get successfully.")
-    public Mono<List<LocalDate>> getDatesWithTeamPlanDeadlineInMonth(@RequestParam UUID userId,
-                                                                     @RequestParam UUID teamId,
-                                                                     @RequestParam int month,
-                                                                     @RequestParam int year) {
-        return planService.getDatesWithTeamPlanDeadlineInMonth(userId, teamId, month, year);
+    public Mono<ResponseEntity<List<LocalDate>>> getDatesWithTeamPlanDeadlineInMonth(@RequestParam UUID userId,
+                                                                                     @RequestParam UUID teamId,
+                                                                                     @RequestParam int month,
+                                                                                     @RequestParam int year) {
+        return planService.getDatesWithTeamPlanDeadlineInMonth(userId, teamId, month, year).map(ResponseEntity::ok);
     }
 
     @GetMapping("/missed")
     @Operation(summary = "Get personal missed plans.")
     @ApiResponse(responseCode = "200", description = "Get successfully.")
-    public Mono<List<PlanSummaryResponseDto>> getPersonalMissedPlans(@RequestParam UUID userId){
-        return planService.getPersonalMissedPlans(userId);
+    public Mono<ResponseEntity<List<PlanSummaryResponseDto>>> getPersonalMissedPlans(@RequestParam UUID userId){
+        return planService.getPersonalMissedPlans(userId).map(ResponseEntity::ok);
     }
 
     @GetMapping("/team/missed")
     @Operation(summary = "Get team missed plans.")
     @ApiResponse(responseCode = "200", description = "Get successfully.")
-    public Mono<List<TeamPlanSummaryResponseDto>> getTeamMissedPlans(@RequestParam UUID userId,
-                                                                     @RequestParam UUID teamId){
-        return planService.getTeamMissedPlans(userId, teamId);
+    public Mono<ResponseEntity<List<TeamPlanSummaryResponseDto>>> getTeamMissedPlans(@RequestParam UUID userId,
+                                                                                     @RequestParam UUID teamId){
+        return planService.getTeamMissedPlans(userId, teamId).map(ResponseEntity::ok);
     }
 
+    @PatchMapping("/{planId}")
+    @Operation(summary = "Update plan's information.")
+    @ApiResponse(responseCode = "200", description = "Update successfully.")
+    @ApiResponse(responseCode = "400", description = "Invalid request body.",
+            content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+    @ApiResponse(responseCode = "404", description = "Not found.",
+            content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+    public Mono<ResponseEntity<PlanResponseDto>> updatePlan(@RequestParam UUID userId,
+                                                            @PathVariable UUID planId,
+                                                            @Valid @RequestBody UpdatePlanRequestDto request) {
+        return planService.updatePlan(userId, planId, request).map(ResponseEntity::ok);
+    }
+
+    @DeleteMapping("/{planId}")
+    @Operation(summary = "Delete a plan.")
+    @ApiResponse(responseCode = "200", description = "Delete successfully.")
+    @ApiResponse(responseCode = "404", description = "Not found.",
+            content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+    public Mono<ResponseEntity<ActionResponseDto>> deletePlan(@RequestParam UUID userId,
+                                                              @PathVariable UUID planId) {
+        return planService.deletePlan(userId, planId).map(ResponseEntity::ok);
+    }
+
+    @PatchMapping("/restore/{planId}")
+    @Operation(summary = "Restore a plan.")
+    @ApiResponse(responseCode = "200", description = "Restore successfully.")
+    @ApiResponse(responseCode = "400", description = "Invalid request body.",
+            content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+    @ApiResponse(responseCode = "404", description = "Not found.",
+            content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+    public Mono<ResponseEntity<ActionResponseDto>> restorePlan(@RequestParam UUID userId,
+                                                               @PathVariable UUID planId,
+                                                               @Valid @RequestBody RestorePlanRequestDto request){
+        return planService.restorePlan(userId, planId, request).map(ResponseEntity::ok);
+    }
 }
