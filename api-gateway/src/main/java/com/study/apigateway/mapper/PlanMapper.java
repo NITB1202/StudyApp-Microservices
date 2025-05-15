@@ -1,9 +1,6 @@
 package com.study.apigateway.mapper;
 
-import com.study.apigateway.dto.Plan.Plan.response.PlanSummaryResponseDto;
-import com.study.apigateway.dto.Plan.Plan.response.PlanDetailResponseDto;
-import com.study.apigateway.dto.Plan.Plan.response.PlanResponseDto;
-import com.study.apigateway.dto.Plan.Plan.response.TeamPlanSummaryResponseDto;
+import com.study.apigateway.dto.Plan.Plan.response.*;
 import com.study.apigateway.dto.Plan.Reminder.response.PlanReminderResponseDto;
 import com.study.apigateway.dto.Plan.Task.response.TaskResponseDto;
 import com.study.planservice.grpc.*;
@@ -67,6 +64,13 @@ public class PlanMapper {
                 .endAt(LocalDateTime.parse(plan.getEndAt()))
                 .progress(plan.getProgress())
                 .isAssigned(plan.getIsAssigned())
+                .build();
+    }
+
+    public static PlanStatisticsResponseDto toPlanStatisticsResponseDto(GetWeeklyPlanStatsResponse stats) {
+        return PlanStatisticsResponseDto.builder()
+                .finishedPlans(stats.getFinishedPlans())
+                .finishedPlansPercent(stats.getFinishInTotal())
                 .build();
     }
 }

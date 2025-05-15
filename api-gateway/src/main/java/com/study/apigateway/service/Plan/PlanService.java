@@ -5,10 +5,7 @@ import com.study.apigateway.dto.Plan.Plan.request.CreatePersonalPlanRequestDto;
 import com.study.apigateway.dto.Plan.Plan.request.CreateTeamPlanRequestDto;
 import com.study.apigateway.dto.Plan.Plan.request.RestorePlanRequestDto;
 import com.study.apigateway.dto.Plan.Plan.request.UpdatePlanRequestDto;
-import com.study.apigateway.dto.Plan.Plan.response.PlanSummaryResponseDto;
-import com.study.apigateway.dto.Plan.Plan.response.PlanDetailResponseDto;
-import com.study.apigateway.dto.Plan.Plan.response.PlanResponseDto;
-import com.study.apigateway.dto.Plan.Plan.response.TeamPlanSummaryResponseDto;
+import com.study.apigateway.dto.Plan.Plan.response.*;
 import reactor.core.publisher.Mono;
 
 import java.time.LocalDate;
@@ -28,4 +25,5 @@ public interface PlanService {
     Mono<PlanResponseDto> updatePlan(UUID userId, UUID planId, UpdatePlanRequestDto request);
     Mono<ActionResponseDto> deletePlan(UUID userId, UUID planId);
     Mono<ActionResponseDto> restorePlan(UUID userId, UUID planId, RestorePlanRequestDto request);
+    Mono<PlanStatisticsResponseDto> getWeeklyPlanStatistics(UUID userId);
 }

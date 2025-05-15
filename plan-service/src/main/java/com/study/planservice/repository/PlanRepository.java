@@ -40,7 +40,6 @@ public interface PlanRepository extends JpaRepository<Plan, UUID> {
     List<Plan> findPlansByCreatorIdAndTeamIdIsNullAndCompleteAtIsNullAndEndAtBefore(UUID creatorId, LocalDateTime time);
     List<Plan> findPlansByTeamIdAndCompleteAtIsNullAndEndAtBefore(UUID teamId, LocalDateTime time);
     List<Plan> findAllByCompleteAtNullAndEndAtBefore(LocalDateTime time);
-    List<Plan> findByTeamIdAndEndAtBefore(UUID teamId, LocalDateTime time);
     @Query("""
         SELECT DISTINCT p
         FROM Plan p
@@ -54,6 +53,35 @@ public interface PlanRepository extends JpaRepository<Plan, UUID> {
             @Param("teamId") UUID teamId,
             @Param("now") LocalDateTime now
     );
-
-
+    @Query("""
+        SELECT COUNT(DISTINCT p)
+        FROM Plan p
+        JOIN Task t ON t.planId = p.id
+        WHERE t.assigneeId = :userId
+        AND p.completeAt BETWEEN :start AND :end
+    """)
+    long countCompletedAssignedPlansByUserIdAndIn(@Param("userId") UUID userId,
+                                                  @Param("start") LocalDateTime start,
+                                                  @Param("end") LocalDateTime end);
+    @Query("""
+        SELECT COUNT(DISTINCT p)
+        FROM Plan p
+        JOIN Task t ON t.planId = p.id
+        WHERE t.assigneeId = :userId
+        AND p.endAt BETWEEN :start AND :end
+    """)
+    long countAssignedPlansHaveDeadlineIn(@Param("userId") UUID userId,
+                                          @Param("start") LocalDateTime start,
+                                          @Param("end") LocalDateTime end);
+    @Query("""
+        SELECT COUNT(DISTINCT p)
+        FROM Plan p
+        JOIN Task t ON t.planId = p.id
+        WHERE t.assigneeId = :userId
+        AND p.endAt BETWEEN :start AND :end
+        AND p.completeAt BETWEEN :start AND :end
+    """)
+    long countCompletedAssignedPlansHaveDeadlineIn(@Param("userId") UUID userId,
+                                                   @Param("start") LocalDateTime start,
+                                                   @Param("end") LocalDateTime end);
 }

@@ -6,6 +6,7 @@ import com.study.apigateway.dto.Plan.Plan.request.RestorePlanRequestDto;
 import com.study.apigateway.dto.Plan.Plan.request.UpdatePlanRequestDto;
 import com.study.apigateway.dto.Plan.Plan.response.PlanDetailResponseDto;
 import com.study.apigateway.dto.Plan.Plan.response.PlanResponseDto;
+import com.study.apigateway.dto.Plan.Plan.response.PlanStatisticsResponseDto;
 import com.study.apigateway.dto.Plan.Plan.response.PlanSummaryResponseDto;
 import com.study.apigateway.exception.ErrorResponse;
 import com.study.apigateway.service.Plan.PlanService;
@@ -106,5 +107,12 @@ public class PlanController {
                                                                @PathVariable UUID planId,
                                                                @Valid @RequestBody RestorePlanRequestDto request){
         return planService.restorePlan(userId, planId, request).map(ResponseEntity::ok);
+    }
+
+    @GetMapping("/statistic")
+    @Operation(summary = "Get weekly plan statistics.")
+    @ApiResponse(responseCode = "200", description = "Get successfully.")
+    public Mono<ResponseEntity<PlanStatisticsResponseDto>> getWeeklyPlanStatistics(@RequestParam UUID userId) {
+        return planService.getWeeklyPlanStatistics(userId).map(ResponseEntity::ok);
     }
 }

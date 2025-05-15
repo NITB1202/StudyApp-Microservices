@@ -190,6 +190,20 @@ public class PlanController extends PlanServiceGrpc.PlanServiceImplBase {
         responseObserver.onCompleted();
     }
 
+    @Override
+    public void getWeeklyPlanStats(GetWeeklyPlanStatsRequest request, StreamObserver<GetWeeklyPlanStatsResponse> responseObserver) {
+        long finishedPlans = planService.getWeeklyFinishedPlansCount(request);
+        float finishInTotal = planService.getWeeklyFinishedAssignedPlansPercentage(request);
+
+        GetWeeklyPlanStatsResponse response = GetWeeklyPlanStatsResponse.newBuilder()
+                .setFinishedPlans(finishedPlans)
+                .setFinishInTotal(finishInTotal)
+                .build();
+
+        responseObserver.onNext(response);
+        responseObserver.onCompleted();
+    }
+
     private TeamPlansResponse filterAssignedPlans(UUID userId, List<Plan> plans) {
         List<TeamPlanSummaryResponse> filteredPlans = new ArrayList<>();
 

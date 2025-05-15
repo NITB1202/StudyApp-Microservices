@@ -22,7 +22,7 @@ import java.util.UUID;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/team/plans")
+@RequestMapping("/api/plans/team")
 public class TeamPlanController {
     private final PlanService planService;
 

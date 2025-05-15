@@ -20,6 +20,8 @@ public interface PlanService {
     Plan updatePlan(UpdatePlanRequest request);
     void deletePlan(DeletePlanRequest request);
     Plan restorePlan(RestorePlanRequest request);
+    long getWeeklyFinishedPlansCount(GetWeeklyPlanStatsRequest request);
+    float getWeeklyFinishedAssignedPlansPercentage(GetWeeklyPlanStatsRequest request);
 
     List<Plan> getAssignedTeamPlansFromNowOn(UUID userId, UUID teamId);
     List<Plan> getAllTeamPlans(UUID teamId);

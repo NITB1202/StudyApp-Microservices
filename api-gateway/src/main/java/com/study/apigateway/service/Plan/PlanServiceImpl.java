@@ -2,10 +2,7 @@ package com.study.apigateway.service.Plan;
 
 import com.study.apigateway.dto.Action.ActionResponseDto;
 import com.study.apigateway.dto.Plan.Plan.request.*;
-import com.study.apigateway.dto.Plan.Plan.response.PlanSummaryResponseDto;
-import com.study.apigateway.dto.Plan.Plan.response.PlanDetailResponseDto;
-import com.study.apigateway.dto.Plan.Plan.response.PlanResponseDto;
-import com.study.apigateway.dto.Plan.Plan.response.TeamPlanSummaryResponseDto;
+import com.study.apigateway.dto.Plan.Plan.response.*;
 import com.study.apigateway.dto.Plan.Task.request.CreateTaskRequestDto;
 import com.study.apigateway.dto.Plan.Task.response.TaskResponseDto;
 import com.study.apigateway.grpc.PlanServiceGrpcClient;
@@ -187,6 +184,14 @@ public class PlanServiceImpl implements PlanService {
             validateIfUpdateTeamPlan(userId, planId);
             ActionResponse response = planServiceGrpc.restorePlan(userId, planId, request);
             return ActionMapper.toResponseDto(response);
+        }).subscribeOn(Schedulers.boundedElastic());
+    }
+
+    @Override
+    public Mono<PlanStatisticsResponseDto> getWeeklyPlanStatistics(UUID userId) {
+        return Mono.fromCallable(()->{
+            GetWeeklyPlanStatsResponse stats = planServiceGrpc.getWeeklyPlanStats(userId);
+            return PlanMapper.toPlanStatisticsResponseDto(stats);
         }).subscribeOn(Schedulers.boundedElastic());
     }
 

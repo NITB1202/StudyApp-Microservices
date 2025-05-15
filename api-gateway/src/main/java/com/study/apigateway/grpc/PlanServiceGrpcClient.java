@@ -140,6 +140,14 @@ public class PlanServiceGrpcClient {
         return planStub.restorePlan(request);
     }
 
+    public GetWeeklyPlanStatsResponse getWeeklyPlanStats(UUID userId) {
+        GetWeeklyPlanStatsRequest request = GetWeeklyPlanStatsRequest.newBuilder()
+                .setUserId(userId.toString())
+                .build();
+
+        return planStub.getWeeklyPlanStats(request);
+    }
+
     //Task
     public ActionResponse createTasks(UUID userId, UUID planId, List<CreateTaskRequestDto> tasks) {
         List<CreateTaskRequest> createTaskRequests = tasks.stream().map(TaskMapper::toCreateTaskRequest).toList();
