@@ -8,6 +8,7 @@ import com.study.planservice.grpc.*;
 import net.devh.boot.grpc.client.inject.GrpcClient;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
@@ -42,6 +43,38 @@ public class PlanServiceGrpcClient {
         return planStub.getPlanById(request);
     }
 
+    public PlansResponse getAssignedPlansOnDate(UUID userId, LocalDate date) {
+        GetAssignedPlansOnDateRequest request = GetAssignedPlansOnDateRequest.newBuilder()
+                .setUserId(userId.toString())
+                .setDate(date.toString())
+                .build();
+
+        return planStub.getAssignedPlansOnDate(request);
+    }
+
+    public TeamPlansResponse getTeamPlansOnDate(UUID userId, UUID teamId, LocalDate date) {
+        GetTeamPlansOnDateRequest request = GetTeamPlansOnDateRequest.newBuilder()
+                .setUserId(userId.toString())
+                .setTeamId(teamId.toString())
+                .setDate(date.toString())
+                .build();
+
+        return planStub.getTeamPlansOnDate(request);
+    }
+
+    public DatesResponse getDatesWithDeadlineInMonth(UUID userId, int month, int year, UUID teamId) {
+        String teamIdStr = teamId == null ? "" : teamId.toString();
+
+        GetDatesWithDeadlineInMonthRequest request = GetDatesWithDeadlineInMonthRequest.newBuilder()
+                .setUserId(userId.toString())
+                .setMonth(month)
+                .setYear(year)
+                .setTeamId(teamIdStr)
+                .build();
+
+        return planStub.getDatesWithDeadlineInMonth(request);
+    }
+
     public ActionResponse isAssignedForTeamPlansFromNowOn(UUID userId, UUID teamId) {
         IsAssignedForTeamPlansFromNowOnRequest request = IsAssignedForTeamPlansFromNowOnRequest.newBuilder()
                 .setUserId(userId.toString())
@@ -49,6 +82,23 @@ public class PlanServiceGrpcClient {
                 .build();
 
         return planStub.isAssignedForTeamPlansFromNowOn(request);
+    }
+
+    public PlansResponse getPersonalMissedPlans(UUID userId) {
+        GetPersonalMissedPlansRequest request = GetPersonalMissedPlansRequest.newBuilder()
+                .setUserId(userId.toString())
+                .build();
+
+        return planStub.getPersonalMissedPlans(request);
+    }
+
+    public TeamPlansResponse getTeamMissedPlans(UUID userId, UUID teamId) {
+        GetTeamMissedPlansRequest request = GetTeamMissedPlansRequest.newBuilder()
+                .setUserId(userId.toString())
+                .setTeamId(teamId.toString())
+                .build();
+
+        return planStub.getTeamMissedPlans(request);
     }
 
     //Task

@@ -3,8 +3,10 @@ package com.study.apigateway.service.Plan;
 import com.study.apigateway.dto.Plan.Plan.request.CreatePersonalPlanRequestDto;
 import com.study.apigateway.dto.Plan.Plan.request.CreatePlanRequestDto;
 import com.study.apigateway.dto.Plan.Plan.request.CreateTeamPlanRequestDto;
+import com.study.apigateway.dto.Plan.Plan.response.PlanSummaryResponseDto;
 import com.study.apigateway.dto.Plan.Plan.response.PlanDetailResponseDto;
 import com.study.apigateway.dto.Plan.Plan.response.PlanResponseDto;
+import com.study.apigateway.dto.Plan.Plan.response.TeamPlanSummaryResponseDto;
 import com.study.apigateway.dto.Plan.Task.request.CreateTaskRequestDto;
 import com.study.apigateway.dto.Plan.Task.response.TaskResponseDto;
 import com.study.apigateway.grpc.PlanServiceGrpcClient;
@@ -19,6 +21,7 @@ import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -108,6 +111,54 @@ public class PlanServiceImpl implements PlanService {
             }
 
             return PlanMapper.toPlanDetailResponseDto(plan, reminders, tasksDto);
+        }).subscribeOn(Schedulers.boundedElastic());
+    }
+
+    @Override
+    public Mono<List<PlanSummaryResponseDto>> getAssignedPlansOnDate(UUID userId, LocalDate date) {
+        return Mono.fromCallable(()->{
+            PlansResponse plans = planServiceGrpc.getAssignedPlansOnDate(userId, date);
+            return plans.getPlansList().stream().map(PlanMapper::toPlanSummaryResponseDto).toList();
+        }).subscribeOn(Schedulers.boundedElastic());
+    }
+
+    @Override
+    public Mono<List<TeamPlanSummaryResponseDto>> getTeamPlansOnDate(UUID userId, UUID teamId, LocalDate date) {
+        return Mono.fromCallable(()->{
+            TeamPlansResponse plans = planServiceGrpc.getTeamPlansOnDate(userId, teamId, date);
+            return plans.getPlansList().stream().map(PlanMapper::toTeamPlanSummaryResponseDto).toList();
+        }).subscribeOn(Schedulers.boundedElastic());
+    }
+
+    @Override
+    public Mono<List<LocalDate>> getDatesWithAssignedPlanDeadlineInMonth(UUID userId, int month, int year) {
+        return Mono.fromCallable(()->{
+            DatesResponse response = planServiceGrpc.getDatesWithDeadlineInMonth(userId, month, year, null);
+            return response.getDatesList().stream().map(LocalDate::parse).toList();
+        }).subscribeOn(Schedulers.boundedElastic());
+    }
+
+    @Override
+    public Mono<List<LocalDate>> getDatesWithTeamPlanDeadlineInMonth(UUID userId, UUID teamId, int month, int year) {
+        return Mono.fromCallable(()->{
+          DatesResponse response = planServiceGrpc.getDatesWithDeadlineInMonth(userId, month, year, teamId);
+          return response.getDatesList().stream().map(LocalDate::parse).toList();
+        });
+    }
+
+    @Override
+    public Mono<List<PlanSummaryResponseDto>> getPersonalMissedPlans(UUID userId) {
+        return Mono.fromCallable(()->{
+            PlansResponse plans = planServiceGrpc.getPersonalMissedPlans(userId);
+            return plans.getPlansList().stream().map(PlanMapper::toPlanSummaryResponseDto).toList();
+        }).subscribeOn(Schedulers.boundedElastic());
+    }
+
+    @Override
+    public Mono<List<TeamPlanSummaryResponseDto>> getTeamMissedPlans(UUID userId, UUID teamIdS) {
+        return Mono.fromCallable(()->{
+            TeamPlansResponse plans = planServiceGrpc.getTeamMissedPlans(userId, teamIdS);
+            return plans.getPlansList().stream().map(PlanMapper::toTeamPlanSummaryResponseDto).toList();
         }).subscribeOn(Schedulers.boundedElastic());
     }
 }

@@ -4,6 +4,8 @@ import com.study.apigateway.dto.Plan.Plan.request.CreatePersonalPlanRequestDto;
 import com.study.apigateway.dto.Plan.Plan.request.CreateTeamPlanRequestDto;
 import com.study.apigateway.dto.Plan.Plan.response.PlanDetailResponseDto;
 import com.study.apigateway.dto.Plan.Plan.response.PlanResponseDto;
+import com.study.apigateway.dto.Plan.Plan.response.PlanSummaryResponseDto;
+import com.study.apigateway.dto.Plan.Plan.response.TeamPlanSummaryResponseDto;
 import com.study.apigateway.exception.ErrorResponse;
 import com.study.apigateway.service.Plan.PlanService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -16,6 +18,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
 
+import java.time.LocalDate;
+import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -52,4 +56,57 @@ public class PlanController {
     public Mono<ResponseEntity<PlanDetailResponseDto>> getPlanById(@PathVariable UUID id) {
         return planService.getPlanById(id).map(ResponseEntity::ok);
     }
+
+    @GetMapping("/date")
+    @Operation(summary = "Get assigned plans for a specific date.")
+    @ApiResponse(responseCode = "200", description = "Get successfully.")
+    public Mono<List<PlanSummaryResponseDto>> getAssignedPlansOnDate(@RequestParam UUID userId,
+                                                                     @RequestParam LocalDate date) {
+        return planService.getAssignedPlansOnDate(userId, date);
+    }
+
+    @GetMapping("/team/date")
+    @Operation(summary = "Get team plans for a specific date.")
+    @ApiResponse(responseCode = "200", description = "Get successfully.")
+    public Mono<List<TeamPlanSummaryResponseDto>> getTeamPlansOnDate(@RequestParam UUID userId,
+                                                                     @RequestParam UUID teamId,
+                                                                     @RequestParam LocalDate date) {
+        return planService.getTeamPlansOnDate(userId, teamId, date);
+    }
+
+    @GetMapping("/month")
+    @Operation(summary = "Get dates with assigned plan deadlines in a month.")
+    @ApiResponse(responseCode = "200", description = "Get successfully.")
+    public Mono<List<LocalDate>> getDatesWithAssignedPlanDeadlineInMonth(@RequestParam UUID userId,
+                                                                         @RequestParam int month,
+                                                                         @RequestParam int year) {
+        return planService.getDatesWithAssignedPlanDeadlineInMonth(userId, month, year);
+    }
+
+
+    @GetMapping("/team/month")
+    @Operation(summary = "Get dates with team plan deadlines in a month.")
+    @ApiResponse(responseCode = "200", description = "Get successfully.")
+    public Mono<List<LocalDate>> getDatesWithTeamPlanDeadlineInMonth(@RequestParam UUID userId,
+                                                                     @RequestParam UUID teamId,
+                                                                     @RequestParam int month,
+                                                                     @RequestParam int year) {
+        return planService.getDatesWithTeamPlanDeadlineInMonth(userId, teamId, month, year);
+    }
+
+    @GetMapping("/missed")
+    @Operation(summary = "Get personal missed plans.")
+    @ApiResponse(responseCode = "200", description = "Get successfully.")
+    public Mono<List<PlanSummaryResponseDto>> getPersonalMissedPlans(@RequestParam UUID userId){
+        return planService.getPersonalMissedPlans(userId);
+    }
+
+    @GetMapping("/team/missed")
+    @Operation(summary = "Get team missed plans.")
+    @ApiResponse(responseCode = "200", description = "Get successfully.")
+    public Mono<List<TeamPlanSummaryResponseDto>> getTeamMissedPlans(@RequestParam UUID userId,
+                                                                     @RequestParam UUID teamId){
+        return planService.getTeamMissedPlans(userId, teamId);
+    }
+
 }
