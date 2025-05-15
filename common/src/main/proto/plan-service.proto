@@ -171,7 +171,6 @@ message UpdateTasksStatusRequest {
 message UpdateTaskAssigneeRequest {
   string taskId = 1;
   string assigneeId = 2;
-
 }
 
 message UpdateTasksAssigneeRequest {

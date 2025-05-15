@@ -3,7 +3,7 @@ package com.study.apigateway.grpc;
 import com.study.apigateway.dto.Plan.Plan.request.CreatePlanRequestDto;
 import com.study.apigateway.dto.Plan.Plan.request.RestorePlanRequestDto;
 import com.study.apigateway.dto.Plan.Plan.request.UpdatePlanRequestDto;
-import com.study.apigateway.dto.Plan.Task.request.CreateTaskRequestDto;
+import com.study.apigateway.dto.Plan.Task.request.*;
 import com.study.apigateway.mapper.TaskMapper;
 import com.study.common.grpc.ActionResponse;
 import com.study.planservice.grpc.*;
@@ -167,6 +167,48 @@ public class PlanServiceGrpcClient {
                 .build();
 
         return planStub.getAllTasksInPlan(request);
+    }
+
+    public ActionResponse updateTasksStatus(UUID userId, UpdateTasksStatusRequestDto dto) {
+        List<UpdateTaskStatusRequest> statusRequests = dto.getTasks().stream()
+                .map(TaskMapper::toUpdateTaskStatusRequest)
+                .toList();
+
+        UpdateTasksStatusRequest request = UpdateTasksStatusRequest.newBuilder()
+                .setUserId(userId.toString())
+                .setPlanId(dto.getPlanId().toString())
+                .addAllRequests(statusRequests)
+                .build();
+
+        return planStub.updateTasksStatus(request);
+    }
+
+    public ActionResponse updateTasksAssignee(UUID userId, UpdateTasksAssigneeRequestDto dto) {
+        List<UpdateTaskAssigneeRequest> taskAssigneeRequests = dto.getTask().stream()
+                .map(TaskMapper::toUpdateTaskAssigneeRequest)
+                .toList();
+
+        UpdateTasksAssigneeRequest request = UpdateTasksAssigneeRequest.newBuilder()
+                .setUserId(userId.toString())
+                .setPlanId(dto.getPlanId().toString())
+                .addAllRequests(taskAssigneeRequests)
+                .build();
+
+        return planStub.updateTasksAssignee(request);
+    }
+
+    public ActionResponse deleteTasks(UUID userId, DeleteTasksRequestDto dto) {
+        List<String> idsStr = dto.getTaskIds().stream()
+                .map(UUID::toString)
+                .toList();
+
+        DeleteTasksRequest request = DeleteTasksRequest.newBuilder()
+                .setUserId(userId.toString())
+                .setPlanId(dto.getPlanId().toString())
+                .addAllTaskIds(idsStr)
+                .build();
+
+        return planStub.deleteTasks(request);
     }
 
     //Plan reminder
