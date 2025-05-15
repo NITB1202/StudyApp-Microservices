@@ -1,4 +1,4 @@
-package com.study.apigateway.dto.Team.response;
+package com.study.apigateway.dto.Team.Member.response;
 
 import com.study.common.enums.TeamRole;
 import lombok.AllArgsConstructor;

@@ -1,4 +1,4 @@
-package com.study.apigateway.dto.Team.response;
+package com.study.apigateway.dto.Team.Member.response;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.study.common.enums.TeamRole;
@@ -14,7 +14,7 @@ import java.util.UUID;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class TeamUserProfileResponseDto {
+public class TeamMemberProfileResponseDto {
     private UUID userId;
 
     private TeamRole role;

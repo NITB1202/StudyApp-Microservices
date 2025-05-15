@@ -1,10 +1,10 @@
 package com.study.apigateway.grpc;
 
 import com.study.apigateway.dto.Notification.request.CreateInvitationRequestDto;
-import com.study.apigateway.dto.Team.request.CreateTeamRequestDto;
-import com.study.apigateway.dto.Team.request.RemoveTeamMemberRequestDto;
-import com.study.apigateway.dto.Team.request.UpdateMemberRoleRequestDto;
-import com.study.apigateway.dto.Team.request.UpdateTeamRequestDto;
+import com.study.apigateway.dto.Team.Team.request.CreateTeamRequestDto;
+import com.study.apigateway.dto.Team.Member.request.RemoveTeamMemberRequestDto;
+import com.study.apigateway.dto.Team.Member.request.UpdateMemberRoleRequestDto;
+import com.study.apigateway.dto.Team.Team.request.UpdateTeamRequestDto;
 import com.study.common.grpc.ActionResponse;
 import com.study.common.mappers.TeamRoleMapper;
 import com.study.teamservice.grpc.*;
@@ -35,6 +35,14 @@ public class TeamServiceGrpcClient {
                 .build();
 
         return stub.getTeamById(request);
+    }
+
+    public TeamProfileResponse getTeamByTeamCode(String teamCode) {
+        GetTeamByTeamCodeRequest request = GetTeamByTeamCodeRequest.newBuilder()
+                .setTeamCode(teamCode)
+                .build();
+
+        return stub.getTeamByTeamCode(request);
     }
 
     public ListTeamResponse getUserTeams(UUID userId, String cursor, int size){
@@ -102,6 +110,15 @@ public class TeamServiceGrpcClient {
                 .build();
 
         return stub.deleteTeam(request);
+    }
+
+    public void validateUpdateTeamResource(UUID userId, UUID teamId) {
+        ValidateUpdateTeamResourceRequest request = ValidateUpdateTeamResourceRequest.newBuilder()
+                .setUserId(userId.toString())
+                .setTeamId(teamId.toString())
+                .build();
+
+        stub.validateUpdateTeamResource(request);
     }
 
     //Member section

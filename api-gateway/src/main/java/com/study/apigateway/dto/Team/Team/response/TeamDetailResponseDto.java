@@ -1,4 +1,4 @@
-package com.study.apigateway.dto.Team.response;
+package com.study.apigateway.dto.Team.Team.response;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.AllArgsConstructor;

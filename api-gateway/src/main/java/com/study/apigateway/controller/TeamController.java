@@ -1,11 +1,12 @@
 package com.study.apigateway.controller;
 
 import com.study.apigateway.dto.Action.ActionResponseDto;
-import com.study.apigateway.dto.Team.request.CreateTeamRequestDto;
-import com.study.apigateway.dto.Team.request.UpdateTeamRequestDto;
-import com.study.apigateway.dto.Team.response.ListTeamResponseDto;
-import com.study.apigateway.dto.Team.response.TeamDetailResponseDto;
-import com.study.apigateway.dto.Team.response.TeamResponseDto;
+import com.study.apigateway.dto.Team.Team.request.CreateTeamRequestDto;
+import com.study.apigateway.dto.Team.Team.request.UpdateTeamRequestDto;
+import com.study.apigateway.dto.Team.Team.response.ListTeamResponseDto;
+import com.study.apigateway.dto.Team.Team.response.TeamDetailResponseDto;
+import com.study.apigateway.dto.Team.Team.response.TeamProfileResponseDto;
+import com.study.apigateway.dto.Team.Team.response.TeamResponseDto;
 import com.study.apigateway.exception.ErrorResponse;
 import com.study.apigateway.service.Team.TeamService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -43,6 +44,15 @@ public class TeamController {
             content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     public Mono<ResponseEntity<TeamDetailResponseDto>> getTeamById(@PathVariable UUID id){
         return teamService.getTeamById(id).map(ResponseEntity::ok);
+    }
+
+    @GetMapping("/code/{teamCode}")
+    @Operation(summary = "Get team's information by team code.")
+    @ApiResponse(responseCode = "200", description = "Get successfully")
+    @ApiResponse(responseCode = "404", description = "Not found.",
+            content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+    public Mono<ResponseEntity<TeamProfileResponseDto>> getTeamByTeamCode(@PathVariable String teamCode){
+        return teamService.getTeamByTeamCode(teamCode).map(ResponseEntity::ok);
     }
 
     @GetMapping("/all")

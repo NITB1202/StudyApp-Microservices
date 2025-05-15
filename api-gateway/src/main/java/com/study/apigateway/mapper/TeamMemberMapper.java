@@ -1,8 +1,8 @@
 package com.study.apigateway.mapper;
 
-import com.study.apigateway.dto.Team.response.ListTeamMemberResponseDto;
-import com.study.apigateway.dto.Team.response.TeamMemberResponseDto;
-import com.study.apigateway.dto.Team.response.TeamUserProfileResponseDto;
+import com.study.apigateway.dto.Team.Member.response.ListTeamMemberResponseDto;
+import com.study.apigateway.dto.Team.Member.response.TeamMemberResponseDto;
+import com.study.apigateway.dto.Team.Member.response.TeamMemberProfileResponseDto;
 import com.study.common.mappers.TeamRoleMapper;
 import com.study.teamservice.grpc.TeamMemberResponse;
 import com.study.teamservice.grpc.TeamMemberSummaryResponse;
@@ -45,8 +45,8 @@ public class TeamMemberMapper {
                 .build();
     }
 
-    public static TeamUserProfileResponseDto toTeamUserProfileResponseDto(TeamMemberResponse member) {
-        return TeamUserProfileResponseDto.builder()
+    public static TeamMemberProfileResponseDto toTeamUserProfileResponseDto(TeamMemberResponse member) {
+        return TeamMemberProfileResponseDto.builder()
                 .userId(UUID.fromString(member.getUserId()))
                 .role(TeamRoleMapper.toEnum(member.getRole()))
                 .joinDate(LocalDate.parse(member.getJoinDate()))

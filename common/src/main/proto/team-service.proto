@@ -3,6 +3,7 @@ syntax = "proto3";
 package team;
 
 import "common.proto";
+import "google/protobuf/empty.proto";
 
 option java_multiple_files = true;
 option java_package = "com.study.teamservice.grpc";
@@ -43,6 +44,20 @@ message TeamDetailResponse {
   string avatarUrl = 8;
 }
 
+message GetTeamByTeamCodeRequest{
+  string teamCode = 1;
+}
+
+message TeamProfileResponse {
+  string id = 1;
+  string avatarUrl = 2;
+  string name = 3;
+  string description = 4;
+  string creatorId = 5;
+  string createDate = 6;
+  int64 totalMembers = 7;
+}
+
 message UpdateTeamRequest {
   string id = 1;
   string userId = 2;
@@ -63,6 +78,11 @@ message ResetTeamCodeRequest {
 
 message DeleteTeamRequest {
   string id = 1;
+  string userId = 2;
+}
+
+message ValidateUpdateTeamResourceRequest {
+  string teamId = 1;
   string userId = 2;
 }
 
@@ -162,10 +182,12 @@ service TeamService {
   //Team section
   rpc CreateTeam(CreateTeamRequest) returns (TeamResponse);
   rpc GetTeamById(GetTeamByIdRequest) returns (TeamDetailResponse);
+  rpc GetTeamByTeamCode(GetTeamByTeamCodeRequest) returns (TeamProfileResponse);
   rpc UpdateTeam(UpdateTeamRequest) returns (TeamResponse); // -> notification
   rpc UploadTeamAvatar(UploadTeamAvatarRequest) returns (common.ActionResponse); // -> notification
   rpc ResetTeamCode(ResetTeamCodeRequest) returns (common.ActionResponse);
   rpc DeleteTeam(DeleteTeamRequest) returns (common.ActionResponse); // -> notification
+  rpc ValidateUpdateTeamResource(ValidateUpdateTeamResourceRequest) returns (google.protobuf.Empty);
 
   //Team member section
   rpc CreateInvitation(CreateInvitationRequest) returns (common.ActionResponse); // -> notification

@@ -154,7 +154,11 @@ public class TeamServiceImpl implements TeamService {
 
     @Override
     public Team getTeamByTeamCode(String teamCode) {
-        return teamRepository.findByTeamCode(teamCode);
+        Team team = teamRepository.findByTeamCode(teamCode);
+        if(team == null){
+            throw new NotFoundException("Team not found.");
+        }
+        return team;
     }
 
     @Override
@@ -193,5 +197,4 @@ public class TeamServiceImpl implements TeamService {
             teamRepository.save(team);
         }
     }
-
 }

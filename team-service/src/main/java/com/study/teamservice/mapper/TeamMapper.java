@@ -1,10 +1,7 @@
 package com.study.teamservice.mapper;
 
 import com.study.teamservice.entity.Team;
-import com.study.teamservice.grpc.ListTeamResponse;
-import com.study.teamservice.grpc.TeamDetailResponse;
-import com.study.teamservice.grpc.TeamResponse;
-import com.study.teamservice.grpc.TeamSummaryResponse;
+import com.study.teamservice.grpc.*;
 
 import java.util.List;
 
@@ -46,6 +43,18 @@ public class TeamMapper {
                 .addAllTeams(teams)
                 .setTotal(total)
                 .setNextCursor(nextCursor)
+                .build();
+    }
+
+    public static TeamProfileResponse toTeamProfileResponse(Team team) {
+        return TeamProfileResponse.newBuilder()
+                .setId(team.getId().toString())
+                .setName(team.getName())
+                .setAvatarUrl(team.getAvatarUrl())
+                .setDescription(team.getDescription())
+                .setCreatorId(team.getCreatorId().toString())
+                .setCreateDate(team.getCreateDate().toString())
+                .setTotalMembers(team.getTotalMembers())
                 .build();
     }
 }

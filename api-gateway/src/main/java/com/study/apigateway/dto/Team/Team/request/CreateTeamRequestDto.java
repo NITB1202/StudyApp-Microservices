@@ -1,4 +1,4 @@
-package com.study.apigateway.dto.Team.request;
+package com.study.apigateway.dto.Team.Team.request;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;

@@ -1,4 +1,4 @@
-package com.study.apigateway.dto.Team.response;
+package com.study.apigateway.dto.Team.Team.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -11,10 +11,12 @@ import java.util.UUID;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class TeamResponseDto {
+public class TeamSummaryResponseDto {
     private UUID id;
 
     private String name;
-    
-    private String description;
+
+    private String avatarUrl;
+
+    private boolean managedByUser;
 }
