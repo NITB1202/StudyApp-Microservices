@@ -204,6 +204,21 @@ public class PlanController extends PlanServiceGrpc.PlanServiceImplBase {
         responseObserver.onCompleted();
     }
 
+    @Override
+    public void isTeamPlan(IsTeamPlanRequest request, StreamObserver<ActionResponse> responseObserver) {
+        UUID planId = UUID.fromString(request.getPlanId());
+        boolean isTeamPlan = planService.isTeamPlan(planId);
+        String teamId = isTeamPlan ? planService.getTeamId(planId).toString() : "";
+
+        ActionResponse response = ActionResponse.newBuilder()
+                .setSuccess(isTeamPlan)
+                .setMessage(teamId)
+                .build();
+
+        responseObserver.onNext(response);
+        responseObserver.onCompleted();
+    }
+
     private TeamPlansResponse filterAssignedPlans(UUID userId, List<Plan> plans) {
         List<TeamPlanSummaryResponse> filteredPlans = new ArrayList<>();
 

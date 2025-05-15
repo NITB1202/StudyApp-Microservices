@@ -36,4 +36,5 @@ public interface PlanService {
     String getPlanName(UUID planId);
     LocalDateTime getPlanEndAt(UUID planId);
     float getPlanProgress(UUID planId);
+    UUID getTeamId(UUID planId);
 }

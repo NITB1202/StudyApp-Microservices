@@ -7,7 +7,6 @@ import com.study.apigateway.grpc.TeamServiceGrpcClient;
 import com.study.apigateway.mapper.ActionMapper;
 import com.study.common.exceptions.BusinessException;
 import com.study.common.grpc.ActionResponse;
-import com.study.planservice.grpc.PlanDetailResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
@@ -27,8 +26,8 @@ public class TaskServiceImpl implements TaskService {
     @Override
     public Mono<ActionResponseDto> addTasksToPersonalPlan(UUID userId, AddTasksToPersonalPlanRequestDto request) {
         return Mono.fromCallable(()->{
-            PlanDetailResponse planDetail = planGrpc.getPlanById(request.getPlanId());
-            if(!planDetail.getTeamId().isEmpty()) {
+            ActionResponse isTeamPlan = planGrpc.isTeamPlan(request.getPlanId());
+            if(isTeamPlan.getSuccess()) {
                 throw new BusinessException("This is not a personal plan.");
             }
 
@@ -49,12 +48,12 @@ public class TaskServiceImpl implements TaskService {
     public Mono<ActionResponseDto> addTasksToTeamPlan(UUID userId, AddTasksToTeamPlanRequestDto request) {
         return Mono.fromCallable(()->{
             //Validate update team request
-            PlanDetailResponse planDetail = planGrpc.getPlanById(request.getPlanId());
-            if(planDetail.getTeamId().isEmpty()){
+            ActionResponse isTeamPlan = planGrpc.isTeamPlan(request.getPlanId());
+            if(!isTeamPlan.getSuccess()) {
                 throw new BusinessException("This is not a team plan.");
             }
 
-            UUID teamId = UUID.fromString(planDetail.getTeamId());
+            UUID teamId = UUID.fromString(isTeamPlan.getMessage());
             teamGrpc.validateUpdateTeamResource(userId, teamId);
 
             //Validate task assignees
@@ -81,12 +80,12 @@ public class TaskServiceImpl implements TaskService {
     public Mono<ActionResponseDto> updateTasksAssignee(UUID userId, UpdateTasksAssigneeRequestDto request) {
         return Mono.fromCallable(()->{
             //Validate update team request
-            PlanDetailResponse planDetail = planGrpc.getPlanById(request.getPlanId());
-            if(planDetail.getTeamId().isEmpty()){
+            ActionResponse isTeamPlan = planGrpc.isTeamPlan(request.getPlanId());
+            if(!isTeamPlan.getSuccess()) {
                 throw new BusinessException("Can't update task assignee for personal plan.");
             }
 
-            UUID teamId = UUID.fromString(planDetail.getTeamId());
+            UUID teamId = UUID.fromString(isTeamPlan.getMessage());
             teamGrpc.validateUpdateTeamResource(userId, teamId);
 
             ActionResponse response = planGrpc.updateTasksAssignee(userId, request);
@@ -97,11 +96,11 @@ public class TaskServiceImpl implements TaskService {
     @Override
     public Mono<ActionResponseDto> deleteTasks(UUID userId, DeleteTasksRequestDto request) {
         return Mono.fromCallable(()->{
-            PlanDetailResponse planDetail = planGrpc.getPlanById(request.getPlanId());
+            ActionResponse isTeamPlan = planGrpc.isTeamPlan(request.getPlanId());
 
             //Validate update team request
-            if(!planDetail.getTeamId().isEmpty()){
-                UUID teamId = UUID.fromString(planDetail.getTeamId());
+            if(isTeamPlan.getSuccess()) {
+                UUID teamId = UUID.fromString(isTeamPlan.getMessage());
                 teamGrpc.validateUpdateTeamResource(userId, teamId);
             }
 

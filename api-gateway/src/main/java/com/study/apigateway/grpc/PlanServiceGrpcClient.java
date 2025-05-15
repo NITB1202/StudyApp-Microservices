@@ -148,6 +148,14 @@ public class PlanServiceGrpcClient {
         return planStub.getWeeklyPlanStats(request);
     }
 
+    public ActionResponse isTeamPlan(UUID planId) {
+        IsTeamPlanRequest request = IsTeamPlanRequest.newBuilder()
+                .setPlanId(planId.toString())
+                .build();
+
+        return planStub.isTeamPlan(request);
+    }
+
     //Task
     public ActionResponse createTasks(UUID userId, UUID planId, List<CreateTaskRequestDto> tasks) {
         List<CreateTaskRequest> createTaskRequests = tasks.stream().map(TaskMapper::toCreateTaskRequest).toList();

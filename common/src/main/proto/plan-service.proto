@@ -130,6 +130,10 @@ message GetWeeklyPlanStatsResponse {
   float finishInTotal = 2;
 }
 
+message IsTeamPlanRequest {
+  string planId = 1;
+}
+
 //Task
 message CreateTaskRequest {
   string assigneeId = 1;
@@ -233,6 +237,7 @@ service PlanService {
   rpc RestorePlan(RestorePlanRequest) returns (common.ActionResponse);
   rpc IsAssignedForTeamPlansFromNowOn(IsAssignedForTeamPlansFromNowOnRequest) returns (common.ActionResponse);
   rpc GetWeeklyPlanStats(GetWeeklyPlanStatsRequest) returns (GetWeeklyPlanStatsResponse);
+  rpc IsTeamPlan(IsTeamPlanRequest) returns (common.ActionResponse);
 
   //Task
   rpc CreateTasks(CreateTasksRequest) returns (common.ActionResponse);

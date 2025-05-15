@@ -366,4 +366,13 @@ public class PlanServiceImpl implements PlanService {
 
         return plan.getProgress();
     }
+
+    @Override
+    public UUID getTeamId(UUID planId) {
+        Plan plan = planRepository.findById(planId).orElseThrow(
+                () -> new NotFoundException("Plan not found.")
+        );
+
+        return plan.getTeamId();
+    }
 }

@@ -196,10 +196,10 @@ public class PlanServiceImpl implements PlanService {
     }
 
     private void validateIfUpdateTeamPlan(UUID userId, UUID planId) {
-        PlanDetailResponse detail = planServiceGrpc.getPlanById(planId);
+        ActionResponse response = planServiceGrpc.isTeamPlan(planId);
 
-        if(!detail.getTeamId().isEmpty()) {
-            UUID teamId = UUID.fromString(detail.getTeamId());
+        if(response.getSuccess()) {
+            UUID teamId = UUID.fromString(response.getMessage());
             teamServiceGrpc.validateUpdateTeamResource(userId, teamId);
         }
     }
