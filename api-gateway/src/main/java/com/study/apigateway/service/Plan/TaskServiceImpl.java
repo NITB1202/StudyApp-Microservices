@@ -27,6 +27,11 @@ public class TaskServiceImpl implements TaskService {
     @Override
     public Mono<ActionResponseDto> addTasksToPersonalPlan(UUID userId, AddTasksToPersonalPlanRequestDto request) {
         return Mono.fromCallable(()->{
+            PlanDetailResponse planDetail = planGrpc.getPlanById(request.getPlanId());
+            if(!planDetail.getTeamId().isEmpty()) {
+                throw new BusinessException("This is not a personal plan.");
+            }
+
             List<CreateTaskRequestDto> tasks = request.getTasks().stream()
                     .map(t -> CreateTaskRequestDto.builder()
                             .name(t)
@@ -45,6 +50,10 @@ public class TaskServiceImpl implements TaskService {
         return Mono.fromCallable(()->{
             //Validate update team request
             PlanDetailResponse planDetail = planGrpc.getPlanById(request.getPlanId());
+            if(planDetail.getTeamId().isEmpty()){
+                throw new BusinessException("This is not a team plan.");
+            }
+
             UUID teamId = UUID.fromString(planDetail.getTeamId());
             teamGrpc.validateUpdateTeamResource(userId, teamId);
 
@@ -53,7 +62,7 @@ public class TaskServiceImpl implements TaskService {
             for(CreateTaskRequestDto task : request.getTasks()) {
                 assigneeIds.add(task.getAssigneeId());
             }
-            teamGrpc.validateUsersInTeam(userId, assigneeIds);
+            teamGrpc.validateUsersInTeam(teamId, assigneeIds);
 
             ActionResponse response = planGrpc.createTasks(userId, request.getPlanId(), request.getTasks());
             return ActionMapper.toResponseDto(response);
