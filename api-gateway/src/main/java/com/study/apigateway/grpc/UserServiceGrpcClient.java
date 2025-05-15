@@ -62,14 +62,6 @@ public class UserServiceGrpcClient {
         return userServiceStub.updateUser(request);
     }
 
-    public void validateUserId(UUID id) {
-        ValidateUserIdRequest request = ValidateUserIdRequest.newBuilder()
-                .setId(id.toString())
-                .build();
-
-        userServiceStub.validateUserId(request);
-    }
-
     public ActionResponse uploadUserAvatar(UUID id, String avatarUrl){
         UploadUserAvatarRequest request = UploadUserAvatarRequest.newBuilder()
                 .setId(id.toString())

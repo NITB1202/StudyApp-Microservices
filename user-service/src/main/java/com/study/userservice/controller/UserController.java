@@ -1,6 +1,5 @@
 package com.study.userservice.controller;
 
-import com.google.protobuf.Empty;
 import com.study.common.grpc.ActionResponse;
 import com.study.userservice.enity.User;
 import com.study.userservice.grpc.*;
@@ -62,13 +61,6 @@ public class UserController extends UserServiceGrpc.UserServiceImplBase{
                 .build();
 
         responseObserver.onNext(response);
-        responseObserver.onCompleted();
-    }
-
-    @Override
-    public void validateUserId(ValidateUserIdRequest request, StreamObserver<Empty> responseObserver){
-        userService.validateUserId(request);
-        responseObserver.onNext(Empty.getDefaultInstance());
         responseObserver.onCompleted();
     }
 }
