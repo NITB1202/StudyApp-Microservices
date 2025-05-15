@@ -11,6 +11,8 @@ import com.study.teamservice.grpc.*;
 import net.devh.boot.grpc.client.inject.GrpcClient;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 @Service
@@ -112,15 +114,6 @@ public class TeamServiceGrpcClient {
         return stub.deleteTeam(request);
     }
 
-    public void validateUpdateTeamResource(UUID userId, UUID teamId) {
-        ValidateUpdateTeamResourceRequest request = ValidateUpdateTeamResourceRequest.newBuilder()
-                .setUserId(userId.toString())
-                .setTeamId(teamId.toString())
-                .build();
-
-        stub.validateUpdateTeamResource(request);
-    }
-
     //Member section
     public ActionResponse createInvitation(UUID userId, CreateInvitationRequestDto dto){
         CreateInvitationRequest request = CreateInvitationRequest.newBuilder()
@@ -198,5 +191,27 @@ public class TeamServiceGrpcClient {
                 .build();
 
         return stub.leaveTeam(request);
+    }
+
+    public void validateUpdateTeamResource(UUID userId, UUID teamId) {
+        ValidateUpdateTeamResourceRequest request = ValidateUpdateTeamResourceRequest.newBuilder()
+                .setUserId(userId.toString())
+                .setTeamId(teamId.toString())
+                .build();
+
+        stub.validateUpdateTeamResource(request);
+    }
+
+    public void validateUsersInTeam(UUID teamId, Set<UUID> userIds) {
+        List<String> idsStr = userIds.stream()
+                .map(UUID::toString)
+                .toList();
+
+        ValidateUsersInTeamRequest request = ValidateUsersInTeamRequest.newBuilder()
+                .setTeamId(teamId.toString())
+                .addAllUserIds(idsStr)
+                .build();
+
+        stub.validateUsersInTeam(request);
     }
 }

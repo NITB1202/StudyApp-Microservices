@@ -251,6 +251,18 @@ public class MemberServiceImpl implements MemberService {
     }
 
     @Override
+    public void validateUsersInTeam(ValidateUsersInTeamRequest request) {
+        UUID teamId = UUID.fromString(request.getTeamId());
+
+        for(String userIdStr : request.getUserIdsList()) {
+            UUID userId = UUID.fromString(userIdStr);
+            if (!teamUserRepository.existsByUserIdAndTeamId(userId, teamId)) {
+                throw new NotFoundException("User with id " + userIdStr + " is not part of the team.");
+            }
+        }
+    }
+
+    @Override
     public void saveMember(UUID teamId, UUID userId, TeamRole role) {
         teamService.increaseMember(teamId);
 

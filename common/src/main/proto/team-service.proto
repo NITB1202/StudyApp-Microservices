@@ -81,11 +81,6 @@ message DeleteTeamRequest {
   string userId = 2;
 }
 
-message ValidateUpdateTeamResourceRequest {
-  string teamId = 1;
-  string userId = 2;
-}
-
 //Team member section
 message CreateInvitationRequest {
   string teamId = 1;
@@ -178,6 +173,16 @@ message LeaveTeamRequest {
   string userId = 2;
 }
 
+message ValidateUpdateTeamResourceRequest {
+  string teamId = 1;
+  string userId = 2;
+}
+
+message ValidateUsersInTeamRequest {
+  string teamId = 1;
+  repeated string userIds = 2;
+}
+
 service TeamService {
   //Team section
   rpc CreateTeam(CreateTeamRequest) returns (TeamResponse);
@@ -187,7 +192,6 @@ service TeamService {
   rpc UploadTeamAvatar(UploadTeamAvatarRequest) returns (common.ActionResponse); // -> notification
   rpc ResetTeamCode(ResetTeamCodeRequest) returns (common.ActionResponse);
   rpc DeleteTeam(DeleteTeamRequest) returns (common.ActionResponse); // -> notification
-  rpc ValidateUpdateTeamResource(ValidateUpdateTeamResourceRequest) returns (google.protobuf.Empty);
 
   //Team member section
   rpc CreateInvitation(CreateInvitationRequest) returns (common.ActionResponse); // -> notification
@@ -200,4 +204,6 @@ service TeamService {
   rpc UpdateTeamMemberRole(UpdateMemberRoleRequest) returns (common.ActionResponse);
   rpc RemoveTeamMember(RemoveTeamMemberRequest) returns (common.ActionResponse); // -> notification
   rpc LeaveTeam(LeaveTeamRequest) returns (common.ActionResponse); // -> notification
+  rpc ValidateUpdateTeamResource(ValidateUpdateTeamResourceRequest) returns (google.protobuf.Empty);
+  rpc ValidateUsersInTeam(ValidateUsersInTeamRequest) returns (google.protobuf.Empty);
 }

@@ -168,13 +168,6 @@ public class TeamController extends TeamServiceGrpc.TeamServiceImplBase {
         responseObserver.onCompleted();
     }
 
-    @Override
-    public void validateUpdateTeamResource(ValidateUpdateTeamResourceRequest request, StreamObserver<Empty> responseObserver){
-        memberService.validateUpdateTeamResource(request);
-        responseObserver.onNext(Empty.getDefaultInstance());
-        responseObserver.onCompleted();
-    }
-
     //Member section
     @Override
     public void createInvitation(CreateInvitationRequest request, StreamObserver<ActionResponse> responseObserver){
@@ -288,6 +281,19 @@ public class TeamController extends TeamServiceGrpc.TeamServiceImplBase {
         responseObserver.onCompleted();
     }
 
+    @Override
+    public void validateUpdateTeamResource(ValidateUpdateTeamResourceRequest request, StreamObserver<Empty> responseObserver){
+        memberService.validateUpdateTeamResource(request);
+        responseObserver.onNext(Empty.getDefaultInstance());
+        responseObserver.onCompleted();
+    }
+
+    @Override
+    public void validateUsersInTeam(ValidateUsersInTeamRequest request, StreamObserver<Empty> responseObserver) {
+        memberService.validateUsersInTeam(request);
+        responseObserver.onNext(Empty.getDefaultInstance());
+        responseObserver.onCompleted();
+    }
 
     private List<TeamSummaryResponse> toListTeamSummaryResponse(UUID userId, List<Team> teams) {
         List<TeamSummaryResponse> teamResponses = new ArrayList<>();
