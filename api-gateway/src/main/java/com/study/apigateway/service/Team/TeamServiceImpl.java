@@ -33,7 +33,6 @@ public class TeamServiceImpl implements TeamService {
     @Override
     public Mono<TeamResponseDto> createTeam(UUID userId, CreateTeamRequestDto request) {
         return Mono.fromCallable(() -> {
-            userClient.validateUserId(userId);
             TeamResponse team = grpcClient.createTeam(userId, request);
             return TeamMapper.toTeamResponseDto(team);
         }).subscribeOn(Schedulers.boundedElastic());
