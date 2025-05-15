@@ -25,7 +25,7 @@ public class TaskServiceImpl implements TaskService {
     private final TeamServiceGrpcClient teamGrpc;
 
     @Override
-    public Mono<ActionResponseDto> addTasksForPersonalPlan(UUID userId, AddTasksForPersonalPlanRequestDto request) {
+    public Mono<ActionResponseDto> addTasksToPersonalPlan(UUID userId, AddTasksToPersonalPlanRequestDto request) {
         return Mono.fromCallable(()->{
             List<CreateTaskRequestDto> tasks = request.getTasks().stream()
                     .map(t -> CreateTaskRequestDto.builder()
@@ -41,7 +41,7 @@ public class TaskServiceImpl implements TaskService {
     }
 
     @Override
-    public Mono<ActionResponseDto> addTasksForTeamPlan(UUID userId, AddTasksForTeamPlanRequestDto request) {
+    public Mono<ActionResponseDto> addTasksToTeamPlan(UUID userId, AddTasksToTeamPlanRequestDto request) {
         return Mono.fromCallable(()->{
             //Validate update team request
             PlanDetailResponse planDetail = planGrpc.getPlanById(request.getPlanId());

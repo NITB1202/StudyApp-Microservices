@@ -27,9 +27,9 @@ public class TaskController {
     @ApiResponse(responseCode = "200", description = "Add successfully.")
     @ApiResponse(responseCode = "400", description = "Invalid request body.",
             content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
-    public Mono<ResponseEntity<ActionResponseDto>> addTasksForPersonalPlan(@RequestParam UUID userId,
-                                                                           @Valid @RequestBody AddTasksForPersonalPlanRequestDto request) {
-        return taskService.addTasksForPersonalPlan(userId, request).map(ResponseEntity::ok);
+    public Mono<ResponseEntity<ActionResponseDto>> addTasksToPersonalPlan(@RequestParam UUID userId,
+                                                                           @Valid @RequestBody AddTasksToPersonalPlanRequestDto request) {
+        return taskService.addTasksToPersonalPlan(userId, request).map(ResponseEntity::ok);
     }
 
     @PostMapping("/team")
@@ -37,9 +37,9 @@ public class TaskController {
     @ApiResponse(responseCode = "200", description = "Add successfully.")
     @ApiResponse(responseCode = "400", description = "Invalid request body.",
             content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
-    public Mono<ResponseEntity<ActionResponseDto>> addTasksForTeamPlan(@RequestParam UUID userId,
-                                                                       @Valid @RequestBody AddTasksForTeamPlanRequestDto request) {
-        return taskService.addTasksForTeamPlan(userId, request).map(ResponseEntity::ok);
+    public Mono<ResponseEntity<ActionResponseDto>> addTasksToTeamPlan(@RequestParam UUID userId,
+                                                                       @Valid @RequestBody AddTasksToTeamPlanRequestDto request) {
+        return taskService.addTasksToTeamPlan(userId, request).map(ResponseEntity::ok);
     }
 
     @PatchMapping("/status")

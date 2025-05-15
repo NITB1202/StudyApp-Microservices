@@ -14,7 +14,7 @@ import java.util.UUID;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class AddTasksForPersonalPlanRequestDto {
+public class AddTasksToPersonalPlanRequestDto {
     @NotNull(message = "Plan id is required.")
     private UUID planId;
 
