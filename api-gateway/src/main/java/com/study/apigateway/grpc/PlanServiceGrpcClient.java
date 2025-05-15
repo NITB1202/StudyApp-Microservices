@@ -34,6 +34,14 @@ public class PlanServiceGrpcClient {
         return planStub.createPlan(request);
     }
 
+    public PlanDetailResponse getPlanById(UUID planId) {
+        GetPlanByIdRequest request = GetPlanByIdRequest.newBuilder()
+                .setId(planId.toString())
+                .build();
+
+        return planStub.getPlanById(request);
+    }
+
     public ActionResponse isAssignedForTeamPlansFromNowOn(UUID userId, UUID teamId) {
         IsAssignedForTeamPlansFromNowOnRequest request = IsAssignedForTeamPlansFromNowOnRequest.newBuilder()
                 .setUserId(userId.toString())
@@ -56,6 +64,14 @@ public class PlanServiceGrpcClient {
         return planStub.createTasks(request);
     }
 
+    public TasksResponse getAllTasksInPlan(UUID planId) {
+        GetAllTasksInPlanRequest request = GetAllTasksInPlanRequest.newBuilder()
+                .setPlanId(planId.toString())
+                .build();
+
+        return planStub.getAllTasksInPlan(request);
+    }
+
     //Plan reminder
     public ActionResponse createPlanReminders(UUID planId, List<LocalDateTime> remindTimes) {
         List<String> timeStrings = remindTimes.stream().map(LocalDateTime::toString).toList();
@@ -66,5 +82,13 @@ public class PlanServiceGrpcClient {
                 .build();
 
         return planStub.createPlanReminders(request);
+    }
+
+    public PlanRemindersResponse getAllPlanRemindersInPlan(UUID planId) {
+        GetAllPlanRemindersInPlanRequest request = GetAllPlanRemindersInPlanRequest.newBuilder()
+                .setPlanId(planId.toString())
+                .build();
+
+        return planStub.getAllPlanRemindersInPlan(request);
     }
 }

@@ -3,13 +3,17 @@ package com.study.apigateway.service.Plan;
 import com.study.apigateway.dto.Plan.Plan.request.CreatePersonalPlanRequestDto;
 import com.study.apigateway.dto.Plan.Plan.request.CreatePlanRequestDto;
 import com.study.apigateway.dto.Plan.Plan.request.CreateTeamPlanRequestDto;
+import com.study.apigateway.dto.Plan.Plan.response.PlanDetailResponseDto;
 import com.study.apigateway.dto.Plan.Plan.response.PlanResponseDto;
 import com.study.apigateway.dto.Plan.Task.request.CreateTaskRequestDto;
+import com.study.apigateway.dto.Plan.Task.response.TaskResponseDto;
 import com.study.apigateway.grpc.PlanServiceGrpcClient;
 import com.study.apigateway.grpc.TeamServiceGrpcClient;
+import com.study.apigateway.grpc.UserServiceGrpcClient;
 import com.study.apigateway.mapper.PlanMapper;
 import com.study.apigateway.mapper.TaskMapper;
-import com.study.planservice.grpc.PlanResponse;
+import com.study.planservice.grpc.*;
+import com.study.userservice.grpc.UserDetailResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
@@ -25,6 +29,7 @@ import java.util.UUID;
 public class PlanServiceImpl implements PlanService {
     private final TeamServiceGrpcClient teamServiceGrpc;
     private final PlanServiceGrpcClient planServiceGrpc;
+    private final UserServiceGrpcClient userServiceGrpc;
 
     @Override
     public Mono<PlanResponseDto> createPersonalPlan(UUID userId, CreatePersonalPlanRequestDto request) {
@@ -84,6 +89,25 @@ public class PlanServiceImpl implements PlanService {
             }
 
             return PlanMapper.toPlanResponseDto(plan);
+        }).subscribeOn(Schedulers.boundedElastic());
+    }
+
+    @Override
+    public Mono<PlanDetailResponseDto> getPlanById(UUID planId) {
+        return Mono.fromCallable(()->{
+            PlanDetailResponse plan = planServiceGrpc.getPlanById(planId);
+            PlanRemindersResponse reminders = planServiceGrpc.getAllPlanRemindersInPlan(planId);
+            TasksResponse tasks = planServiceGrpc.getAllTasksInPlan(planId);
+
+            List<TaskResponseDto> tasksDto = new ArrayList<>();
+            for(TaskResponse task : tasks.getTasksList()) {
+                UUID assigneeId = UUID.fromString(task.getAssigneeId());
+                UserDetailResponse assignee = userServiceGrpc.getUserById(assigneeId);
+                TaskResponseDto taskDto = TaskMapper.toTaskResponseDto(task, assignee);
+                tasksDto.add(taskDto);
+            }
+
+            return PlanMapper.toPlanDetailResponseDto(plan, reminders, tasksDto);
         }).subscribeOn(Schedulers.boundedElastic());
     }
 }

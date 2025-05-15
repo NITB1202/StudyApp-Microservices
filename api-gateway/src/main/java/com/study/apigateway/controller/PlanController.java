@@ -2,6 +2,7 @@ package com.study.apigateway.controller;
 
 import com.study.apigateway.dto.Plan.Plan.request.CreatePersonalPlanRequestDto;
 import com.study.apigateway.dto.Plan.Plan.request.CreateTeamPlanRequestDto;
+import com.study.apigateway.dto.Plan.Plan.response.PlanDetailResponseDto;
 import com.study.apigateway.dto.Plan.Plan.response.PlanResponseDto;
 import com.study.apigateway.exception.ErrorResponse;
 import com.study.apigateway.service.Plan.PlanService;
@@ -41,5 +42,14 @@ public class PlanController {
     public Mono<ResponseEntity<PlanResponseDto>> createTeamPlan(@RequestParam UUID userId,
                                                                 @Valid @RequestBody CreateTeamPlanRequestDto request) {
         return planService.createTeamPlan(userId, request).map(ResponseEntity::ok);
+    }
+
+    @GetMapping("/{id}")
+    @Operation(summary = "Get a plan by id.")
+    @ApiResponse(responseCode = "200", description = "Get successfully.")
+    @ApiResponse(responseCode = "404", description = "Not found.",
+            content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+    public Mono<ResponseEntity<PlanDetailResponseDto>> getPlanById(@PathVariable UUID id) {
+        return planService.getPlanById(id).map(ResponseEntity::ok);
     }
 }

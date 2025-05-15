@@ -21,7 +21,7 @@ CREATE TABLE tasks (
 CREATE TABLE plan_reminders (
     id UUID PRIMARY KEY,
     plan_id UUID NOT NULL,
-    receiver_ids VARCHAR(255) NOT NULL,
+    receiver_ids VARCHAR(500) NOT NULL,
     remind_at TIMESTAMP NOT NULL
 );
 
