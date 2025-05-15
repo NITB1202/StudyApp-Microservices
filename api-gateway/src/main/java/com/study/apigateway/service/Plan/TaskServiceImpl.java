@@ -89,6 +89,8 @@ public class TaskServiceImpl implements TaskService {
     public Mono<ActionResponseDto> deleteTasks(UUID userId, DeleteTasksRequestDto request) {
         return Mono.fromCallable(()->{
             PlanDetailResponse planDetail = planGrpc.getPlanById(request.getPlanId());
+
+            //Validate update team request
             if(!planDetail.getTeamId().isEmpty()){
                 UUID teamId = UUID.fromString(planDetail.getTeamId());
                 teamGrpc.validateUpdateTeamResource(userId, teamId);
