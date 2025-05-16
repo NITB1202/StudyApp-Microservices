@@ -20,6 +20,8 @@ public interface PlanService {
     Plan updatePlan(UpdatePlanRequest request);
     void deletePlan(DeletePlanRequest request);
     Plan restorePlan(RestorePlanRequest request);
+    long getWeeklyFinishedPlansCount(GetWeeklyPlanStatsRequest request);
+    float getWeeklyFinishedAssignedPlansPercentage(GetWeeklyPlanStatsRequest request);
 
     List<Plan> getAssignedTeamPlansFromNowOn(UUID userId, UUID teamId);
     List<Plan> getAllTeamPlans(UUID teamId);
@@ -34,4 +36,5 @@ public interface PlanService {
     String getPlanName(UUID planId);
     LocalDateTime getPlanEndAt(UUID planId);
     float getPlanProgress(UUID planId);
+    UUID getTeamId(UUID planId);
 }

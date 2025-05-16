@@ -121,6 +121,19 @@ message IsAssignedForTeamPlansFromNowOnRequest {
   string userId = 2;
 }
 
+message GetWeeklyPlanStatsRequest {
+  string userId = 1;
+}
+
+message GetWeeklyPlanStatsResponse {
+  int64 finishedPlans = 1;
+  float finishInTotal = 2;
+}
+
+message IsTeamPlanRequest {
+  string planId = 1;
+}
+
 //Task
 message CreateTaskRequest {
   string assigneeId = 1;
@@ -128,9 +141,9 @@ message CreateTaskRequest {
 }
 
 message CreateTasksRequest {
-  string planId = 1;
-  repeated CreateTaskRequest tasks = 2;
-  string userId = 3;
+  string userId = 1;
+  string planId = 2;
+  repeated CreateTaskRequest tasks = 3;
 }
 
 message TaskResponse {
@@ -162,7 +175,6 @@ message UpdateTasksStatusRequest {
 message UpdateTaskAssigneeRequest {
   string taskId = 1;
   string assigneeId = 2;
-
 }
 
 message UpdateTasksAssigneeRequest {
@@ -224,6 +236,8 @@ service PlanService {
   rpc DeletePlan(DeletePlanRequest) returns (common.ActionResponse);
   rpc RestorePlan(RestorePlanRequest) returns (common.ActionResponse);
   rpc IsAssignedForTeamPlansFromNowOn(IsAssignedForTeamPlansFromNowOnRequest) returns (common.ActionResponse);
+  rpc GetWeeklyPlanStats(GetWeeklyPlanStatsRequest) returns (GetWeeklyPlanStatsResponse);
+  rpc IsTeamPlan(IsTeamPlanRequest) returns (common.ActionResponse);
 
   //Task
   rpc CreateTasks(CreateTasksRequest) returns (common.ActionResponse);

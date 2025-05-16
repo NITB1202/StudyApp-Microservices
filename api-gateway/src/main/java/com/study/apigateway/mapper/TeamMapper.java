@@ -1,13 +1,8 @@
 package com.study.apigateway.mapper;
 
-import com.study.apigateway.dto.Team.response.ListTeamResponseDto;
-import com.study.apigateway.dto.Team.response.TeamDetailResponseDto;
-import com.study.apigateway.dto.Team.response.TeamResponseDto;
-import com.study.apigateway.dto.Team.response.TeamSummaryResponseDto;
-import com.study.teamservice.grpc.ListTeamResponse;
-import com.study.teamservice.grpc.TeamDetailResponse;
-import com.study.teamservice.grpc.TeamResponse;
-import com.study.teamservice.grpc.TeamSummaryResponse;
+import com.study.apigateway.dto.Team.Team.response.*;
+import com.study.teamservice.grpc.*;
+import com.study.userservice.grpc.UserDetailResponse;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -55,6 +50,19 @@ public class TeamMapper {
                 .teams(summaries)
                 .total(teams.getTotal())
                 .nextCursor(teams.getNextCursor())
+                .build();
+    }
+
+    public static TeamProfileResponseDto toTeamProfileResponseDto(TeamProfileResponse team, UserDetailResponse creator){
+        return TeamProfileResponseDto.builder()
+                .id(UUID.fromString(team.getId()))
+                .avatarUrl(team.getAvatarUrl())
+                .name(team.getName())
+                .description(team.getDescription())
+                .createDate(LocalDate.parse(team.getCreateDate()))
+                .totalMembers(team.getTotalMembers())
+                .creatorName(creator.getUsername())
+                .creatorAvatarUrl(creator.getAvatarUrl())
                 .build();
     }
 }

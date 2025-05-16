@@ -3,7 +3,6 @@ syntax = "proto3";
 package user;
 
 import "common.proto";
-import "google/protobuf/empty.proto";
 
 option java_multiple_files = true;
 option java_package = "com.study.userservice.grpc";
@@ -82,5 +81,4 @@ service UserService {
   rpc SearchUserByUsername(SearchUserRequest) returns (ListUserResponse);
   rpc UpdateUser(UpdateUserRequest) returns (UserResponse);
   rpc UploadUserAvatar(UploadUserAvatarRequest) returns (common.ActionResponse);
-  rpc ValidateUserId(ValidateUserIdRequest) returns (google.protobuf.Empty);
 }

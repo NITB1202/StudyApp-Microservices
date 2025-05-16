@@ -12,5 +12,4 @@ public interface UserService {
     long countUsersByUsername(String username);
     User updateUser(UpdateUserRequest request);
     void uploadUserAvatar(UploadUserAvatarRequest request);
-    void validateUserId(ValidateUserIdRequest request);
 }

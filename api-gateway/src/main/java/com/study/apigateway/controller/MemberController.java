@@ -2,10 +2,10 @@ package com.study.apigateway.controller;
 
 import com.study.apigateway.dto.Action.ActionResponseDto;
 import com.study.apigateway.dto.Notification.request.CreateInvitationRequestDto;
-import com.study.apigateway.dto.Team.request.RemoveTeamMemberRequestDto;
-import com.study.apigateway.dto.Team.request.UpdateMemberRoleRequestDto;
-import com.study.apigateway.dto.Team.response.ListTeamMemberResponseDto;
-import com.study.apigateway.dto.Team.response.TeamUserProfileResponseDto;
+import com.study.apigateway.dto.Team.Member.request.RemoveTeamMemberRequestDto;
+import com.study.apigateway.dto.Team.Member.request.UpdateMemberRoleRequestDto;
+import com.study.apigateway.dto.Team.Member.response.ListTeamMemberResponseDto;
+import com.study.apigateway.dto.Team.Member.response.TeamMemberProfileResponseDto;
 import com.study.apigateway.exception.ErrorResponse;
 import com.study.apigateway.service.Team.MemberService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -18,7 +18,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
 
-import java.time.LocalDate;
 import java.util.UUID;
 
 @RestController
@@ -52,8 +51,8 @@ public class MemberController {
     @ApiResponse(responseCode = "200", description = "Get successfully.")
     @ApiResponse(responseCode = "404", description = "Not found.",
             content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
-    public Mono<ResponseEntity<TeamUserProfileResponseDto>> getUserInTeam(@RequestParam UUID userId,
-                                                                          @RequestParam UUID teamId){
+    public Mono<ResponseEntity<TeamMemberProfileResponseDto>> getUserInTeam(@RequestParam UUID userId,
+                                                                            @RequestParam UUID teamId){
         return memberService.getUserInTeam(userId, teamId).map(ResponseEntity::ok);
     }
 

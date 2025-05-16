@@ -108,10 +108,4 @@ public class UserServiceImpl implements UserService {
         user.setAvatarUrl(request.getAvatarUrl());
         userRepository.save(user);
     }
-
-    @Override
-    public void validateUserId(ValidateUserIdRequest request){
-        if(!userRepository.existsById(UUID.fromString(request.getId())))
-            throw new BusinessException("User not found");
-    }
 }

@@ -1,11 +1,12 @@
 package com.study.apigateway.service.Team;
 
-import com.study.apigateway.dto.Team.request.CreateTeamRequestDto;
-import com.study.apigateway.dto.Team.request.UpdateTeamRequestDto;
+import com.study.apigateway.dto.Team.Team.request.CreateTeamRequestDto;
+import com.study.apigateway.dto.Team.Team.request.UpdateTeamRequestDto;
 import com.study.apigateway.dto.Action.ActionResponseDto;
-import com.study.apigateway.dto.Team.response.ListTeamResponseDto;
-import com.study.apigateway.dto.Team.response.TeamDetailResponseDto;
-import com.study.apigateway.dto.Team.response.TeamResponseDto;
+import com.study.apigateway.dto.Team.Team.response.ListTeamResponseDto;
+import com.study.apigateway.dto.Team.Team.response.TeamDetailResponseDto;
+import com.study.apigateway.dto.Team.Team.response.TeamProfileResponseDto;
+import com.study.apigateway.dto.Team.Team.response.TeamResponseDto;
 import com.study.apigateway.grpc.TeamServiceGrpcClient;
 import com.study.apigateway.grpc.UserServiceGrpcClient;
 import com.study.apigateway.mapper.ActionMapper;
@@ -13,7 +14,9 @@ import com.study.apigateway.mapper.TeamMapper;
 import com.study.common.grpc.ActionResponse;
 import com.study.teamservice.grpc.ListTeamResponse;
 import com.study.teamservice.grpc.TeamDetailResponse;
+import com.study.teamservice.grpc.TeamProfileResponse;
 import com.study.teamservice.grpc.TeamResponse;
+import com.study.userservice.grpc.UserDetailResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
@@ -30,7 +33,6 @@ public class TeamServiceImpl implements TeamService {
     @Override
     public Mono<TeamResponseDto> createTeam(UUID userId, CreateTeamRequestDto request) {
         return Mono.fromCallable(() -> {
-            userClient.validateUserId(userId);
             TeamResponse team = grpcClient.createTeam(userId, request);
             return TeamMapper.toTeamResponseDto(team);
         }).subscribeOn(Schedulers.boundedElastic());
@@ -41,6 +43,18 @@ public class TeamServiceImpl implements TeamService {
         return Mono.fromCallable(()-> {
             TeamDetailResponse team = grpcClient.getTeamById(id);
             return TeamMapper.toTeamDetailResponseDto(team);
+        }).subscribeOn(Schedulers.boundedElastic());
+    }
+
+    @Override
+    public Mono<TeamProfileResponseDto> getTeamByTeamCode(String teamCode) {
+        return Mono.fromCallable(()->{
+            TeamProfileResponse team = grpcClient.getTeamByTeamCode(teamCode);
+
+            UUID creatorId = UUID.fromString(team.getCreatorId());
+            UserDetailResponse creator = userClient.getUserById(creatorId);
+
+            return TeamMapper.toTeamProfileResponseDto(team, creator);
         }).subscribeOn(Schedulers.boundedElastic());
     }
 

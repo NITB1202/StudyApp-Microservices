@@ -2,11 +2,12 @@ package com.study.apigateway.service.Team;
 
 import com.study.apigateway.dto.Action.ActionResponseDto;
 import com.study.apigateway.dto.Notification.request.CreateInvitationRequestDto;
-import com.study.apigateway.dto.Team.request.RemoveTeamMemberRequestDto;
-import com.study.apigateway.dto.Team.request.UpdateMemberRoleRequestDto;
-import com.study.apigateway.dto.Team.response.ListTeamMemberResponseDto;
-import com.study.apigateway.dto.Team.response.TeamMemberResponseDto;
-import com.study.apigateway.dto.Team.response.TeamUserProfileResponseDto;
+import com.study.apigateway.dto.Team.Member.request.RemoveTeamMemberRequestDto;
+import com.study.apigateway.dto.Team.Member.request.UpdateMemberRoleRequestDto;
+import com.study.apigateway.dto.Team.Member.response.ListTeamMemberResponseDto;
+import com.study.apigateway.dto.Team.Member.response.TeamMemberResponseDto;
+import com.study.apigateway.dto.Team.Member.response.TeamMemberProfileResponseDto;
+import com.study.apigateway.grpc.PlanServiceGrpcClient;
 import com.study.apigateway.grpc.TeamServiceGrpcClient;
 import com.study.apigateway.grpc.UserServiceGrpcClient;
 import com.study.apigateway.mapper.ActionMapper;
@@ -35,6 +36,7 @@ import java.util.UUID;
 public class MemberServiceImpl implements MemberService {
     private final TeamServiceGrpcClient teamGrpcClient;
     private final UserServiceGrpcClient userGrpcClient;
+    private final PlanServiceGrpcClient planGrpcClient;
 
     @Override
     public Mono<ActionResponseDto> createInvitation(UUID userId, CreateInvitationRequestDto request) {
@@ -53,7 +55,7 @@ public class MemberServiceImpl implements MemberService {
     }
 
     @Override
-    public Mono<TeamUserProfileResponseDto> getUserInTeam(UUID userId, UUID teamId) {
+    public Mono<TeamMemberProfileResponseDto> getUserInTeam(UUID userId, UUID teamId) {
         return Mono.fromCallable(()->{
             TeamMemberResponse member = teamGrpcClient.getTeamMember(userId, teamId);
             return TeamMemberMapper.toTeamUserProfileResponseDto(member);
@@ -158,6 +160,10 @@ public class MemberServiceImpl implements MemberService {
     @Override
     public Mono<ActionResponseDto> leaveTeam(UUID userId, UUID teamId) {
         return Mono.fromCallable(()->{
+            ActionResponse isAssigned = planGrpcClient.isAssignedForTeamPlansFromNowOn(userId, teamId);
+            if(isAssigned.getSuccess()) {
+                return ActionMapper.toResponseDto(isAssigned);
+            }
             ActionResponse response = teamGrpcClient.leaveTeam(userId, teamId);
             return ActionMapper.toResponseDto(response);
         }).subscribeOn(Schedulers.boundedElastic());

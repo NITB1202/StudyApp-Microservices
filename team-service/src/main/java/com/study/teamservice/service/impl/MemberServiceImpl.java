@@ -234,6 +234,33 @@ public class MemberServiceImpl implements MemberService {
         teamUserRepository.deleteByUserIdAndTeamId(userId, teamId);
     }
 
+    @Override
+    public void validateUpdateTeamResource(ValidateUpdateTeamResourceRequest request) {
+        UUID userId = UUID.fromString(request.getUserId());
+        UUID teamId = UUID.fromString(request.getTeamId());
+
+        TeamUser user = teamUserRepository.findByUserIdAndTeamId(userId, teamId);
+
+        if(user == null){
+            throw new NotFoundException("User id or team id is incorrect.");
+        }
+
+        if(user.getRole() == TeamRole.MEMBER){
+            throw new BusinessException("User doesn't have permission to update team resource.");
+        }
+    }
+
+    @Override
+    public void validateUsersInTeam(ValidateUsersInTeamRequest request) {
+        UUID teamId = UUID.fromString(request.getTeamId());
+
+        for(String userIdStr : request.getUserIdsList()) {
+            UUID userId = UUID.fromString(userIdStr);
+            if (!teamUserRepository.existsByUserIdAndTeamId(userId, teamId)) {
+                throw new NotFoundException("User with id " + userIdStr + " is not part of the team.");
+            }
+        }
+    }
 
     @Override
     public void saveMember(UUID teamId, UUID userId, TeamRole role) {

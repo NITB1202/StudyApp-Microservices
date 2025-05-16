@@ -1,5 +1,6 @@
 package com.study.teamservice.controller;
 
+import com.google.protobuf.Empty;
 import com.study.common.enums.TeamRole;
 import com.study.common.grpc.ActionResponse;
 import com.study.teamservice.entity.Team;
@@ -44,6 +45,14 @@ public class TeamController extends TeamServiceGrpc.TeamServiceImplBase {
         UUID teamId = UUID.fromString(request.getId());
         Team team = teamService.getTeamById(teamId);
         TeamDetailResponse response = TeamMapper.toTeamDetailResponse(team);
+        responseObserver.onNext(response);
+        responseObserver.onCompleted();
+    }
+
+    @Override
+    public void getTeamByTeamCode(GetTeamByTeamCodeRequest request, StreamObserver<TeamProfileResponse> responseObserver){
+        Team team = teamService.getTeamByTeamCode(request.getTeamCode());
+        TeamProfileResponse response = TeamMapper.toTeamProfileResponse(team);
         responseObserver.onNext(response);
         responseObserver.onCompleted();
     }
@@ -159,7 +168,6 @@ public class TeamController extends TeamServiceGrpc.TeamServiceImplBase {
         responseObserver.onCompleted();
     }
 
-
     //Member section
     @Override
     public void createInvitation(CreateInvitationRequest request, StreamObserver<ActionResponse> responseObserver){
@@ -273,6 +281,19 @@ public class TeamController extends TeamServiceGrpc.TeamServiceImplBase {
         responseObserver.onCompleted();
     }
 
+    @Override
+    public void validateUpdateTeamResource(ValidateUpdateTeamResourceRequest request, StreamObserver<Empty> responseObserver){
+        memberService.validateUpdateTeamResource(request);
+        responseObserver.onNext(Empty.getDefaultInstance());
+        responseObserver.onCompleted();
+    }
+
+    @Override
+    public void validateUsersInTeam(ValidateUsersInTeamRequest request, StreamObserver<Empty> responseObserver) {
+        memberService.validateUsersInTeam(request);
+        responseObserver.onNext(Empty.getDefaultInstance());
+        responseObserver.onCompleted();
+    }
 
     private List<TeamSummaryResponse> toListTeamSummaryResponse(UUID userId, List<Team> teams) {
         List<TeamSummaryResponse> teamResponses = new ArrayList<>();

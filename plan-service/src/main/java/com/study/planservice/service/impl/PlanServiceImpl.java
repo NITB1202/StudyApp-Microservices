@@ -9,9 +9,11 @@ import com.study.planservice.grpc.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.time.temporal.TemporalAdjusters;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -213,6 +215,43 @@ public class PlanServiceImpl implements PlanService {
     }
 
     @Override
+    public long getWeeklyFinishedPlansCount(GetWeeklyPlanStatsRequest request) {
+        UUID userId = UUID.fromString(request.getUserId());
+
+        LocalDateTime startOfWeek = LocalDate.now()
+                .with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY))
+                .atStartOfDay();
+
+        LocalDateTime endOfWeek = LocalDate.now()
+                    .with(TemporalAdjusters.nextOrSame(DayOfWeek.SUNDAY))
+                    .atTime(LocalTime.MAX);
+
+
+        return planRepository.countCompletedAssignedPlansByUserIdAndIn(userId, startOfWeek, endOfWeek);
+    }
+
+    @Override
+    public float getWeeklyFinishedAssignedPlansPercentage(GetWeeklyPlanStatsRequest request) {
+        UUID userId = UUID.fromString(request.getUserId());
+
+        LocalDateTime startOfWeek = LocalDate.now()
+                .with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY))
+                .atStartOfDay();
+
+        LocalDateTime endOfWeek = LocalDate.now()
+                .with(TemporalAdjusters.nextOrSame(DayOfWeek.SUNDAY))
+                .atTime(LocalTime.MAX);
+
+        long totalPlans = planRepository.countAssignedPlansHaveDeadlineIn(userId, startOfWeek, endOfWeek);
+
+        if(totalPlans == 0) return 1;
+
+        long completedPlans = planRepository.countCompletedAssignedPlansHaveDeadlineIn(userId, startOfWeek, endOfWeek);
+
+        return (float)completedPlans / totalPlans;
+    }
+
+    @Override
     public List<Plan> getAssignedTeamPlansFromNowOn(UUID userId, UUID teamId) {
         return planRepository.findAssignedTeamPlansFromNowOn(userId, teamId, LocalDateTime.now());
     }
@@ -326,5 +365,14 @@ public class PlanServiceImpl implements PlanService {
         );
 
         return plan.getProgress();
+    }
+
+    @Override
+    public UUID getTeamId(UUID planId) {
+        Plan plan = planRepository.findById(planId).orElseThrow(
+                () -> new NotFoundException("Plan not found.")
+        );
+
+        return plan.getTeamId();
     }
 }

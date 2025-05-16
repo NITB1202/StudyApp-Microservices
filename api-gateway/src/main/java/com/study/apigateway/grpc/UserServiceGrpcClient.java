@@ -48,7 +48,7 @@ public class UserServiceGrpcClient {
 
     public UserResponse updateUser(UUID id, UpdateUserRequestDto dto) {
         //Avoid null fields
-        String username = dto.getUsername() != null ? dto.getUsername() : "";
+        String username = dto.getUsername() != null ? dto.getUsername().trim() : "";
         String dateOfBirth = dto.getDateOfBirth() != null ? dto.getDateOfBirth().toString() : "";
         Gender gender = dto.getGender() != null ? GenderMapper.toProtoEnum(dto.getGender()) : Gender.UNSPECIFIED;
 
@@ -60,14 +60,6 @@ public class UserServiceGrpcClient {
                 .build();
 
         return userServiceStub.updateUser(request);
-    }
-
-    public void validateUserId(UUID id) {
-        ValidateUserIdRequest request = ValidateUserIdRequest.newBuilder()
-                .setId(id.toString())
-                .build();
-
-        userServiceStub.validateUserId(request);
     }
 
     public ActionResponse uploadUserAvatar(UUID id, String avatarUrl){

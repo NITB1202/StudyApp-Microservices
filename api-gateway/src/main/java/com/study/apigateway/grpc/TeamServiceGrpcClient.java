@@ -1,16 +1,18 @@
 package com.study.apigateway.grpc;
 
 import com.study.apigateway.dto.Notification.request.CreateInvitationRequestDto;
-import com.study.apigateway.dto.Team.request.CreateTeamRequestDto;
-import com.study.apigateway.dto.Team.request.RemoveTeamMemberRequestDto;
-import com.study.apigateway.dto.Team.request.UpdateMemberRoleRequestDto;
-import com.study.apigateway.dto.Team.request.UpdateTeamRequestDto;
+import com.study.apigateway.dto.Team.Team.request.CreateTeamRequestDto;
+import com.study.apigateway.dto.Team.Member.request.RemoveTeamMemberRequestDto;
+import com.study.apigateway.dto.Team.Member.request.UpdateMemberRoleRequestDto;
+import com.study.apigateway.dto.Team.Team.request.UpdateTeamRequestDto;
 import com.study.common.grpc.ActionResponse;
 import com.study.common.mappers.TeamRoleMapper;
 import com.study.teamservice.grpc.*;
 import net.devh.boot.grpc.client.inject.GrpcClient;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 @Service
@@ -23,7 +25,7 @@ public class TeamServiceGrpcClient {
         CreateTeamRequest request = CreateTeamRequest.newBuilder()
                 .setCreatorId(userId.toString())
                 .setName(dto.getName())
-                .setDescription(dto.getDescription() != null ? dto.getDescription() : "")
+                .setDescription(dto.getDescription() != null ? dto.getDescription().trim() : "")
                 .build();
 
         return stub.createTeam(request);
@@ -35,6 +37,14 @@ public class TeamServiceGrpcClient {
                 .build();
 
         return stub.getTeamById(request);
+    }
+
+    public TeamProfileResponse getTeamByTeamCode(String teamCode) {
+        GetTeamByTeamCodeRequest request = GetTeamByTeamCodeRequest.newBuilder()
+                .setTeamCode(teamCode)
+                .build();
+
+        return stub.getTeamByTeamCode(request);
     }
 
     public ListTeamResponse getUserTeams(UUID userId, String cursor, int size){
@@ -63,8 +73,8 @@ public class TeamServiceGrpcClient {
     }
 
     public TeamResponse updateTeam(UUID userId, UUID teamId, UpdateTeamRequestDto dto){
-        String name = dto.getName() != null ? dto.getName() : "";
-        String description = dto.getDescription() != null ? dto.getDescription() : "";
+        String name = dto.getName() != null ? dto.getName().trim() : "";
+        String description = dto.getDescription() != null ? dto.getDescription().trim() : "";
 
         UpdateTeamRequest request = UpdateTeamRequest.newBuilder()
                 .setId(teamId.toString())
@@ -181,5 +191,27 @@ public class TeamServiceGrpcClient {
                 .build();
 
         return stub.leaveTeam(request);
+    }
+
+    public void validateUpdateTeamResource(UUID userId, UUID teamId) {
+        ValidateUpdateTeamResourceRequest request = ValidateUpdateTeamResourceRequest.newBuilder()
+                .setUserId(userId.toString())
+                .setTeamId(teamId.toString())
+                .build();
+
+        stub.validateUpdateTeamResource(request);
+    }
+
+    public void validateUsersInTeam(UUID teamId, Set<UUID> userIds) {
+        List<String> idsStr = userIds.stream()
+                .map(UUID::toString)
+                .toList();
+
+        ValidateUsersInTeamRequest request = ValidateUsersInTeamRequest.newBuilder()
+                .setTeamId(teamId.toString())
+                .addAllUserIds(idsStr)
+                .build();
+
+        stub.validateUsersInTeam(request);
     }
 }

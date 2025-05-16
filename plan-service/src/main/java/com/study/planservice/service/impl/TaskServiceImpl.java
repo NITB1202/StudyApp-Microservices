@@ -103,7 +103,6 @@ public class TaskServiceImpl implements TaskService {
 
     @Override
     public Set<UUID> updateTasksAssignee(UpdateTasksAssigneeRequest request) {
-        UUID userId = UUID.fromString(request.getUserId());
         UUID planId = UUID.fromString(request.getPlanId());
 
         if(!planService.isTeamPlan(planId)){
@@ -116,6 +115,7 @@ public class TaskServiceImpl implements TaskService {
 
         for(UpdateTaskAssigneeRequest updateRequest : request.getRequestsList()){
             UUID taskId = UUID.fromString(updateRequest.getTaskId());
+            UUID assigneeId = UUID.fromString(updateRequest.getAssigneeId());
 
             Task task = taskRepository.findById(taskId).orElseThrow(
                     ()->new NotFoundException("Task not found.")
@@ -126,11 +126,11 @@ public class TaskServiceImpl implements TaskService {
             }
 
             //If change assignee -> reset task status
-            task.setAssigneeId(userId);
+            task.setAssigneeId(assigneeId);
             task.setIsCompleted(false);
 
             taskRepository.save(task);
-            assignees.add(userId);
+            assignees.add(assigneeId);
         }
 
         //Update progress
