@@ -11,7 +11,6 @@ services:
   user-db:
     image: postgres:15
     container_name: user-db
-    restart: always
     ports:
       - "5432:5432"
     environment:
@@ -27,7 +26,6 @@ services:
     build:
       context: ./user-service
     container_name: user-service
-    restart: always
     depends_on:
       - user-db
       - eureka-server
@@ -44,7 +42,6 @@ services:
   zookeeper:
     image: confluentinc/cp-zookeeper:latest
     container_name: zookeeper
-    restart: always
     environment:
       ZOOKEEPER_CLIENT_PORT: 2181
     networks:
@@ -53,7 +50,6 @@ services:
   kafka:
     image: confluentinc/cp-kafka:latest
     container_name: kafka
-    restart: always
     depends_on:
       - zookeeper
     ports:
@@ -73,7 +69,6 @@ services:
   team-db:
     image: postgres:15
     container_name: team-db
-    restart: always
     ports:
       - "5433:5432"
     environment:
@@ -89,7 +84,6 @@ services:
     build:
       context: ./team-service
     container_name: team-service
-    restart: always
     depends_on:
       - zookeeper
       - kafka
@@ -105,11 +99,43 @@ services:
     networks:
       - backend
 
+  plan-db:
+    image: postgres:15
+    container_name: plan-db
+    ports:
+      - "5434:5432"
+    environment:
+      POSTGRES_DB: ${PLAN_SERVICE_DB_NAME}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      - plan-db-data:/var/lib/postgresql/data
+    networks:
+      - backend
+
+  plan-service:
+    build:
+      context: ./plan-service
+    container_name: plan-service
+    depends_on:
+      - zookeeper
+      - kafka
+      - plan-db
+      - eureka-server
+    environment:
+      SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE}
+      PLAN_SERVICE_DB_HOST: ${PLAN_SERVICE_DB_HOST}
+      PLAN_SERVICE_DB_PORT: ${PLAN_SERVICE_DB_PORT}
+      PLAN_SERVICE_DB_NAME: ${PLAN_SERVICE_DB_NAME}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    networks:
+      - backend
+
   api-gateway:
     build:
       context: ./api-gateway
     container_name: api-gateway
-    restart: always
     ports:
       - "8080:8080"
     depends_on:
@@ -123,6 +149,7 @@ services:
 volumes:
   user-db-data:
   team-db-data:
+  plan-db-data:
 
 networks:
   backend:
