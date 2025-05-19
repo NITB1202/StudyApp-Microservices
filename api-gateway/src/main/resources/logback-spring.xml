@@ -1,6 +1,6 @@
 <configuration>
     <include resource="org/springframework/boot/logging/logback/defaults.xml"/>
-    <property name="LOGSTASH_HOST" value="localhost"/>
+    <property name="LOGSTASH_HOST" value="logstash"/>
     <property name="LOGSTASH_PORT" value="5000"/>
 
     <appender name="LOGSTASH" class="net.logstash.logback.appender.LogstashTcpSocketAppender">
