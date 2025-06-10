@@ -35,6 +35,7 @@ public class Notification {
     @Column(name = "is_read", nullable = false)
     private Boolean isRead;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "subject")
     private LinkedSubject subject;
 
