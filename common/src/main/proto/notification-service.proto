@@ -8,6 +8,11 @@ option java_multiple_files = true;
 option java_package = "com.study.notificationservice.grpc";
 option java_outer_classname = "NotificationProto";
 
+enum LinkedSubject {
+  PLAN = 0;
+  TEAM = 1;
+}
+
 message GetNotificationRequest {
   string user_id = 1;
   int32 page = 2;
@@ -19,6 +24,8 @@ message NotificationResponse {
   string date = 2;
   string content = 3;
   bool is_read = 4;
+  LinkedSubject subject = 5;
+  string subject_id = 6;
 }
 
 message NotificationsResponse {
@@ -40,7 +47,7 @@ message MarkAllNotificationsAsReadRequest {
   string user_id = 1;
 }
 
-message UpdateNotificationSettingsRequest {
+message UpdateTeamNotificationSettingsRequest {
   string user_id = 1;
   string team_id = 2;
   bool team_notification = 3;
@@ -61,7 +68,7 @@ service NotificationService {
   rpc ReplyToInvitation(ReplyToInvitationRequest) returns (common.ActionResponse);
   rpc MarkNotificationsAsRead(MarkNotificationsAsReadRequest) returns (common.ActionResponse);
   rpc MarkAllNotificationsAsRead(MarkAllNotificationsAsReadRequest) returns (common.ActionResponse);
-  rpc UpdateNotificationSettings(UpdateNotificationSettingsRequest) returns (common.ActionResponse);
+  rpc UpdateTeamNotificationSettings(UpdateTeamNotificationSettingsRequest) returns (common.ActionResponse);
   rpc DeleteNotifications(DeleteNotificationsRequest) returns (common.ActionResponse);
   rpc DeleteAllNotifications(DeleteAllNotificationsRequest) returns (common.ActionResponse);
 }
