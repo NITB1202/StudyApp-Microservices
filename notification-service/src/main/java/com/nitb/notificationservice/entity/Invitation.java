@@ -28,6 +28,9 @@ public class Invitation {
     @Column(name = "team_id", nullable = false)
     private UUID teamId;
 
+    @Column(name = "team_name", nullable = false)
+    private String teamName;
+
     @Column(name = "invited_at", nullable = false)
     private LocalDateTime invitedAt;
 

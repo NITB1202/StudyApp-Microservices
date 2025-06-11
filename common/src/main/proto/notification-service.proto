@@ -13,9 +13,10 @@ enum LinkedSubject {
   TEAM = 1;
 }
 
-message GetNotificationRequest {
-  string user_id = 1;
-  int32 page = 2;
+//Notification
+message GetNotificationsRequest {
+  string userId = 1;
+  string cursor = 2;
   int32 size = 3;
 }
 
@@ -23,31 +24,15 @@ message NotificationResponse {
   string title = 1;
   string date = 2;
   string content = 3;
-  bool is_read = 4;
+  bool isRead = 4;
   LinkedSubject subject = 5;
-  string subject_id = 6;
+  string subjectId = 6;
 }
 
 message NotificationsResponse {
   repeated NotificationResponse notifications = 1;
-  int64 total_items = 2;
-  int32 total_pages = 3;
-}
-
-message GetTeamNotificationSettingsRequest {
-  string user_id = 1;
-  string team_id = 2;
-}
-
-message TeamNotificationSettingsResponse {
-  bool team_notification = 1;
-  bool team_plan_reminder = 2;
-  bool chat_notification = 3;
-}
-
-message ReplyToInvitationRequest {
-  string invitation_id = 1;
-  bool accept = 2;
+  int64 total = 2;
+  string nextCursor = 3;
 }
 
 message MarkNotificationsAsReadRequest {
@@ -55,15 +40,7 @@ message MarkNotificationsAsReadRequest {
 }
 
 message MarkAllNotificationsAsReadRequest {
-  string user_id = 1;
-}
-
-message UpdateTeamNotificationSettingsRequest {
-  string user_id = 1;
-  string team_id = 2;
-  bool team_notification = 3;
-  bool chat_notification = 4;
-  bool team_plan_reminder = 5;
+  string userId = 1;
 }
 
 message DeleteNotificationsRequest {
@@ -71,16 +48,65 @@ message DeleteNotificationsRequest {
 }
 
 message DeleteAllNotificationsRequest {
-  string user_id = 1;
+  string userId = 1;
+}
+
+//Invitation
+message GetInvitationsRequest {
+  string userId = 1;
+  string cursor = 2;
+  int32 size = 3;
+}
+
+message InvitationResponse {
+  string id = 1;
+  string inviterId = 2;
+  string teamId = 3;
+  string teamName = 4;
+  string invitedAt = 5;
+}
+
+message InvitationsResponse {
+  repeated InvitationResponse invitations = 1;
+  int64 total = 2;
+  string nextCursor = 3;
+}
+
+message ReplyToInvitationRequest {
+  string id = 1;
+  bool accept = 2;
+}
+
+//Notification settings
+message GetTeamNotificationSettingsRequest {
+  string userId = 1;
+  string teamId = 2;
+}
+
+message TeamNotificationSettingsResponse {
+  string id = 1;
+  bool teamNotification = 2;
+  bool teamPlanReminder = 3;
+  bool chatNotification = 4;
+}
+
+message UpdateTeamNotificationSettingsRequest {
+  string id = 1;
+  bool teamNotification = 2;
+  bool chatNotification = 3;
+  bool teamPlanReminder = 4;
 }
 
 service NotificationService {
-  rpc GetNotifications(GetNotificationRequest) returns (NotificationsResponse);
-  rpc GetTeamNotificationSettings(GetTeamNotificationSettingsRequest) returns (TeamNotificationSettingsResponse);
-  rpc ReplyToInvitation(ReplyToInvitationRequest) returns (common.ActionResponse);
+  rpc GetNotifications(GetNotificationsRequest) returns (NotificationsResponse);
   rpc MarkNotificationsAsRead(MarkNotificationsAsReadRequest) returns (common.ActionResponse);
   rpc MarkAllNotificationsAsRead(MarkAllNotificationsAsReadRequest) returns (common.ActionResponse);
-  rpc UpdateTeamNotificationSettings(UpdateTeamNotificationSettingsRequest) returns (common.ActionResponse);
   rpc DeleteNotifications(DeleteNotificationsRequest) returns (common.ActionResponse);
   rpc DeleteAllNotifications(DeleteAllNotificationsRequest) returns (common.ActionResponse);
+
+  rpc GetInvitations(GetInvitationsRequest) returns (InvitationsResponse);
+  rpc ReplyToInvitation(ReplyToInvitationRequest) returns (common.ActionResponse);
+
+  rpc GetTeamNotificationSettings(GetTeamNotificationSettingsRequest) returns (TeamNotificationSettingsResponse);
+  rpc UpdateTeamNotificationSettings(UpdateTeamNotificationSettingsRequest) returns (common.ActionResponse);
 }
