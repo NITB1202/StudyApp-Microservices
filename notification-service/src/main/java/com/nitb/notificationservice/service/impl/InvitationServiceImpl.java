@@ -23,13 +23,13 @@ public class InvitationServiceImpl implements InvitationService {
     private static final int DEFAULT_SIZE = 10;
 
     @Override
-    public void createInvitation(UUID inviterId, UUID inviteeId, UUID teamId, String teamName) {
+    public void createInvitation(String inviterName, UUID inviteeId, UUID teamId, String teamName) {
         if(invitationRepository.existsByInviteeIdAndTeamId(inviteeId, teamId)) {
             throw new BusinessException("The invitation has already been sent to the invitee.");
         }
 
         Invitation invitation = Invitation.builder()
-                .inviterId(inviterId)
+                .inviterName(inviterName)
                 .inviteeId(inviteeId)
                 .teamId(teamId)
                 .teamName(teamName)

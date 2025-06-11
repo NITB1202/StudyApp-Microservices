@@ -1,7 +1,5 @@
 package com.study.teamservice.service;
 
-import com.study.teamservice.entity.Team;
-
 import java.util.Set;
 import java.util.UUID;
 

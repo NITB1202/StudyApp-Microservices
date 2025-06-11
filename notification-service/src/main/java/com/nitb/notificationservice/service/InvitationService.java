@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.UUID;
 
 public interface InvitationService {
-    void createInvitation(UUID inviterId, UUID inviteeId, UUID teamId, String teamName);
+    void createInvitation(String inviterName, UUID inviteeId, UUID teamId, String teamName);
     List<Invitation> getInvitations(GetInvitationsRequest request);
     void deleteInvitation(UUID id);
 }

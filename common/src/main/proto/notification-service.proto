@@ -61,7 +61,7 @@ message GetInvitationsRequest {
 
 message InvitationResponse {
   string id = 1;
-  string inviterId = 2;
+  string inviterName = 2;
   string teamId = 3;
   string teamName = 4;
   string invitedAt = 5;

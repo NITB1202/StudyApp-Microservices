@@ -19,8 +19,8 @@ public class Invitation {
     @Column(name = "id", nullable = false)
     private UUID id;
 
-    @Column(name = "inviter_id", nullable = false)
-    private UUID inviterId;
+    @Column(name = "inviter_name", nullable = false)
+    private String inviterName;
 
     @Column(name = "invitee_id", nullable = false)
     private UUID inviteeId;
