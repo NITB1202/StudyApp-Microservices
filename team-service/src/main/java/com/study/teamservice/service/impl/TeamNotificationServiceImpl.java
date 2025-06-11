@@ -1,10 +1,7 @@
 package com.study.teamservice.service.impl;
 
 import com.study.common.events.Notification.InvitationCreatedEvent;
-import com.study.common.events.Team.TeamDeletedEvent;
-import com.study.common.events.Team.TeamUpdatedEvent;
-import com.study.common.events.Team.UserJoinedTeamEvent;
-import com.study.common.events.Team.UserLeftTeamEvent;
+import com.study.common.events.Team.*;
 import com.study.teamservice.event.TeamEventPublisher;
 import com.study.teamservice.service.MemberService;
 import com.study.teamservice.service.TeamNotificationService;
@@ -25,12 +22,23 @@ public class TeamNotificationServiceImpl implements TeamNotificationService {
     private final MemberService memberService;
     private final TeamEventPublisher teamEventPublisher;
 
+    private static final String CREATE_TOPIC = "team-created";
     private static final String UPDATE_TOPIC = "team-updated";
     private static final String DELETE_TOPIC = "team-deleted";
 
     private static final String INVITATION_CREATED_TOPIC = "invitation-created";
     private static final String USER_JOINED_TOPIC = "user-joined";
     private static final String USER_LEFT_TOPIC = "user-left";
+
+    @Override
+    public void publishTeamCreatedEvent(UUID teamId) {
+        TeamCreatedEvent event = TeamCreatedEvent.builder()
+                .teamId(teamId)
+                .build();
+
+        log.info("Publish team created event: {}", event);
+        teamEventPublisher.publishEvent(CREATE_TOPIC, event);
+    }
 
     @Override
     public void publishTeamUpdateNotification(UUID userId, UUID teamId, Set<String> updatedFields) {

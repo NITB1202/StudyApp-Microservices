@@ -34,6 +34,9 @@ public class TeamController extends TeamServiceGrpc.TeamServiceImplBase {
         UUID creatorId = UUID.fromString(request.getCreatorId());
         memberService.saveMember(team.getId(), creatorId, TeamRole.CREATOR);
 
+        //Publish create event
+        teamNotificationService.publishTeamCreatedEvent(team.getId());
+
         TeamResponse response = TeamMapper.toTeamResponse(team);
 
         responseObserver.onNext(response);
