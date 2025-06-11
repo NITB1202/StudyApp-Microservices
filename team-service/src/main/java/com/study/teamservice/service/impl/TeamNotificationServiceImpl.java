@@ -70,6 +70,7 @@ public class TeamNotificationServiceImpl implements TeamNotificationService {
 
         TeamDeletedEvent event = TeamDeletedEvent.builder()
                 .id(teamId)
+                .teamId(teamId)
                 .teamName(teamName)
                 .deletedBy(userId)
                 .memberIds(memberIds)
