@@ -31,9 +31,10 @@ public class TeamNotificationServiceImpl implements TeamNotificationService {
     private static final String USER_LEFT_TOPIC = "user-left";
 
     @Override
-    public void publishTeamCreatedEvent(UUID teamId) {
+    public void publishTeamCreatedEvent(UUID teamId, UUID creatorId) {
         TeamCreatedEvent event = TeamCreatedEvent.builder()
                 .teamId(teamId)
+                .creatorId(creatorId)
                 .build();
 
         log.info("Publish team created event: {}", event);

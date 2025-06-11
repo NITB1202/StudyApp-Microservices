@@ -11,4 +11,5 @@ import java.util.UUID;
 @Builder
 public class TeamCreatedEvent {
     private UUID teamId;
+    private UUID creatorId;
 }

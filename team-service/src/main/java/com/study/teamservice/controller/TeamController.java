@@ -35,7 +35,7 @@ public class TeamController extends TeamServiceGrpc.TeamServiceImplBase {
         memberService.saveMember(team.getId(), creatorId, TeamRole.CREATOR);
 
         //Publish create event
-        teamNotificationService.publishTeamCreatedEvent(team.getId());
+        teamNotificationService.publishTeamCreatedEvent(team.getId(), creatorId);
 
         TeamResponse response = TeamMapper.toTeamResponse(team);
 
