@@ -5,6 +5,7 @@ import com.nitb.notificationservice.entity.Notification;
 import com.study.notificationservice.grpc.*;
 
 import java.util.List;
+import java.util.UUID;
 
 public interface NotificationService {
     void createNotification(CreateNotificationRequestDto request);
@@ -13,4 +14,6 @@ public interface NotificationService {
     void markAllNotificationsAsRead(MarkAllNotificationsAsReadRequest request);
     void deleteNotifications(DeleteNotificationsRequest request);
     void deleteAllNotifications(DeleteAllNotificationsRequest request);
+
+    long countNotificationsByUserId(UUID userId);
 }

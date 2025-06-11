@@ -78,4 +78,9 @@ public class InvitationServiceImpl implements InvitationService {
 
         invitationRepository.delete(invitation);
     }
+
+    @Override
+    public long countInvitationsByUserId(UUID userId) {
+        return invitationRepository.countByInviteeId(userId);
+    }
 }

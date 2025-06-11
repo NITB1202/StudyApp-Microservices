@@ -11,4 +11,5 @@ public interface InvitationService {
     void createInvitation(String inviterName, UUID inviteeId, UUID teamId, String teamName);
     List<Invitation> getInvitations(GetInvitationsRequest request);
     void replyToInvitation(ReplyToInvitationRequest request);
+    long countInvitationsByUserId(UUID userId);
 }

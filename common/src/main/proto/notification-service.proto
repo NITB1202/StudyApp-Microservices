@@ -23,7 +23,7 @@ message GetNotificationsRequest {
 
 message NotificationResponse {
   string title = 1;
-  string date = 2;
+  string createdAt = 2;
   string content = 3;
   bool isRead = 4;
   LinkedSubject subject = 5;

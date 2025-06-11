@@ -101,4 +101,9 @@ public class NotificationServiceImpl implements NotificationService {
         List<Notification> notifications = notificationRepository.findByUserId(userId);
         notificationRepository.deleteAll(notifications);
     }
+
+    @Override
+    public long countNotificationsByUserId(UUID userId) {
+        return notificationRepository.countByUserId(userId);
+    }
 }

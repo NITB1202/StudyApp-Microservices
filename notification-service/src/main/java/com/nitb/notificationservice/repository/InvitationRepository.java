@@ -12,4 +12,5 @@ public interface InvitationRepository extends JpaRepository<Invitation, UUID> {
     boolean existsByInviteeIdAndTeamId(UUID inviteeId, UUID teamId);
     List<Invitation> findByInviteeId(UUID inviteeId, Pageable pageable);
     List<Invitation> findByInviteeIdAndInvitedAtLessThan(UUID inviteeId, LocalDateTime invitedAt, Pageable pageable);
+    long countByInviteeId(UUID inviteeId);
 }
