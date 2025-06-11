@@ -33,7 +33,4 @@ public class Invitation {
 
     @Column(name = "invited_at", nullable = false)
     private LocalDateTime invitedAt;
-
-    @Column(name = "accepted", nullable = false)
-    private Boolean accepted;
 }

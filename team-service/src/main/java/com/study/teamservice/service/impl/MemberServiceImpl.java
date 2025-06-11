@@ -38,16 +38,8 @@ public class MemberServiceImpl implements MemberService {
 
         validateUpdateMemberPermission(teamId, inviterId);
 
-        if(!teamService.existsById(teamId)) {
-            throw new NotFoundException("Team does not exist");
-        }
-
-        if(!teamUserRepository.existsByUserIdAndTeamId(inviterId, teamId)) {
-            throw new NotFoundException("User id or team id is incorrect");
-        }
-
         if(teamUserRepository.existsByUserIdAndTeamId(inviteeId, teamId)) {
-           throw new BusinessException("The invitee is already in the team");
+           throw new BusinessException("The invitee is already in the team.");
         }
     }
 
@@ -58,11 +50,11 @@ public class MemberServiceImpl implements MemberService {
         Team team = teamService.getTeamByTeamCode(request.getTeamCode());
 
         if(team == null) {
-            throw new NotFoundException("Team does not exist");
+            throw new NotFoundException("Team does not exist.");
         }
 
         if(teamUserRepository.existsByUserIdAndTeamId(userId, team.getId())) {
-            throw new BusinessException("User is already in the team");
+            throw new BusinessException("User is already in the team.");
         }
 
         saveMember(team.getId(), userId, TeamRole.MEMBER);
@@ -117,7 +109,7 @@ public class MemberServiceImpl implements MemberService {
         TeamUser teamUser = teamUserRepository.findByUserIdAndTeamId(userId, teamId);
 
         if(teamUser == null) {
-            throw new NotFoundException("User id or team id is incorrect");
+            throw new NotFoundException("User id or team id is incorrect.");
         }
 
         return teamUser;
@@ -168,17 +160,17 @@ public class MemberServiceImpl implements MemberService {
         TeamUser user = teamUserRepository.findByUserIdAndTeamId(userId, teamId);
 
         if(user == null) {
-            throw new NotFoundException("User id or team id is incorrect");
+            throw new NotFoundException("User id or team id is incorrect.");
         }
 
         if(user.getRole() != TeamRole.CREATOR){
-            throw new BusinessException("Only the creator can change a member's role");
+            throw new BusinessException("Only the creator can change a member's role.");
         }
 
         TeamUser member = teamUserRepository.findByUserIdAndTeamId(memberId, teamId);
 
         if(member == null) {
-            throw new NotFoundException("Member id or team id is incorrect");
+            throw new NotFoundException("Member id or team id is incorrect.");
         }
 
         if(request.getRole() == com.study.teamservice.grpc.TeamRole.CREATOR){
@@ -220,7 +212,7 @@ public class MemberServiceImpl implements MemberService {
         TeamUser teamUser = teamUserRepository.findByUserIdAndTeamId(userId, teamId);
 
         if(teamUser == null) {
-            throw new NotFoundException("User is not part of the team");
+            throw new NotFoundException("User is not part of the team.");
         }
 
         long memberCount = teamUserRepository.countByTeamId(teamId);
@@ -327,17 +319,17 @@ public class MemberServiceImpl implements MemberService {
         TeamUser teamUser = teamUserRepository.findByUserIdAndTeamId(userId, teamId);
 
         if(teamUser == null)
-            throw new NotFoundException("User is not part of this team");
+            throw new NotFoundException("User is not part of this team.");
 
         if(teamUser.getRole() != TeamRole.CREATOR)
-            throw new BusinessException("Only the creator has permission to update this team");
+            throw new BusinessException("Only the creator has permission to update this team.");
     }
 
     private void validateUpdateMemberPermission(UUID teamId, UUID userId) {
         TeamUser user = teamUserRepository.findByUserIdAndTeamId(userId, teamId);
 
         if(user == null){
-            throw new NotFoundException("User is not part of this team");
+            throw new NotFoundException("User is not part of this team.");
         }
 
         if(user.getRole() == TeamRole.MEMBER){
