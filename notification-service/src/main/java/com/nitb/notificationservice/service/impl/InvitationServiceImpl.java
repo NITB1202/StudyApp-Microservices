@@ -1,11 +1,14 @@
 package com.nitb.notificationservice.service.impl;
 
 import com.nitb.notificationservice.entity.Invitation;
+import com.nitb.notificationservice.event.NotificationEventPublisher;
 import com.nitb.notificationservice.repository.InvitationRepository;
 import com.nitb.notificationservice.service.InvitationService;
+import com.study.common.events.Notification.InvitationAcceptEvent;
 import com.study.common.exceptions.BusinessException;
 import com.study.common.exceptions.NotFoundException;
 import com.study.notificationservice.grpc.GetInvitationsRequest;
+import com.study.notificationservice.grpc.ReplyToInvitationRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -20,7 +23,9 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class InvitationServiceImpl implements InvitationService {
     private final InvitationRepository invitationRepository;
+    private final NotificationEventPublisher publisher;
     private static final int DEFAULT_SIZE = 10;
+    private static final String ACCEPT_TOPIC = "invitation-accepted";
 
     @Override
     public void createInvitation(String inviterName, UUID inviteeId, UUID teamId, String teamName) {
@@ -55,10 +60,21 @@ public class InvitationServiceImpl implements InvitationService {
     }
 
     @Override
-    public void deleteInvitation(UUID id) {
+    public void replyToInvitation(ReplyToInvitationRequest request) {
+        UUID id = UUID.fromString(request.getId());
+
         Invitation invitation = invitationRepository.findById(id).orElseThrow(
                 () -> new NotFoundException("Invitation not found.")
         );
+
+        if(request.getAccept()) {
+            InvitationAcceptEvent event = InvitationAcceptEvent.builder()
+                    .teamId(invitation.getTeamId())
+                    .userId(invitation.getInviteeId())
+                    .build();
+
+            publisher.publishEvent(ACCEPT_TOPIC, event);
+        }
 
         invitationRepository.delete(invitation);
     }
