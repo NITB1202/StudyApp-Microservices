@@ -4,6 +4,7 @@ import com.nitb.notificationservice.entity.Invitation;
 import com.nitb.notificationservice.entity.Notification;
 import com.nitb.notificationservice.mapper.InvitationMapper;
 import com.nitb.notificationservice.mapper.NotificationMapper;
+import com.nitb.notificationservice.service.DeviceTokenService;
 import com.nitb.notificationservice.service.InvitationService;
 import com.nitb.notificationservice.service.NotificationService;
 import com.study.common.grpc.ActionResponse;
@@ -20,6 +21,7 @@ import java.util.UUID;
 public class NotificationController extends NotificationServiceGrpc.NotificationServiceImplBase {
     private final InvitationService invitationService;
     private final NotificationService notificationService;
+    private final DeviceTokenService deviceTokenService;
 
     //Notifications
     @Override
@@ -133,6 +135,14 @@ public class NotificationController extends NotificationServiceGrpc.Notification
     //Device tokens
     @Override
     public void registerDeviceToken(RegisterDeviceTokenRequest request, StreamObserver<ActionResponse> responseObserver) {
+        deviceTokenService.registerDeviceToken(request);
 
+        ActionResponse response = ActionResponse.newBuilder()
+                .setSuccess(true)
+                .setMessage("Register successfully.")
+                .build();
+
+        responseObserver.onNext(response);
+        responseObserver.onCompleted();
     }
 }
