@@ -129,4 +129,10 @@ public class NotificationController extends NotificationServiceGrpc.Notification
         responseObserver.onNext(response);
         responseObserver.onCompleted();
     }
+
+    //Device tokens
+    @Override
+    public void registerDeviceToken(RegisterDeviceTokenRequest request, StreamObserver<ActionResponse> responseObserver) {
+
+    }
 }

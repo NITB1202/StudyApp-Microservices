@@ -86,6 +86,12 @@ message ReplyToInvitationRequest {
   bool accept = 2;
 }
 
+//Device token
+message RegisterDeviceTokenRequest {
+  string userId = 1;
+  string fcmToken = 2;
+}
+
 service NotificationService {
   rpc GetNotifications(GetNotificationsRequest) returns (NotificationsResponse);
   rpc GetUnreadNotificationCount(GetUnreadNotificationCountRequest) returns (GetUnreadNotificationCountResponse);
@@ -96,4 +102,6 @@ service NotificationService {
 
   rpc GetInvitations(GetInvitationsRequest) returns (InvitationsResponse);
   rpc ReplyToInvitation(ReplyToInvitationRequest) returns (common.ActionResponse);
+
+  rpc RegisterDeviceToken(RegisterDeviceTokenRequest) returns (common.ActionResponse);
 }
