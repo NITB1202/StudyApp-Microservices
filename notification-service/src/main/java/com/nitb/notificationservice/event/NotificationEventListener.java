@@ -10,6 +10,10 @@ import com.study.common.enums.LinkedSubject;
 import com.study.common.events.Notification.InvitationCreatedEvent;
 import com.study.common.events.Plan.*;
 
+import com.study.common.events.Team.TeamDeletedEvent;
+import com.study.common.events.Team.TeamUpdatedEvent;
+import com.study.common.events.Team.UserJoinedTeamEvent;
+import com.study.common.events.Team.UserLeftTeamEvent;
 import com.study.userservice.grpc.UserDetailResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.kafka.annotation.KafkaListener;
@@ -192,6 +196,94 @@ public class NotificationEventListener {
                     .content(content)
                     .subject(LinkedSubject.PLAN)
                     .subjectId(event.getPlanId())
+                    .build();
+
+            notificationService.createNotification(dto);
+            deviceTokenService.sendPushNotification(dto);
+        }
+    }
+
+    @KafkaListener(topics = "team-deleted", groupId = "notification-service-group")
+    public void consumeTeamDeletedEvent(TeamDeletedEvent event) {
+        UserDetailResponse deletedBy = userServiceGrpcClient.getUserById(event.getDeletedBy());
+        String title = "Team deleted";
+        String content = "Team '" + event.getTeamName() +"' has been deleted by " + deletedBy.getUsername() + ".";
+
+        for(UUID memberId : event.getMemberIds()) {
+            if(memberId == event.getDeletedBy()) continue;
+
+            CreateNotificationDto dto = CreateNotificationDto.builder()
+                    .userId(memberId)
+                    .title(title)
+                    .content(content)
+                    .subject(LinkedSubject.TEAM)
+                    .subjectId(null)
+                    .build();
+
+            notificationService.createNotification(dto);
+            deviceTokenService.sendPushNotification(dto);
+        }
+    }
+
+    @KafkaListener(topics = "team-updated", groupId = "notification-service-group")
+    public void consumeTeamUpdatedEvent(TeamUpdatedEvent event) {
+        UserDetailResponse updatedBy = userServiceGrpcClient.getUserById(event.getUpdatedBy());
+        String title = "Team updated";
+        String content = updatedBy.getUsername() + " has updated team '" + event.getTeamName() +"''s general information.";
+
+        for(UUID memberId : event.getMemberIds()) {
+            if(memberId == event.getUpdatedBy()) continue;
+
+            CreateNotificationDto dto = CreateNotificationDto.builder()
+                    .userId(memberId)
+                    .title(title)
+                    .content(content)
+                    .subject(LinkedSubject.TEAM)
+                    .subjectId(event.getId())
+                    .build();
+
+            notificationService.createNotification(dto);
+            deviceTokenService.sendPushNotification(dto);
+        }
+    }
+
+    @KafkaListener(topics = "user-joined", groupId = "notification-service-group")
+    public void consumeUserJoinedTeamEvent(UserJoinedTeamEvent event) {
+        UserDetailResponse user = userServiceGrpcClient.getUserById(event.getUserId());
+        String title = "New team member";
+        String content = user.getUsername() + " has joined team '" + event.getTeamName() +"'.";
+
+        for(UUID memberId : event.getMemberIds()) {
+            if(memberId == event.getUserId()) continue;
+
+            CreateNotificationDto dto = CreateNotificationDto.builder()
+                    .userId(memberId)
+                    .title(title)
+                    .content(content)
+                    .subject(LinkedSubject.TEAM)
+                    .subjectId(event.getTeamId())
+                    .build();
+
+            notificationService.createNotification(dto);
+            deviceTokenService.sendPushNotification(dto);
+        }
+    }
+
+    @KafkaListener(topics = "user-left", groupId = "notification-service-group")
+    public void consumeUserLeftTeamEvent(UserLeftTeamEvent event) {
+        UserDetailResponse user = userServiceGrpcClient.getUserById(event.getUserId());
+        String title = "Member left";
+        String content = user.getUsername() + " has left team '" + event.getTeamName() +"'.";
+
+        for(UUID memberId : event.getMemberIds()) {
+            if(memberId == event.getUserId()) continue;
+
+            CreateNotificationDto dto = CreateNotificationDto.builder()
+                    .userId(memberId)
+                    .title(title)
+                    .content(content)
+                    .subject(LinkedSubject.TEAM)
+                    .subjectId(event.getTeamId())
                     .build();
 
             notificationService.createNotification(dto);

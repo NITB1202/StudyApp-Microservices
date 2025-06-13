@@ -18,4 +18,4 @@ public class TeamUpdatedEvent {
     private Set<String> updatedFields;
 }
 
-//Message: User01 updated "TEAM01"’s name and avatar. -> Linked: teamId
+//Message: User01 has updated the team "TEAM01"'s general information. -> Linked: teamId

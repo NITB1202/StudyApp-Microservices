@@ -47,10 +47,11 @@ public class DeviceTokenServiceImpl implements DeviceTokenService {
     public void sendPushNotification(CreateNotificationDto dto) {
         try {
             List<DeviceToken> tokens = deviceTokenRepository.findByUserId(dto.getUserId());
+            String id = dto.getSubjectId() != null ? dto.getSubjectId().toString() : "";
 
             Map<String, String> data = new HashMap<>();
             data.put("type", dto.getSubject().toString());
-            data.put("id", dto.getSubjectId().toString());
+            data.put("id", id);
 
             Notification notification = Notification.builder()
                     .setTitle(dto.getTitle())
