@@ -11,7 +11,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Set;
 import java.util.UUID;
 
 @Slf4j
@@ -42,12 +41,7 @@ public class TeamNotificationServiceImpl implements TeamNotificationService {
     }
 
     @Override
-    public void publishTeamUpdateNotification(UUID userId, UUID teamId, Set<String> updatedFields) {
-        if(updatedFields.isEmpty()) {
-            log.info("No fields updated for team {}. Skipping update notification.", teamId);
-            return;
-        }
-
+    public void publishTeamUpdateNotification(UUID userId, UUID teamId) {
         String teamName = teamService.getTeamName(teamId);
         List<UUID> memberIds = memberService.getTeamMemberIds(teamId);
 
@@ -55,11 +49,10 @@ public class TeamNotificationServiceImpl implements TeamNotificationService {
                 .id(teamId)
                 .teamName(teamName)
                 .updatedBy(userId)
-                .updatedFields(updatedFields)
                 .memberIds(memberIds)
                 .build();
 
-        log.info("Publishing team update notification for team {}: fields updated: {}", teamId, updatedFields);
+        log.info("Publishing team update notification for team {}", teamId);
         teamEventPublisher.publishEvent(UPDATE_TOPIC, event);
     }
 

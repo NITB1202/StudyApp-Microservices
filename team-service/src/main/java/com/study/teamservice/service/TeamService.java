@@ -4,12 +4,11 @@ import com.study.teamservice.entity.Team;
 import com.study.teamservice.grpc.*;
 
 import java.util.List;
-import java.util.Set;
 import java.util.UUID;
 
 public interface TeamService {
     Team createTeam(CreateTeamRequest request);
-    Set<String> updateTeam(UpdateTeamRequest request);
+    void updateTeam(UpdateTeamRequest request);
     void uploadTeamAvatar(UploadTeamAvatarRequest request);
     void deleteTeam(DeleteTeamRequest request);
     void resetTeamCode(ResetTeamCodeRequest request);

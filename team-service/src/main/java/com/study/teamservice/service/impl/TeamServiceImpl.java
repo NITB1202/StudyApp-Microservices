@@ -58,15 +58,13 @@ public class TeamServiceImpl implements TeamService {
     }
 
     @Override
-    public Set<String> updateTeam(UpdateTeamRequest request) {
+    public void updateTeam(UpdateTeamRequest request) {
         UUID teamId = UUID.fromString(request.getId());
         UUID userId = UUID.fromString(request.getUserId());
 
         Team team = teamRepository.findById(teamId).orElseThrow(
                 () -> new NotFoundException("Team not found")
         );
-
-        Set<String> updatedFields = new HashSet<>();
 
         if(!request.getName().isBlank()) {
             if(request.getName().equals(team.getName()))
@@ -77,17 +75,13 @@ public class TeamServiceImpl implements TeamService {
             }
 
             team.setName(request.getName());
-            updatedFields.add("name");
         }
 
         if(!request.getDescription().isBlank()) {
             team.setDescription(request.getDescription());
-            updatedFields.add("description");
         }
 
         teamRepository.save(team);
-
-        return updatedFields;
     }
 
     @Override

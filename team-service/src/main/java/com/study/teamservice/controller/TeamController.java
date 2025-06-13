@@ -106,8 +106,8 @@ public class TeamController extends TeamServiceGrpc.TeamServiceImplBase {
 
         memberService.validateUpdateTeamPermission(userId, teamId);
 
-        Set<String> updatedFields = teamService.updateTeam(request);
-        teamNotificationService.publishTeamUpdateNotification(userId, teamId, updatedFields);
+        teamService.updateTeam(request);
+        teamNotificationService.publishTeamUpdateNotification(userId, teamId);
 
         Team team = teamService.getTeamById(teamId);
         TeamResponse response = TeamMapper.toTeamResponse(team);
@@ -120,11 +120,10 @@ public class TeamController extends TeamServiceGrpc.TeamServiceImplBase {
     public void uploadTeamAvatar(UploadTeamAvatarRequest request, StreamObserver<ActionResponse> responseObserver){
         UUID userId = UUID.fromString(request.getUserId());
         UUID teamId = UUID.fromString(request.getTeamId());
-        Set<String> updatedFields = Set.of("avatar");
 
         memberService.validateUpdateTeamPermission(userId, teamId);
         teamService.uploadTeamAvatar(request);
-        teamNotificationService.publishTeamUpdateNotification(userId, teamId, updatedFields);
+        teamNotificationService.publishTeamUpdateNotification(userId, teamId);
 
         ActionResponse response = ActionResponse.newBuilder()
                 .setSuccess(true)
