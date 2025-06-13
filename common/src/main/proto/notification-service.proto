@@ -3,7 +3,6 @@ syntax = "proto3";
 package notification;
 
 import "common.proto";
-import "google/protobuf/wrappers.proto";
 
 option java_multiple_files = true;
 option java_package = "com.study.notificationservice.grpc";
@@ -79,26 +78,6 @@ message ReplyToInvitationRequest {
   bool accept = 2;
 }
 
-//Notification settings
-message GetTeamNotificationSettingsRequest {
-  string userId = 1;
-  string teamId = 2;
-}
-
-message TeamNotificationSettingsResponse {
-  string id = 1;
-  bool teamNotification = 2;
-  bool teamPlanReminder = 3;
-  bool chatNotification = 4;
-}
-
-message UpdateTeamNotificationSettingsRequest {
-  string id = 1;
-  google.protobuf.BoolValue teamNotification = 2;
-  google.protobuf.BoolValue chatNotification = 3;
-  google.protobuf.BoolValue teamPlanReminder = 4;
-}
-
 service NotificationService {
   rpc GetNotifications(GetNotificationsRequest) returns (NotificationsResponse);
   rpc MarkNotificationsAsRead(MarkNotificationsAsReadRequest) returns (common.ActionResponse);
@@ -108,7 +87,4 @@ service NotificationService {
 
   rpc GetInvitations(GetInvitationsRequest) returns (InvitationsResponse);
   rpc ReplyToInvitation(ReplyToInvitationRequest) returns (common.ActionResponse);
-
-  rpc GetTeamNotificationSettings(GetTeamNotificationSettingsRequest) returns (TeamNotificationSettingsResponse);
-  rpc UpdateTeamNotificationSettings(UpdateTeamNotificationSettingsRequest) returns (common.ActionResponse);
 }

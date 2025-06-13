@@ -2,13 +2,10 @@ package com.nitb.notificationservice.controller;
 
 import com.nitb.notificationservice.entity.Invitation;
 import com.nitb.notificationservice.entity.Notification;
-import com.nitb.notificationservice.entity.TeamNotificationSettings;
 import com.nitb.notificationservice.mapper.InvitationMapper;
 import com.nitb.notificationservice.mapper.NotificationMapper;
-import com.nitb.notificationservice.mapper.TeamNotificationSettingsMapper;
 import com.nitb.notificationservice.service.InvitationService;
 import com.nitb.notificationservice.service.NotificationService;
-import com.nitb.notificationservice.service.TeamNotificationSettingsService;
 import com.study.common.grpc.ActionResponse;
 import com.study.notificationservice.grpc.*;
 import io.grpc.stub.StreamObserver;
@@ -23,7 +20,6 @@ import java.util.UUID;
 public class NotificationController extends NotificationServiceGrpc.NotificationServiceImplBase {
     private final InvitationService invitationService;
     private final NotificationService notificationService;
-    private final TeamNotificationSettingsService teamNotificationSettingsService;
 
     //Notifications
     @Override
@@ -116,26 +112,6 @@ public class NotificationController extends NotificationServiceGrpc.Notification
         ActionResponse response = ActionResponse.newBuilder()
                 .setSuccess(true)
                 .setMessage("Reply successfully.")
-                .build();
-
-        responseObserver.onNext(response);
-        responseObserver.onCompleted();
-    }
-
-    //Team notification settings
-    public void getTeamNotificationSettings(GetTeamNotificationSettingsRequest request, StreamObserver<TeamNotificationSettingsResponse> responseObserver) {
-        TeamNotificationSettings settings = teamNotificationSettingsService.getTeamNotificationSettings(request);
-        TeamNotificationSettingsResponse response = TeamNotificationSettingsMapper.toTeamNotificationSettingsResponse(settings);
-        responseObserver.onNext(response);
-        responseObserver.onCompleted();
-    }
-
-    public void updateTeamNotificationSettings(UpdateTeamNotificationSettingsRequest request, StreamObserver<ActionResponse> responseObserver) {
-        teamNotificationSettingsService.updateTeamNotificationSettings(request);
-
-        ActionResponse response = ActionResponse.newBuilder()
-                .setSuccess(true)
-                .setMessage("Update successfully.")
                 .build();
 
         responseObserver.onNext(response);
