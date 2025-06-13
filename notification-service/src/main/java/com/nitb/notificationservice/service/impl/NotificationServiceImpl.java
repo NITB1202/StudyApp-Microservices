@@ -55,6 +55,12 @@ public class NotificationServiceImpl implements NotificationService {
     }
 
     @Override
+    public int getUnreadNotificationCount(GetUnreadNotificationCountRequest request) {
+        UUID userId = UUID.fromString(request.getUserId());
+        return notificationRepository.countByUserIdAndIsReadFalse(userId);
+    }
+
+    @Override
     @Transactional
     public void markNotificationAsRead(MarkNotificationsAsReadRequest request) {
         List<Notification> savedNotifications = new ArrayList<>();

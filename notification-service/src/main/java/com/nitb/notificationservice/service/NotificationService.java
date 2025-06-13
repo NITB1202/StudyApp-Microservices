@@ -11,6 +11,7 @@ import java.util.UUID;
 public interface NotificationService {
     void createNotification(CreateNotificationDto request);
     List<Notification> getNotifications(GetNotificationsRequest request);
+    int getUnreadNotificationCount(GetUnreadNotificationCountRequest request);
     void markNotificationAsRead(MarkNotificationsAsReadRequest request);
     void markAllNotificationsAsRead(MarkAllNotificationsAsReadRequest request);
     void deleteNotifications(DeleteNotificationsRequest request);

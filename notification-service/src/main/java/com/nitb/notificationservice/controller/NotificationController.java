@@ -38,6 +38,18 @@ public class NotificationController extends NotificationServiceGrpc.Notification
     }
 
     @Override
+    public void getUnreadNotificationCount(GetUnreadNotificationCountRequest request, StreamObserver<GetUnreadNotificationCountResponse> responseObserver) {
+        int count = notificationService.getUnreadNotificationCount(request);
+
+        GetUnreadNotificationCountResponse response = GetUnreadNotificationCountResponse.newBuilder()
+                .setCount(count)
+                .build();
+
+        responseObserver.onNext(response);
+        responseObserver.onCompleted();
+    }
+
+    @Override
     public void markNotificationsAsRead(MarkNotificationsAsReadRequest request, StreamObserver<ActionResponse> responseObserver) {
         notificationService.markNotificationAsRead(request);
 

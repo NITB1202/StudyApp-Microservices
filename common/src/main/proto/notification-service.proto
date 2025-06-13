@@ -20,6 +20,14 @@ message GetNotificationsRequest {
   int32 size = 3;
 }
 
+message GetUnreadNotificationCountRequest {
+  string userId = 1;
+}
+
+message GetUnreadNotificationCountResponse {
+  int32 count = 1;
+}
+
 message NotificationResponse {
   string title = 1;
   string createdAt = 2;
@@ -80,6 +88,7 @@ message ReplyToInvitationRequest {
 
 service NotificationService {
   rpc GetNotifications(GetNotificationsRequest) returns (NotificationsResponse);
+  rpc GetUnreadNotificationCount(GetUnreadNotificationCountRequest) returns (GetUnreadNotificationCountResponse);
   rpc MarkNotificationsAsRead(MarkNotificationsAsReadRequest) returns (common.ActionResponse);
   rpc MarkAllNotificationsAsRead(MarkAllNotificationsAsReadRequest) returns (common.ActionResponse);
   rpc DeleteNotifications(DeleteNotificationsRequest) returns (common.ActionResponse);
