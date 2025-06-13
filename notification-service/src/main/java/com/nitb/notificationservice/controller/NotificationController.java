@@ -145,4 +145,17 @@ public class NotificationController extends NotificationServiceGrpc.Notification
         responseObserver.onNext(response);
         responseObserver.onCompleted();
     }
+
+    @Override
+    public void removeDeviceToken(RemoveDeviceTokenRequest request, StreamObserver<ActionResponse> responseObserver) {
+        deviceTokenService.removeDeviceToken(request);
+
+        ActionResponse response = ActionResponse.newBuilder()
+                .setSuccess(true)
+                .setMessage("Remove successfully.")
+                .build();
+
+        responseObserver.onNext(response);
+        responseObserver.onCompleted();
+    }
 }

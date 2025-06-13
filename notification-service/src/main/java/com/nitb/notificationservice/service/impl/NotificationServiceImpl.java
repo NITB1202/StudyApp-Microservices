@@ -110,7 +110,7 @@ public class NotificationServiceImpl implements NotificationService {
 
     @Override
     public void deleteNotificationBefore(LocalDateTime dateTime) {
-        notificationRepository.deleteByCreatedAtBefore(dateTime);
+        notificationRepository.deleteAllByCreatedAtBefore(dateTime);
     }
 
     @Override

@@ -10,6 +10,7 @@ import com.nitb.notificationservice.repository.DeviceTokenRepository;
 import com.nitb.notificationservice.service.DeviceTokenService;
 import com.study.common.exceptions.BusinessException;
 import com.study.notificationservice.grpc.RegisterDeviceTokenRequest;
+import com.study.notificationservice.grpc.RemoveDeviceTokenRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -69,5 +70,15 @@ public class DeviceTokenServiceImpl implements DeviceTokenService {
         } catch (FirebaseMessagingException e) {
             throw new BusinessException("Error sending FCM message: " + e.getMessage());
         }
+    }
+
+    @Override
+    public void removeDeviceToken(RemoveDeviceTokenRequest request) {
+        deviceTokenRepository.deleteByFcmToken(request.getFcmToken());
+    }
+
+    @Override
+    public void deleteDeviceTokenBefore(LocalDateTime time) {
+        deviceTokenRepository.deleteAllByLastUpdatedBefore(time);
     }
 }

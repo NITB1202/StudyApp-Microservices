@@ -85,4 +85,9 @@ public class InvitationServiceImpl implements InvitationService {
     public long countInvitationsByUserId(UUID userId) {
         return invitationRepository.countByInviteeId(userId);
     }
+
+    @Override
+    public void deleteInvitationBefore(LocalDateTime time) {
+        invitationRepository.deleteAllByInvitedAtBefore(time);
+    }
 }

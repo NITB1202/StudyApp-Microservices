@@ -13,4 +13,5 @@ public interface InvitationRepository extends JpaRepository<Invitation, UUID> {
     List<Invitation> findByInviteeId(UUID inviteeId, Pageable pageable);
     List<Invitation> findByInviteeIdAndInvitedAtLessThan(UUID inviteeId, LocalDateTime invitedAt, Pageable pageable);
     long countByInviteeId(UUID inviteeId);
+    void deleteAllByInvitedAtBefore(LocalDateTime time);
 }

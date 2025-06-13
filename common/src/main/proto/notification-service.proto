@@ -92,6 +92,10 @@ message RegisterDeviceTokenRequest {
   string fcmToken = 2;
 }
 
+message RemoveDeviceTokenRequest {
+  string fcmToken = 1;
+}
+
 service NotificationService {
   rpc GetNotifications(GetNotificationsRequest) returns (NotificationsResponse);
   rpc GetUnreadNotificationCount(GetUnreadNotificationCountRequest) returns (GetUnreadNotificationCountResponse);
@@ -104,4 +108,5 @@ service NotificationService {
   rpc ReplyToInvitation(ReplyToInvitationRequest) returns (common.ActionResponse);
 
   rpc RegisterDeviceToken(RegisterDeviceTokenRequest) returns (common.ActionResponse);
+  rpc RemoveDeviceToken(RemoveDeviceTokenRequest) returns (common.ActionResponse);
 }
