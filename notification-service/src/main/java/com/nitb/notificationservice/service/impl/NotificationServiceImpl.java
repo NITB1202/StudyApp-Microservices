@@ -103,6 +103,11 @@ public class NotificationServiceImpl implements NotificationService {
     }
 
     @Override
+    public void deleteNotificationBefore(LocalDateTime dateTime) {
+        notificationRepository.deleteByCreatedAtBefore(dateTime);
+    }
+
+    @Override
     public long countNotificationsByUserId(UUID userId) {
         return notificationRepository.countByUserId(userId);
     }

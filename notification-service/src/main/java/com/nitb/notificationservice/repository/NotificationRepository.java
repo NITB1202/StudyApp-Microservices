@@ -13,4 +13,5 @@ public interface NotificationRepository extends JpaRepository<Notification, UUID
     List<Notification> findByUserIdAndCreatedAtLessThan(UUID userId, LocalDateTime createdAt, Pageable pageable);
     List<Notification> findByUserId(UUID userId);
     long countByUserId(UUID userId);
+    void deleteByCreatedAtBefore(LocalDateTime createdAt);
 }
