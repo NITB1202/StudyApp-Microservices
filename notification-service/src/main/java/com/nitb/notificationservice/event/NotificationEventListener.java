@@ -3,6 +3,7 @@ package com.nitb.notificationservice.event;
 import com.nitb.notificationservice.dto.CreateInvitationDto;
 import com.nitb.notificationservice.dto.CreateNotificationDto;
 import com.nitb.notificationservice.grpc.UserServiceGrpcClient;
+import com.nitb.notificationservice.service.DeviceTokenService;
 import com.nitb.notificationservice.service.InvitationService;
 import com.nitb.notificationservice.service.NotificationService;
 import com.study.common.enums.LinkedSubject;
@@ -24,6 +25,7 @@ public class NotificationEventListener {
     private final UserServiceGrpcClient userServiceGrpcClient;
     private final NotificationService notificationService;
     private final InvitationService invitationService;
+    private final DeviceTokenService deviceTokenService;
 
     @KafkaListener(topics = "invitation-created", groupId = "notification-service-group")
     public void consumeInvitationCreatedEvent(InvitationCreatedEvent event) {
@@ -38,6 +40,19 @@ public class NotificationEventListener {
                 .build();
 
         invitationService.createInvitation(dto);
+
+        String title = "Team invitation";
+        String content = inviter.getUsername() + " has invited you to the team '" + event.getTeamName() + "'.";
+
+        CreateNotificationDto notification = CreateNotificationDto.builder()
+                .userId(event.getToId())
+                .title(title)
+                .content(content)
+                .subject(LinkedSubject.TEAM)
+                .subjectId(event.getTeamId())
+                .build();
+
+        deviceTokenService.sendPushNotification(notification);
     }
 
     @KafkaListener(topics = "plan-assigned", groupId = "notification-service-group")
@@ -55,6 +70,7 @@ public class NotificationEventListener {
                     .build();
 
             notificationService.createNotification(dto);
+            deviceTokenService.sendPushNotification(dto);
         }
     }
 
@@ -73,6 +89,7 @@ public class NotificationEventListener {
                     .build();
 
             notificationService.createNotification(dto);
+            deviceTokenService.sendPushNotification(dto);
         }
     }
 
@@ -92,6 +109,7 @@ public class NotificationEventListener {
                     .build();
 
             notificationService.createNotification(dto);
+            deviceTokenService.sendPushNotification(dto);
         }
     }
 
@@ -111,6 +129,7 @@ public class NotificationEventListener {
                     .build();
 
             notificationService.createNotification(dto);
+            deviceTokenService.sendPushNotification(dto);
         }
     }
 
@@ -136,6 +155,7 @@ public class NotificationEventListener {
                     .build();
 
             notificationService.createNotification(dto);
+            deviceTokenService.sendPushNotification(dto);
         }
     }
 
@@ -155,6 +175,7 @@ public class NotificationEventListener {
                     .build();
 
             notificationService.createNotification(dto);
+            deviceTokenService.sendPushNotification(dto);
         }
     }
 
@@ -174,6 +195,7 @@ public class NotificationEventListener {
                     .build();
 
             notificationService.createNotification(dto);
+            deviceTokenService.sendPushNotification(dto);
         }
     }
 }
