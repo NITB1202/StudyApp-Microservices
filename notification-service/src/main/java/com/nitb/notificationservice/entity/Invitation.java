@@ -22,6 +22,9 @@ public class Invitation {
     @Column(name = "inviter_name", nullable = false)
     private String inviterName;
 
+    @Column(name = "inviter_avatar_url", nullable = false)
+    private String inviterAvatarUrl;
+
     @Column(name = "invitee_id", nullable = false)
     private UUID inviteeId;
 

@@ -1,6 +1,6 @@
 package com.nitb.notificationservice.service.impl;
 
-import com.nitb.notificationservice.dto.CreateNotificationRequestDto;
+import com.nitb.notificationservice.dto.CreateNotificationDto;
 import com.nitb.notificationservice.entity.Notification;
 import com.nitb.notificationservice.repository.NotificationRepository;
 import com.nitb.notificationservice.service.NotificationService;
@@ -25,7 +25,7 @@ public class NotificationServiceImpl implements NotificationService {
     private static final int DEFAULT_SIZE = 10;
 
     @Override
-    public void createNotification(CreateNotificationRequestDto request) {
+    public void createNotification(CreateNotificationDto request) {
         Notification notification = Notification.builder()
                 .userId(request.getUserId())
                 .title(request.getTitle())

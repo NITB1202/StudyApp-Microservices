@@ -1,5 +1,6 @@
 package com.nitb.notificationservice.service.impl;
 
+import com.nitb.notificationservice.dto.CreateInvitationDto;
 import com.nitb.notificationservice.entity.Invitation;
 import com.nitb.notificationservice.event.NotificationEventPublisher;
 import com.nitb.notificationservice.repository.InvitationRepository;
@@ -28,16 +29,17 @@ public class InvitationServiceImpl implements InvitationService {
     private static final String ACCEPT_TOPIC = "invitation-accepted";
 
     @Override
-    public void createInvitation(String inviterName, UUID inviteeId, UUID teamId, String teamName) {
-        if(invitationRepository.existsByInviteeIdAndTeamId(inviteeId, teamId)) {
+    public void createInvitation(CreateInvitationDto request) {
+        if(invitationRepository.existsByInviteeIdAndTeamId(request.getInviteeId(), request.getTeamId())) {
             throw new BusinessException("The invitation has already been sent to the invitee.");
         }
 
         Invitation invitation = Invitation.builder()
-                .inviterName(inviterName)
-                .inviteeId(inviteeId)
-                .teamId(teamId)
-                .teamName(teamName)
+                .inviterName(request.getInviterName())
+                .inviterAvatarUrl(request.getInviterAvatarUrl())
+                .inviteeId(request.getInviteeId())
+                .teamId(request.getTeamId())
+                .teamName(request.getTeamName())
                 .invitedAt(LocalDateTime.now())
                 .build();
 

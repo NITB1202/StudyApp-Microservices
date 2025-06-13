@@ -1,6 +1,7 @@
 package com.nitb.notificationservice.event;
 
-import com.nitb.notificationservice.dto.CreateNotificationRequestDto;
+import com.nitb.notificationservice.dto.CreateInvitationDto;
+import com.nitb.notificationservice.dto.CreateNotificationDto;
 import com.nitb.notificationservice.grpc.UserServiceGrpcClient;
 import com.nitb.notificationservice.service.InvitationService;
 import com.nitb.notificationservice.service.NotificationService;
@@ -33,7 +34,16 @@ public class NotificationEventListener {
     @KafkaListener(topics = "invitation-created", groupId = "notification-service-group")
     public void consumeInvitationCreatedEvent(InvitationCreatedEvent event) {
         UserDetailResponse inviter = userServiceGrpcClient.getUserById(event.getFromId());
-        invitationService.createInvitation(inviter.getUsername(), event.getToId(), event.getTeamId(), event.getTeamName());
+
+        CreateInvitationDto dto = CreateInvitationDto.builder()
+                .inviterName(inviter.getUsername())
+                .inviterAvatarUrl(inviter.getAvatarUrl())
+                .inviteeId(event.getToId())
+                .teamId(event.getTeamId())
+                .teamName(event.getTeamName())
+                .build();
+
+        invitationService.createInvitation(dto);
     }
 
     @KafkaListener(topics = "plan-assigned", groupId = "notification-service-group")
@@ -42,7 +52,7 @@ public class NotificationEventListener {
         String content = "You have been assigned for plan '" + event.getPlanName() + "'.";
 
         for(UUID assigneeId : event.getAssigneeIds()) {
-            CreateNotificationRequestDto dto = CreateNotificationRequestDto.builder()
+            CreateNotificationDto dto = CreateNotificationDto.builder()
                     .userId(assigneeId)
                     .title(title)
                     .content(content)
@@ -60,7 +70,7 @@ public class NotificationEventListener {
         String content = "Plan '" + event.getPlanName() + "' has been completed.";
 
         for(UUID assigneeId : event.getAssigneeIds()) {
-            CreateNotificationRequestDto dto = CreateNotificationRequestDto.builder()
+            CreateNotificationDto dto = CreateNotificationDto.builder()
                     .userId(assigneeId)
                     .title(title)
                     .content(content)
@@ -79,7 +89,7 @@ public class NotificationEventListener {
         String content = user.getUsername() + " deleted plan '" + event.getPlanName() +"'.";
 
         for(UUID assigneeId : event.getAssigneeIds()) {
-            CreateNotificationRequestDto dto = CreateNotificationRequestDto.builder()
+            CreateNotificationDto dto = CreateNotificationDto.builder()
                     .userId(assigneeId)
                     .title(title)
                     .content(content)
@@ -98,7 +108,7 @@ public class NotificationEventListener {
         String content = "Plan '" + event.getPlanName() + "' has been moved back to 'In progress' as " + user.getUsername() + " updated tasks.";
 
         for(UUID assigneeId : event.getAssigneeIds()) {
-            CreateNotificationRequestDto dto = CreateNotificationRequestDto.builder()
+            CreateNotificationDto dto = CreateNotificationDto.builder()
                     .userId(assigneeId)
                     .title(title)
                     .content(content)
@@ -123,7 +133,7 @@ public class NotificationEventListener {
                 "Plan '" + event.getPlanName() + "' has expired.";
 
         for(UUID receiverId : event.getReceiverIds()) {
-            CreateNotificationRequestDto dto = CreateNotificationRequestDto.builder()
+            CreateNotificationDto dto = CreateNotificationDto.builder()
                     .userId(receiverId)
                     .title(title)
                     .content(content)
@@ -142,7 +152,7 @@ public class NotificationEventListener {
         String content = user.getUsername() + " has restored plan '" + event.getPlanName() +"'.";
 
         for(UUID assigneeId : event.getAssigneeIds()) {
-            CreateNotificationRequestDto dto = CreateNotificationRequestDto.builder()
+            CreateNotificationDto dto = CreateNotificationDto.builder()
                     .userId(assigneeId)
                     .title(title)
                     .content(content)
@@ -161,7 +171,7 @@ public class NotificationEventListener {
         String content = user.getUsername() + " just updated plan '" + event.getPlanName() +"'.";
 
         for(UUID assigneeId : event.getAssigneeIds()) {
-            CreateNotificationRequestDto dto = CreateNotificationRequestDto.builder()
+            CreateNotificationDto dto = CreateNotificationDto.builder()
                     .userId(assigneeId)
                     .title(title)
                     .content(content)

@@ -10,7 +10,7 @@ import java.util.UUID;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class CreateNotificationRequestDto {
+public class CreateNotificationDto {
     private UUID userId;
 
     private String title;
