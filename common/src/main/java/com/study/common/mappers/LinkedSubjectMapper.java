@@ -10,6 +10,7 @@ public class LinkedSubjectMapper {
         return switch (subject) {
             case PLAN -> com.study.notificationservice.grpc.LinkedSubject.PLAN;
             case TEAM -> com.study.notificationservice.grpc.LinkedSubject.TEAM;
+            case INVITATION -> com.study.notificationservice.grpc.LinkedSubject.INVITATION;
         };
     }
 }

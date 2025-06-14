@@ -11,6 +11,7 @@ option java_outer_classname = "NotificationProto";
 enum LinkedSubject {
   PLAN = 0;
   TEAM = 1;
+  INVITATION = 2;
 }
 
 //Notification

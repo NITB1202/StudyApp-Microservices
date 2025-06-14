@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.UUID;
 
 public interface InvitationService {
-    void createInvitation(CreateInvitationDto request);
+    UUID createInvitation(CreateInvitationDto request);
     List<Invitation> getInvitations(GetInvitationsRequest request);
     void replyToInvitation(ReplyToInvitationRequest request);
     long countInvitationsByUserId(UUID userId);

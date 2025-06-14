@@ -43,7 +43,7 @@ public class NotificationEventListener {
                 .teamName(event.getTeamName())
                 .build();
 
-        invitationService.createInvitation(dto);
+        UUID invitationId = invitationService.createInvitation(dto);
 
         String title = "Team invitation";
         String content = inviter.getUsername() + " has invited you to the team '" + event.getTeamName() + "'.";
@@ -52,8 +52,8 @@ public class NotificationEventListener {
                 .userId(event.getToId())
                 .title(title)
                 .content(content)
-                .subject(LinkedSubject.TEAM)
-                .subjectId(event.getTeamId())
+                .subject(LinkedSubject.INVITATION)
+                .subjectId(invitationId)
                 .build();
 
         deviceTokenService.sendPushNotification(notification);

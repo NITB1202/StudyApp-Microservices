@@ -29,7 +29,7 @@ public class InvitationServiceImpl implements InvitationService {
     private static final String ACCEPT_TOPIC = "invitation-accepted";
 
     @Override
-    public void createInvitation(CreateInvitationDto request) {
+    public UUID createInvitation(CreateInvitationDto request) {
         if(invitationRepository.existsByInviteeIdAndTeamId(request.getInviteeId(), request.getTeamId())) {
             throw new BusinessException("The invitation has already been sent to the invitee.");
         }
@@ -44,6 +44,8 @@ public class InvitationServiceImpl implements InvitationService {
                 .build();
 
         invitationRepository.save(invitation);
+
+        return invitation.getId();
     }
 
     @Override
