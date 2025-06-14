@@ -14,6 +14,7 @@ public class NotificationMapper {
         String subjectId = notification.getSubjectId() != null ? notification.getSubjectId().toString() : "";
 
         return NotificationResponse.newBuilder()
+                .setId(notification.getId().toString())
                 .setTitle(notification.getTitle())
                 .setContent(notification.getContent())
                 .setCreatedAt(notification.getCreatedAt().toString())

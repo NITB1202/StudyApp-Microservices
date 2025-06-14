@@ -29,12 +29,13 @@ message GetUnreadNotificationCountResponse {
 }
 
 message NotificationResponse {
-  string title = 1;
-  string createdAt = 2;
-  string content = 3;
-  bool isRead = 4;
-  LinkedSubject subject = 5;
-  string subjectId = 6;
+  string id = 1;
+  string title = 2;
+  string createdAt = 3;
+  string content = 4;
+  bool isRead = 5;
+  LinkedSubject subject = 6;
+  string subjectId = 7;
 }
 
 message NotificationsResponse {
