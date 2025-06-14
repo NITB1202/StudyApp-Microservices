@@ -16,7 +16,7 @@ public class TeamEventListener {
     private final MemberService memberService;
     private final TeamNotificationService teamNotificationService;
 
-    @KafkaListener(topics = "invitation-accepted", groupId = "team-service-group")
+    @KafkaListener(topics = "invitation-accepted", groupId = "team-invitation-accepted")
     public void consumeInvitationAcceptEvent(InvitationAcceptEvent event) {
         UUID userId = event.getUserId();
         UUID teamId = event.getTeamId();

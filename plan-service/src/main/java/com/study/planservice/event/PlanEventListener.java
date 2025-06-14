@@ -19,7 +19,7 @@ public class PlanEventListener {
     private final TaskService taskService;
     private final PlanReminderService planReminderService;
 
-    @KafkaListener(topics = "team-deleted", groupId = "plan-service-group")
+    @KafkaListener(topics = "team-deleted", groupId = "plan-team-deleted")
     public void consumeTeamDeletedEvent(TeamDeletedEvent event) {
         UUID teamId = event.getId();
         List<Plan> teamPlans = planService.getAllTeamPlans(teamId);

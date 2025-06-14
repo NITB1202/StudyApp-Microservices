@@ -31,7 +31,7 @@ public class NotificationEventListener {
     private final InvitationService invitationService;
     private final DeviceTokenService deviceTokenService;
 
-    @KafkaListener(topics = "invitation-created", groupId = "notification-service-group")
+    @KafkaListener(topics = "invitation-created", groupId = "notification-invitation-created")
     public void consumeInvitationCreatedEvent(InvitationCreatedEvent event) {
         UserDetailResponse inviter = userServiceGrpcClient.getUserById(event.getFromId());
 
@@ -59,7 +59,7 @@ public class NotificationEventListener {
         deviceTokenService.sendPushNotification(notification);
     }
 
-    @KafkaListener(topics = "plan-assigned", groupId = "notification-service-group")
+    @KafkaListener(topics = "plan-assigned", groupId = "notification-plan-assigned")
     public void consumePlanAssignedEvent(PlanAssignedEvent event) {
         String title = "New plan assigned";
         String content = "You have been assigned for plan '" + event.getPlanName() + "'.";
@@ -78,7 +78,7 @@ public class NotificationEventListener {
         }
     }
 
-    @KafkaListener(topics = "plan-completed", groupId = "notification-service-group")
+    @KafkaListener(topics = "plan-completed", groupId = "notification-plan-completed")
     public void consumePlanCompletedEvent(PlanCompletedEvent event) {
         String title = "Plan completed";
         String content = "Plan '" + event.getPlanName() + "' has been completed.";
@@ -97,7 +97,7 @@ public class NotificationEventListener {
         }
     }
 
-    @KafkaListener(topics = "plan-deleted", groupId = "notification-service-group")
+    @KafkaListener(topics = "plan-deleted", groupId = "notification-plan-deleted")
     public void consumePlanDeletedEvent(PlanDeletedEvent event) {
         UserDetailResponse user = userServiceGrpcClient.getUserById(event.getUserId());
         String title = "Plan deleted";
@@ -117,7 +117,7 @@ public class NotificationEventListener {
         }
     }
 
-    @KafkaListener(topics = "plan-incomplete", groupId = "notification-service-group")
+    @KafkaListener(topics = "plan-incomplete", groupId = "notification-plan-incomplete")
     public void consumePlanIncompleteEvent(PlanIncompleteEvent event) {
         UserDetailResponse user = userServiceGrpcClient.getUserById(event.getUserId());
         String title = "Incomplete plan";
@@ -137,7 +137,7 @@ public class NotificationEventListener {
         }
     }
 
-    @KafkaListener(topics = "plan-reminded", groupId = "notification-service-group")
+    @KafkaListener(topics = "plan-reminded", groupId = "notification-plan-reminded")
     public void consumePlanRemindedEvent(PlanRemindedEvent event) {
         LocalDateTime now = LocalDateTime.now();
         DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm:ss");
@@ -163,7 +163,7 @@ public class NotificationEventListener {
         }
     }
 
-    @KafkaListener(topics = "plan-restored", groupId = "notification-service-group")
+    @KafkaListener(topics = "plan-restored", groupId = "notification-plan-restored")
     public void consumePlanRestoredEvent(PlanRestoredEvent event) {
         UserDetailResponse user = userServiceGrpcClient.getUserById(event.getUserId());
         String title = "Plan restored";
@@ -183,7 +183,7 @@ public class NotificationEventListener {
         }
     }
 
-    @KafkaListener(topics = "plan-updated", groupId = "notification-service-group")
+    @KafkaListener(topics = "plan-updated", groupId = "notification-plan-updated")
     public void consumePlanUpdatedEvent(PlanUpdatedEvent event) {
         UserDetailResponse user = userServiceGrpcClient.getUserById(event.getUserId());
         String title = "Plan updated";
@@ -203,7 +203,7 @@ public class NotificationEventListener {
         }
     }
 
-    @KafkaListener(topics = "team-deleted", groupId = "notification-service-group")
+    @KafkaListener(topics = "team-deleted", groupId = "notification-team-deleted")
     public void consumeTeamDeletedEvent(TeamDeletedEvent event) {
         UserDetailResponse deletedBy = userServiceGrpcClient.getUserById(event.getDeletedBy());
         String title = "Team deleted";
@@ -225,7 +225,7 @@ public class NotificationEventListener {
         }
     }
 
-    @KafkaListener(topics = "team-updated", groupId = "notification-service-group")
+    @KafkaListener(topics = "team-updated", groupId = "notification-team-updated")
     public void consumeTeamUpdatedEvent(TeamUpdatedEvent event) {
         UserDetailResponse updatedBy = userServiceGrpcClient.getUserById(event.getUpdatedBy());
         String title = "Team updated";
@@ -247,7 +247,7 @@ public class NotificationEventListener {
         }
     }
 
-    @KafkaListener(topics = "user-joined", groupId = "notification-service-group")
+    @KafkaListener(topics = "user-joined", groupId = "notification-user-joined")
     public void consumeUserJoinedTeamEvent(UserJoinedTeamEvent event) {
         UserDetailResponse user = userServiceGrpcClient.getUserById(event.getUserId());
         String title = "New team member";
@@ -269,7 +269,7 @@ public class NotificationEventListener {
         }
     }
 
-    @KafkaListener(topics = "user-left", groupId = "notification-service-group")
+    @KafkaListener(topics = "user-left", groupId = "notification-user-left")
     public void consumeUserLeftTeamEvent(UserLeftTeamEvent event) {
         UserDetailResponse user = userServiceGrpcClient.getUserById(event.getUserId());
         String title = "Member left";
