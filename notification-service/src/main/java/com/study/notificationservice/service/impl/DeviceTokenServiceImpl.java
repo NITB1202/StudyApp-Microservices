@@ -11,6 +11,7 @@ import com.study.notificationservice.service.DeviceTokenService;
 import com.study.common.exceptions.BusinessException;
 import com.study.notificationservice.grpc.RegisterDeviceTokenRequest;
 import com.study.notificationservice.grpc.RemoveDeviceTokenRequest;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -74,6 +75,7 @@ public class DeviceTokenServiceImpl implements DeviceTokenService {
     }
 
     @Override
+    @Transactional
     public void removeDeviceToken(RemoveDeviceTokenRequest request) {
         deviceTokenRepository.deleteByFcmToken(request.getFcmToken());
     }

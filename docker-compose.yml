@@ -65,6 +65,8 @@ services:
       KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
     networks:
       - backend
+    command: >
+      bash -c "rm -rf /var/lib/kafka/data/* && /etc/confluent/docker/run"
 
   team-db:
     image: postgres:15
