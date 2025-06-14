@@ -19,5 +19,5 @@ INSERT INTO invitations (
 INSERT INTO device_tokens (
     id, user_id, fcm_token, last_updated
 ) VALUES
-    ('eeeeeeee-eeee-eeee-eeee-eeeeeeeeeeee', '041c77e0-ae77-4005-b745-ea12dca9bec6',
-     'fcm_token_123_example_xyz', NOW());
+    ('eeeeeeee-eeee-eeee-eeee-eeeeeeeeeeee', '9f5d79f2-83a2-411d-bb66-caeb640a62b0',
+     'fPosfcSXTKCtb1agcJ8tHI:APA91bFRp_1U_lEnlXMGrpgqR1FwfQF61JYDV43d1qonzumIQvzuX_IHgTCGZUjI0RBXCRToJOpZ3RaA_O5dndYFfFM1v8aNdgnQaw6KiRYPY3etPrJKngc', NOW());
