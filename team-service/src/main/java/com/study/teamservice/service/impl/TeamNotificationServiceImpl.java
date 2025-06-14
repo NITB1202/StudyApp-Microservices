@@ -1,10 +1,7 @@
 package com.study.teamservice.service.impl;
 
 import com.study.common.events.Notification.InvitationCreatedEvent;
-import com.study.common.events.Team.TeamDeletedEvent;
-import com.study.common.events.Team.TeamUpdatedEvent;
-import com.study.common.events.Team.UserJoinedTeamEvent;
-import com.study.common.events.Team.UserLeftTeamEvent;
+import com.study.common.events.Team.*;
 import com.study.teamservice.event.TeamEventPublisher;
 import com.study.teamservice.service.MemberService;
 import com.study.teamservice.service.TeamNotificationService;
@@ -14,7 +11,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Set;
 import java.util.UUID;
 
 @Slf4j
@@ -25,6 +21,7 @@ public class TeamNotificationServiceImpl implements TeamNotificationService {
     private final MemberService memberService;
     private final TeamEventPublisher teamEventPublisher;
 
+    private static final String CREATE_TOPIC = "team-created";
     private static final String UPDATE_TOPIC = "team-updated";
     private static final String DELETE_TOPIC = "team-deleted";
 
@@ -33,12 +30,18 @@ public class TeamNotificationServiceImpl implements TeamNotificationService {
     private static final String USER_LEFT_TOPIC = "user-left";
 
     @Override
-    public void publishTeamUpdateNotification(UUID userId, UUID teamId, Set<String> updatedFields) {
-        if(updatedFields.isEmpty()) {
-            log.info("No fields updated for team {}. Skipping update notification.", teamId);
-            return;
-        }
+    public void publishTeamCreatedEvent(UUID teamId, UUID creatorId) {
+        TeamCreatedEvent event = TeamCreatedEvent.builder()
+                .teamId(teamId)
+                .creatorId(creatorId)
+                .build();
 
+        log.info("Publish team created event: {}", event);
+        teamEventPublisher.publishEvent(CREATE_TOPIC, event);
+    }
+
+    @Override
+    public void publishTeamUpdateNotification(UUID userId, UUID teamId) {
         String teamName = teamService.getTeamName(teamId);
         List<UUID> memberIds = memberService.getTeamMemberIds(teamId);
 
@@ -46,11 +49,10 @@ public class TeamNotificationServiceImpl implements TeamNotificationService {
                 .id(teamId)
                 .teamName(teamName)
                 .updatedBy(userId)
-                .updatedFields(updatedFields)
                 .memberIds(memberIds)
                 .build();
 
-        log.info("Publishing team update notification for team {}: fields updated: {}", teamId, updatedFields);
+        log.info("Publishing team update notification for team {}", teamId);
         teamEventPublisher.publishEvent(UPDATE_TOPIC, event);
     }
 
@@ -61,6 +63,7 @@ public class TeamNotificationServiceImpl implements TeamNotificationService {
 
         TeamDeletedEvent event = TeamDeletedEvent.builder()
                 .id(teamId)
+                .teamId(teamId)
                 .teamName(teamName)
                 .deletedBy(userId)
                 .memberIds(memberIds)

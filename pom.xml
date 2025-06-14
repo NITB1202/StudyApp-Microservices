@@ -19,6 +19,7 @@
         <module>user-service</module>
         <module>team-service</module>
         <module>plan-service</module>
+        <module>notification-service</module>
         <module>api-gateway</module>
     </modules>
 

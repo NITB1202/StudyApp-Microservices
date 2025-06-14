@@ -1,0 +1,112 @@
+syntax = "proto3";
+
+package notification;
+
+import "common.proto";
+
+option java_multiple_files = true;
+option java_package = "com.study.notificationservice.grpc";
+option java_outer_classname = "NotificationProto";
+
+enum LinkedSubject {
+  PLAN = 0;
+  TEAM = 1;
+}
+
+//Notification
+message GetNotificationsRequest {
+  string userId = 1;
+  string cursor = 2;
+  int32 size = 3;
+}
+
+message GetUnreadNotificationCountRequest {
+  string userId = 1;
+}
+
+message GetUnreadNotificationCountResponse {
+  int32 count = 1;
+}
+
+message NotificationResponse {
+  string title = 1;
+  string createdAt = 2;
+  string content = 3;
+  bool isRead = 4;
+  LinkedSubject subject = 5;
+  string subjectId = 6;
+}
+
+message NotificationsResponse {
+  repeated NotificationResponse notifications = 1;
+  int64 total = 2;
+  string nextCursor = 3;
+}
+
+message MarkNotificationsAsReadRequest {
+  repeated string ids = 1;
+}
+
+message MarkAllNotificationsAsReadRequest {
+  string userId = 1;
+}
+
+message DeleteNotificationsRequest {
+  repeated string ids = 1;
+}
+
+message DeleteAllNotificationsRequest {
+  string userId = 1;
+}
+
+//Invitation
+message GetInvitationsRequest {
+  string userId = 1;
+  string cursor = 2;
+  int32 size = 3;
+}
+
+message InvitationResponse {
+  string id = 1;
+  string inviterName = 2;
+  string inviterAvatarUrl = 3;
+  string teamId = 4;
+  string teamName = 5;
+  string invitedAt = 6;
+}
+
+message InvitationsResponse {
+  repeated InvitationResponse invitations = 1;
+  int64 total = 2;
+  string nextCursor = 3;
+}
+
+message ReplyToInvitationRequest {
+  string id = 1;
+  bool accept = 2;
+}
+
+//Device token
+message RegisterDeviceTokenRequest {
+  string userId = 1;
+  string fcmToken = 2;
+}
+
+message RemoveDeviceTokenRequest {
+  string fcmToken = 1;
+}
+
+service NotificationService {
+  rpc GetNotifications(GetNotificationsRequest) returns (NotificationsResponse);
+  rpc GetUnreadNotificationCount(GetUnreadNotificationCountRequest) returns (GetUnreadNotificationCountResponse);
+  rpc MarkNotificationsAsRead(MarkNotificationsAsReadRequest) returns (common.ActionResponse);
+  rpc MarkAllNotificationsAsRead(MarkAllNotificationsAsReadRequest) returns (common.ActionResponse);
+  rpc DeleteNotifications(DeleteNotificationsRequest) returns (common.ActionResponse);
+  rpc DeleteAllNotifications(DeleteAllNotificationsRequest) returns (common.ActionResponse);
+
+  rpc GetInvitations(GetInvitationsRequest) returns (InvitationsResponse);
+  rpc ReplyToInvitation(ReplyToInvitationRequest) returns (common.ActionResponse);
+
+  rpc RegisterDeviceToken(RegisterDeviceTokenRequest) returns (common.ActionResponse);
+  rpc RemoveDeviceToken(RemoveDeviceTokenRequest) returns (common.ActionResponse);
+}
