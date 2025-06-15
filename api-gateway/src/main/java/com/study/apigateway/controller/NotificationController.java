@@ -31,7 +31,7 @@ public class NotificationController {
     @Operation(summary = "Get a list of notifications.")
     @ApiResponse(responseCode = "200", description = "Get successfully.")
     public Mono<ResponseEntity<NotificationsResponseDto>> getNotifications(@RequestParam UUID userId,
-                                                                           @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime cursor,
+                                                                           @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime cursor,
                                                                            @RequestParam(defaultValue = "10") int size) {
         return notificationService.getNotifications(userId, cursor, size).map(ResponseEntity::ok);
     }

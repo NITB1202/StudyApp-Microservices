@@ -27,7 +27,7 @@ public class InvitationController {
     @Operation(summary = "Get a list of invitations.")
     @ApiResponse(responseCode = "200", description = "Get successfully.")
     public Mono<ResponseEntity<InvitationsResponseDto>> getInvitations(@RequestParam UUID userId,
-                                                                       @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime cursor,
+                                                                       @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime cursor,
                                                                        @RequestParam(defaultValue = "10") int size) {
         return invitationService.getInvitations(userId, cursor, size).map(ResponseEntity::ok);
     }

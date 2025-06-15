@@ -24,6 +24,7 @@ public class InvitationMapper {
     }
 
     public static InvitationsResponseDto toInvitationsResponseDto(InvitationsResponse invitations) {
+        LocalDateTime nextCursor = invitations.getNextCursor().isEmpty()? null: LocalDateTime.parse(invitations.getNextCursor());
         List<InvitationResponseDto> dto = invitations.getInvitationsList().stream()
                 .map(InvitationMapper::toInvitationResponseDto)
                 .toList();
@@ -31,7 +32,7 @@ public class InvitationMapper {
         return InvitationsResponseDto.builder()
                 .invitations(dto)
                 .total(invitations.getTotal())
-                .nextCursor(LocalDateTime.parse(invitations.getNextCursor()))
+                .nextCursor(nextCursor)
                 .build();
     }
 }

@@ -16,6 +16,8 @@ public class NotificationMapper {
     private NotificationMapper() {}
 
     public static NotificationResponseDto toNotificationResponseDto(NotificationResponse notification) {
+        UUID subjectId = notification.getSubjectId().isEmpty()? null: UUID.fromString(notification.getSubjectId());
+
         return NotificationResponseDto.builder()
                 .id(UUID.fromString(notification.getId()))
                 .title(notification.getTitle())
@@ -23,11 +25,12 @@ public class NotificationMapper {
                 .createdAt(LocalDateTime.parse(notification.getCreatedAt()))
                 .isRead(notification.getIsRead())
                 .subject(LinkedSubjectMapper.toEnum(notification.getSubject()))
-                .subjectId(UUID.fromString(notification.getSubjectId()))
+                .subjectId(subjectId)
                 .build();
     }
 
     public static NotificationsResponseDto toNotificationsResponseDto(NotificationsResponse notifications) {
+        LocalDateTime nextCursor = notifications.getNextCursor().isEmpty()? null: LocalDateTime.parse(notifications.getNextCursor());
         List<NotificationResponseDto> dto = notifications.getNotificationsList().stream()
                 .map(NotificationMapper::toNotificationResponseDto)
                 .toList();
@@ -35,7 +38,7 @@ public class NotificationMapper {
         return NotificationsResponseDto.builder()
                 .notifications(dto)
                 .total(notifications.getTotal())
-                .nextCursor(LocalDateTime.parse(notifications.getNextCursor()))
+                .nextCursor(nextCursor)
                 .build();
     }
 
