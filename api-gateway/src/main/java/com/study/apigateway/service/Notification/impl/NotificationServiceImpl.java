@@ -1,6 +1,8 @@
 package com.study.apigateway.service.Notification.impl;
 
 import com.study.apigateway.dto.Action.ActionResponseDto;
+import com.study.apigateway.dto.Notification.request.DeleteNotificationsRequestDto;
+import com.study.apigateway.dto.Notification.request.MarkNotificationsAsReadRequestDto;
 import com.study.apigateway.dto.Notification.response.NotificationsResponseDto;
 import com.study.apigateway.dto.Notification.response.UnreadNotificationCountResponseDto;
 import com.study.apigateway.grpc.NotificationGrpcClient;
@@ -41,9 +43,9 @@ public class NotificationServiceImpl implements NotificationService {
     }
 
     @Override
-    public Mono<ActionResponseDto> markNotificationsAsRead(List<UUID> ids) {
+    public Mono<ActionResponseDto> markNotificationsAsRead(MarkNotificationsAsReadRequestDto request) {
         return Mono.fromCallable(()->{
-            ActionResponse response = notificationGrpcClient.markNotificationAsRead(ids);
+            ActionResponse response = notificationGrpcClient.markNotificationAsRead(request.getIds());
             return ActionMapper.toResponseDto(response);
         }).subscribeOn(Schedulers.boundedElastic());
     }
@@ -57,9 +59,9 @@ public class NotificationServiceImpl implements NotificationService {
     }
 
     @Override
-    public Mono<ActionResponseDto> deleteNotifications(UUID userId, List<UUID> ids) {
+    public Mono<ActionResponseDto> deleteNotifications(UUID userId, DeleteNotificationsRequestDto request) {
         return Mono.fromCallable(()->{
-            ActionResponse response = notificationGrpcClient.deleteNotifications(userId, ids);
+            ActionResponse response = notificationGrpcClient.deleteNotifications(userId, request.getIds());
             return ActionMapper.toResponseDto(response);
         }).subscribeOn(Schedulers.boundedElastic());
     }
