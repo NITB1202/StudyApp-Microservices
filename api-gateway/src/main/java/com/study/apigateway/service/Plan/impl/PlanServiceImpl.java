@@ -1,4 +1,4 @@
-package com.study.apigateway.service.Plan;
+package com.study.apigateway.service.Plan.impl;
 
 import com.study.apigateway.dto.Action.ActionResponseDto;
 import com.study.apigateway.dto.Plan.Plan.request.*;
@@ -11,6 +11,7 @@ import com.study.apigateway.grpc.UserServiceGrpcClient;
 import com.study.apigateway.mapper.ActionMapper;
 import com.study.apigateway.mapper.PlanMapper;
 import com.study.apigateway.mapper.TaskMapper;
+import com.study.apigateway.service.Plan.PlanService;
 import com.study.common.grpc.ActionResponse;
 import com.study.planservice.grpc.*;
 import com.study.userservice.grpc.UserDetailResponse;

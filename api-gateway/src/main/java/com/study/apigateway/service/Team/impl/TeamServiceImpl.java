@@ -1,4 +1,4 @@
-package com.study.apigateway.service.Team;
+package com.study.apigateway.service.Team.impl;
 
 import com.study.apigateway.dto.Team.Team.request.CreateTeamRequestDto;
 import com.study.apigateway.dto.Team.Team.request.UpdateTeamRequestDto;
@@ -11,6 +11,7 @@ import com.study.apigateway.grpc.TeamServiceGrpcClient;
 import com.study.apigateway.grpc.UserServiceGrpcClient;
 import com.study.apigateway.mapper.ActionMapper;
 import com.study.apigateway.mapper.TeamMapper;
+import com.study.apigateway.service.Team.TeamService;
 import com.study.common.grpc.ActionResponse;
 import com.study.teamservice.grpc.ListTeamResponse;
 import com.study.teamservice.grpc.TeamDetailResponse;

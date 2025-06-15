@@ -1,4 +1,4 @@
-package com.study.apigateway.service.Plan;
+package com.study.apigateway.service.Plan.impl;
 
 import com.study.apigateway.dto.Action.ActionResponseDto;
 import com.study.apigateway.dto.Plan.Reminder.request.AddPlanRemindersRequestDto;
@@ -6,6 +6,7 @@ import com.study.apigateway.dto.Plan.Reminder.request.DeletePlanRemindersRequest
 import com.study.apigateway.dto.Plan.Reminder.request.UpdatePlanRemindersRequestDto;
 import com.study.apigateway.grpc.PlanServiceGrpcClient;
 import com.study.apigateway.mapper.ActionMapper;
+import com.study.apigateway.service.Plan.PlanReminderService;
 import com.study.common.grpc.ActionResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
