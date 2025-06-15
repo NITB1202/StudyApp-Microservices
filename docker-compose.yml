@@ -134,6 +134,40 @@ services:
     networks:
       - backend
 
+  notification-db:
+    image: postgres:15
+    container_name: notification-db
+    ports:
+      - "5435:5432"
+    environment:
+      POSTGRES_DB: ${NOTIFICATION_SERVICE_DB_NAME}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      - notification-db-data:/var/lib/postgresql/data
+    networks:
+      - backend
+
+  notification-service:
+    build:
+      context: ./notification-service
+    container_name: notification-service
+    depends_on:
+      - zookeeper
+      - kafka
+      - notification-db
+      - eureka-server
+      - user-service
+    environment:
+      SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE}
+      NOTIFICATION_SERVICE_DB_HOST: ${NOTIFICATION_SERVICE_DB_HOST}
+      NOTIFICATION_SERVICE_DB_PORT: ${NOTIFICATION_SERVICE_DB_PORT}
+      NOTIFICATION_SERVICE_DB_NAME: ${NOTIFICATION_SERVICE_DB_NAME}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    networks:
+      - backend
+
   api-gateway:
     build:
       context: ./api-gateway
@@ -141,7 +175,6 @@ services:
     ports:
       - "8080:8080"
     depends_on:
-      - user-service
       - eureka-server
     environment:
       SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE}
@@ -152,6 +185,7 @@ volumes:
   user-db-data:
   team-db-data:
   plan-db-data:
+  notification-db-data:
 
 networks:
   backend:

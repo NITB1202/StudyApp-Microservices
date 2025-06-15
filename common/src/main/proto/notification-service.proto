@@ -11,6 +11,7 @@ option java_outer_classname = "NotificationProto";
 enum LinkedSubject {
   PLAN = 0;
   TEAM = 1;
+  INVITATION = 2;
 }
 
 //Notification
@@ -29,12 +30,13 @@ message GetUnreadNotificationCountResponse {
 }
 
 message NotificationResponse {
-  string title = 1;
-  string createdAt = 2;
-  string content = 3;
-  bool isRead = 4;
-  LinkedSubject subject = 5;
-  string subjectId = 6;
+  string id = 1;
+  string title = 2;
+  string createdAt = 3;
+  string content = 4;
+  bool isRead = 5;
+  LinkedSubject subject = 6;
+  string subjectId = 7;
 }
 
 message NotificationsResponse {
@@ -52,7 +54,8 @@ message MarkAllNotificationsAsReadRequest {
 }
 
 message DeleteNotificationsRequest {
-  repeated string ids = 1;
+  string userId = 1;
+  repeated string ids = 2;
 }
 
 message DeleteAllNotificationsRequest {
@@ -83,7 +86,8 @@ message InvitationsResponse {
 
 message ReplyToInvitationRequest {
   string id = 1;
-  bool accept = 2;
+  string userId = 2;
+  bool accept = 3;
 }
 
 //Device token
