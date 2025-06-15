@@ -1,6 +1,7 @@
 package com.study.apigateway.service.Notification.impl;
 
 import com.study.apigateway.dto.Action.ActionResponseDto;
+import com.study.apigateway.dto.Notification.request.RegisterDeviceTokenRequestDto;
 import com.study.apigateway.grpc.NotificationGrpcClient;
 import com.study.apigateway.mapper.ActionMapper;
 import com.study.apigateway.service.Notification.DeviceTokenService;
@@ -18,9 +19,9 @@ public class DeviceTokenServiceImpl implements DeviceTokenService {
     private final NotificationGrpcClient notificationGrpcClient;
 
     @Override
-    public Mono<ActionResponseDto> registerDeviceToken(UUID userId, String fmcToken) {
+    public Mono<ActionResponseDto> registerDeviceToken(UUID userId, RegisterDeviceTokenRequestDto request) {
         return Mono.fromCallable(()->{
-            ActionResponse response = notificationGrpcClient.registerDeviceToken(userId, fmcToken);
+            ActionResponse response = notificationGrpcClient.registerDeviceToken(userId, request.getFcmToken());
             return ActionMapper.toResponseDto(response);
         }).subscribeOn(Schedulers.boundedElastic());
     }

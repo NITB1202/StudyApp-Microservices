@@ -32,12 +32,12 @@ public class InvitationController {
         return invitationService.getInvitations(userId, cursor, size).map(ResponseEntity::ok);
     }
 
-    @PostMapping
+    @PostMapping("/{id}")
     @Operation(summary = "Reply to the invitation.")
     @ApiResponse(responseCode = "200", description = "Reply successfully.")
     @ApiResponse(responseCode = "404", description = "Not found.",
             content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
-    public Mono<ResponseEntity<ActionResponseDto>> replyToInvitation(UUID id, UUID userId, boolean accept) {
+    public Mono<ResponseEntity<ActionResponseDto>> replyToInvitation(@PathVariable UUID id, @RequestParam UUID userId, @RequestParam boolean accept) {
         return invitationService.replyToInvitation(id, userId, accept).map(ResponseEntity::ok);
     }
 }
