@@ -130,12 +130,20 @@ public class NotificationGrpcClient {
     }
 
     public TeamNotificationSettingsResponse updateTeamNotificationSettings(UUID id, UpdateTeamNotificationSettingsRequestDto dto) {
-        UpdateTeamNotificationSettingsRequest request = UpdateTeamNotificationSettingsRequest.newBuilder()
-                .setId(id.toString())
-                .setTeamNotification(dto.getTeamNotification() == null ? null : BoolValue.of(dto.getTeamNotification()))
-                .setTeamPlanReminder(dto.getTeamPlanReminder() == null ? null : BoolValue.of(dto.getTeamPlanReminder()))
-                .setChatNotification(dto.getChatNotification() == null ? null : BoolValue.of(dto.getChatNotification()))
-                .build();
+        UpdateTeamNotificationSettingsRequest.Builder builder = UpdateTeamNotificationSettingsRequest.newBuilder()
+                .setId(id.toString());
+
+        if (dto.getTeamNotification() != null) {
+            builder.setTeamNotification(BoolValue.of(dto.getTeamNotification()));
+        }
+        if (dto.getChatNotification() != null) {
+            builder.setChatNotification(BoolValue.of(dto.getChatNotification()));
+        }
+        if (dto.getTeamPlanReminder() != null) {
+            builder.setTeamPlanReminder(BoolValue.of(dto.getTeamPlanReminder()));
+        }
+
+        UpdateTeamNotificationSettingsRequest request = builder.build();
 
         return blockingStub.updateTeamNotificationSettings(request);
     }
