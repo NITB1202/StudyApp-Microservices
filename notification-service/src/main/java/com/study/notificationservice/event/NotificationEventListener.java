@@ -142,17 +142,19 @@ public class NotificationEventListener {
 
     @KafkaListener(topics = "plan-reminded", groupId = "notification-plan-reminded")
     public void consumePlanRemindedEvent(PlanRemindedEvent event) {
-        LocalDateTime now = LocalDateTime.now();
+        boolean isReminder = LocalDateTime.now().isBefore(event.getEndAt());
         DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm:ss");
         DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("dd/MM/yy");
 
-        String title = now.isBefore(event.getEndAt()) ? "Plan reminded" : "Expired plan";
-        String content = now.isBefore(event.getEndAt()) ?
+        String title = isReminder ? "Plan reminded" : "Expired plan";
+        String content = isReminder ?
                 "Plan '" + event.getPlanName() +"' will expire at " + event.getEndAt().format(timeFormatter) +
                         " on " + event.getEndAt().format(dateFormatter) + "." :
                 "Plan '" + event.getPlanName() + "' has expired.";
 
         for(UUID receiverId : event.getReceiverIds()) {
+            if(isReminder && event.getTeamId() != null && !settingsService.getTeamPlanReminder(event.getTeamId(), receiverId)) continue;
+
             CreateNotificationDto dto = CreateNotificationDto.builder()
                     .userId(receiverId)
                     .title(title)
