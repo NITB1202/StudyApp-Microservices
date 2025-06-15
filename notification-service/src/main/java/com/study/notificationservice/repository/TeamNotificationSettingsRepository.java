@@ -7,4 +7,5 @@ import java.util.UUID;
 
 public interface TeamNotificationSettingsRepository extends JpaRepository<TeamNotificationSettings, UUID> {
     TeamNotificationSettings findByTeamIdAndUserId(UUID teamId, UUID userId);
+    void deleteAllByTeamId(UUID teamId);
 }

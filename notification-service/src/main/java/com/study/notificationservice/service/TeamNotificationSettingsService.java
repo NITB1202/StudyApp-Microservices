@@ -10,4 +10,9 @@ public interface TeamNotificationSettingsService {
     void createTeamNotificationSettings(UUID userId, UUID teamId);
     TeamNotificationSettings getTeamNotificationSettings(GetTeamNotificationSettingsRequest request);
     void updateTeamNotificationSettings(UpdateTeamNotificationSettingsRequest request);
+    void deleteByTeamIdAndUserId(UUID teamId, UUID userId);
+    void deleteAllByTeamId(UUID teamId);
+    boolean getTeamNotification(UUID teamId, UUID userId);
+    boolean getTeamPlanReminder(UUID teamId, UUID userId);
+    boolean getChatNotification(UUID teamId, UUID userId);
 }

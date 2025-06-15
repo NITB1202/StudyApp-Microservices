@@ -1,5 +1,6 @@
 package com.study.notificationservice.event;
 
+import com.study.common.events.Team.*;
 import com.study.notificationservice.dto.CreateInvitationDto;
 import com.study.notificationservice.dto.CreateNotificationDto;
 import com.study.notificationservice.grpc.UserServiceGrpcClient;
@@ -10,10 +11,7 @@ import com.study.common.enums.LinkedSubject;
 import com.study.common.events.Notification.InvitationCreatedEvent;
 import com.study.common.events.Plan.*;
 
-import com.study.common.events.Team.TeamDeletedEvent;
-import com.study.common.events.Team.TeamUpdatedEvent;
-import com.study.common.events.Team.UserJoinedTeamEvent;
-import com.study.common.events.Team.UserLeftTeamEvent;
+import com.study.notificationservice.service.TeamNotificationSettingsService;
 import com.study.userservice.grpc.UserDetailResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.kafka.annotation.KafkaListener;
@@ -30,6 +28,7 @@ public class NotificationEventListener {
     private final NotificationService notificationService;
     private final InvitationService invitationService;
     private final DeviceTokenService deviceTokenService;
+    private final TeamNotificationSettingsService settingsService;
 
     @KafkaListener(topics = "invitation-created", groupId = "notification-invitation-created")
     public void consumeInvitationCreatedEvent(InvitationCreatedEvent event) {
@@ -211,6 +210,11 @@ public class NotificationEventListener {
         }
     }
 
+    @KafkaListener(topics = "team-created", groupId = "notification-team-created")
+    public void consumeTeamCreatedEvent(TeamCreatedEvent event) {
+        settingsService.createTeamNotificationSettings(event.getCreatorId(), event.getTeamId());
+    }
+
     @KafkaListener(topics = "team-deleted", groupId = "notification-team-deleted")
     public void consumeTeamDeletedEvent(TeamDeletedEvent event) {
         UserDetailResponse deletedBy = userServiceGrpcClient.getUserById(event.getDeletedBy());
@@ -231,6 +235,8 @@ public class NotificationEventListener {
             notificationService.createNotification(dto);
             deviceTokenService.sendPushNotification(dto);
         }
+
+        settingsService.deleteAllByTeamId(event.getTeamId());
     }
 
     @KafkaListener(topics = "team-updated", groupId = "notification-team-updated")
@@ -241,6 +247,7 @@ public class NotificationEventListener {
 
         for(UUID memberId : event.getMemberIds()) {
             if(event.getUpdatedBy().equals(memberId)) continue;
+            if(!settingsService.getTeamNotification(event.getId(), memberId)) continue;
 
             CreateNotificationDto dto = CreateNotificationDto.builder()
                     .userId(memberId)
@@ -263,6 +270,7 @@ public class NotificationEventListener {
 
         for(UUID memberId : event.getMemberIds()) {
             if(event.getUserId().equals(memberId)) continue;
+            if(!settingsService.getTeamNotification(event.getTeamId(), memberId)) continue;
 
             CreateNotificationDto dto = CreateNotificationDto.builder()
                     .userId(memberId)
@@ -275,6 +283,8 @@ public class NotificationEventListener {
             notificationService.createNotification(dto);
             deviceTokenService.sendPushNotification(dto);
         }
+
+        settingsService.createTeamNotificationSettings(event.getUserId(), event.getTeamId());
     }
 
     @KafkaListener(topics = "user-left", groupId = "notification-user-left")
@@ -285,6 +295,7 @@ public class NotificationEventListener {
 
         for(UUID memberId : event.getMemberIds()) {
             if(event.getUserId().equals(memberId)) continue;
+            if(!settingsService.getTeamNotification(event.getTeamId(), memberId)) continue;
 
             CreateNotificationDto dto = CreateNotificationDto.builder()
                     .userId(memberId)
@@ -297,5 +308,7 @@ public class NotificationEventListener {
             notificationService.createNotification(dto);
             deviceTokenService.sendPushNotification(dto);
         }
+
+        settingsService.deleteByTeamIdAndUserId(event.getTeamId(), event.getUserId());
     }
 }

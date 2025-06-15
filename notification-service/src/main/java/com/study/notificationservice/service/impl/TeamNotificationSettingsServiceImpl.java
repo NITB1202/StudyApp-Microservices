@@ -64,4 +64,53 @@ public class TeamNotificationSettingsServiceImpl implements TeamNotificationSett
 
         settingsRepository.save(settings);
     }
+
+    @Override
+    public void deleteByTeamIdAndUserId(UUID teamId, UUID userId) {
+        TeamNotificationSettings settings = settingsRepository.findByTeamIdAndUserId(teamId, userId);
+
+        if(settings == null) {
+            throw new NotFoundException("Team id or user id is incorrect.");
+        }
+
+        settingsRepository.delete(settings);
+    }
+
+    @Override
+    public void deleteAllByTeamId(UUID teamId) {
+        settingsRepository.deleteAllByTeamId(teamId);
+    }
+
+    @Override
+    public boolean getTeamNotification(UUID teamId, UUID userId) {
+        TeamNotificationSettings settings = settingsRepository.findByTeamIdAndUserId(teamId, userId);
+
+        if(settings == null) {
+            throw new NotFoundException("Team id or user id is incorrect.");
+        }
+
+        return settings.getTeamNotification();
+    }
+
+    @Override
+    public boolean getTeamPlanReminder(UUID teamId, UUID userId) {
+        TeamNotificationSettings settings = settingsRepository.findByTeamIdAndUserId(teamId, userId);
+
+        if(settings == null) {
+            throw new NotFoundException("Team id or user id is incorrect.");
+        }
+
+        return settings.getTeamPlanReminder();
+    }
+
+    @Override
+    public boolean getChatNotification(UUID teamId, UUID userId) {
+        TeamNotificationSettings settings = settingsRepository.findByTeamIdAndUserId(teamId, userId);
+
+        if(settings == null) {
+            throw new NotFoundException("Team id or user id is incorrect.");
+        }
+
+        return settings.getChatNotification();
+    }
 }
