@@ -54,7 +54,8 @@ message MarkAllNotificationsAsReadRequest {
 }
 
 message DeleteNotificationsRequest {
-  repeated string ids = 1;
+  string userId = 1;
+  repeated string ids = 2;
 }
 
 message DeleteAllNotificationsRequest {

@@ -104,6 +104,8 @@ public class NotificationEventListener {
         String content = user.getUsername() + " deleted plan '" + event.getPlanName() +"'.";
 
         for(UUID assigneeId : event.getAssigneeIds()) {
+            if(event.getUserId().equals(assigneeId)) continue;
+
             CreateNotificationDto dto = CreateNotificationDto.builder()
                     .userId(assigneeId)
                     .title(title)
@@ -124,6 +126,8 @@ public class NotificationEventListener {
         String content = "Plan '" + event.getPlanName() + "' has been moved back to 'In progress' as " + user.getUsername() + " updated tasks.";
 
         for(UUID assigneeId : event.getAssigneeIds()) {
+            if(event.getUserId().equals(assigneeId)) continue;
+
             CreateNotificationDto dto = CreateNotificationDto.builder()
                     .userId(assigneeId)
                     .title(title)
@@ -170,6 +174,8 @@ public class NotificationEventListener {
         String content = user.getUsername() + " has restored plan '" + event.getPlanName() +"'.";
 
         for(UUID assigneeId : event.getAssigneeIds()) {
+            if(event.getUserId().equals(assigneeId)) continue;
+
             CreateNotificationDto dto = CreateNotificationDto.builder()
                     .userId(assigneeId)
                     .title(title)
@@ -190,6 +196,8 @@ public class NotificationEventListener {
         String content = user.getUsername() + " just updated plan '" + event.getPlanName() +"'.";
 
         for(UUID assigneeId : event.getAssigneeIds()) {
+            if(event.getUserId().equals(assigneeId)) continue;
+
             CreateNotificationDto dto = CreateNotificationDto.builder()
                     .userId(assigneeId)
                     .title(title)
@@ -210,7 +218,7 @@ public class NotificationEventListener {
         String content = "Team '" + event.getTeamName() +"' has been deleted by " + deletedBy.getUsername() + ".";
 
         for(UUID memberId : event.getMemberIds()) {
-            if(memberId == event.getDeletedBy()) continue;
+            if(event.getDeletedBy().equals(memberId)) continue;
 
             CreateNotificationDto dto = CreateNotificationDto.builder()
                     .userId(memberId)
@@ -232,7 +240,7 @@ public class NotificationEventListener {
         String content = updatedBy.getUsername() + " has updated team '" + event.getTeamName() +"''s general information.";
 
         for(UUID memberId : event.getMemberIds()) {
-            if(memberId == event.getUpdatedBy()) continue;
+            if(event.getUpdatedBy().equals(memberId)) continue;
 
             CreateNotificationDto dto = CreateNotificationDto.builder()
                     .userId(memberId)
@@ -254,7 +262,7 @@ public class NotificationEventListener {
         String content = user.getUsername() + " has joined team '" + event.getTeamName() +"'.";
 
         for(UUID memberId : event.getMemberIds()) {
-            if(memberId == event.getUserId()) continue;
+            if(event.getUserId().equals(memberId)) continue;
 
             CreateNotificationDto dto = CreateNotificationDto.builder()
                     .userId(memberId)
@@ -276,7 +284,7 @@ public class NotificationEventListener {
         String content = user.getUsername() + " has left team '" + event.getTeamName() +"'.";
 
         for(UUID memberId : event.getMemberIds()) {
-            if(memberId == event.getUserId()) continue;
+            if(event.getUserId().equals(memberId)) continue;
 
             CreateNotificationDto dto = CreateNotificationDto.builder()
                     .userId(memberId)

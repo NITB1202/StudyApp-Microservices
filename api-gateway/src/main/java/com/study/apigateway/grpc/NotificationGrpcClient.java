@@ -55,12 +55,13 @@ public class NotificationGrpcClient {
         return blockingStub.markAllNotificationsAsRead(request);
     }
 
-    public ActionResponse deleteNotifications(List<UUID> ids) {
+    public ActionResponse deleteNotifications(UUID userId, List<UUID> ids) {
         List<String> idsStr = ids.stream()
                 .map(UUID::toString)
                 .toList();
 
         DeleteNotificationsRequest request = DeleteNotificationsRequest.newBuilder()
+                .setUserId(userId.toString())
                 .addAllIds(idsStr)
                 .build();
 

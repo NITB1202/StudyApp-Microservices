@@ -1,5 +1,6 @@
 package com.study.notificationservice.service.impl;
 
+import com.study.common.exceptions.BusinessException;
 import com.study.notificationservice.dto.CreateNotificationDto;
 import com.study.notificationservice.entity.Notification;
 import com.study.notificationservice.repository.NotificationRepository;
@@ -93,12 +94,20 @@ public class NotificationServiceImpl implements NotificationService {
 
     @Override
     public void deleteNotifications(DeleteNotificationsRequest request) {
+        UUID userId = UUID.fromString(request.getUserId());
         List<UUID> ids = request.getIdsList().stream()
                 .map(UUID::fromString)
                 .toList();
 
         List<Notification> notifications = notificationRepository.findAllById(ids);
-        notificationRepository.deleteAll(notifications);
+
+        for(Notification notification : notifications) {
+            if(!notification.getUserId().equals(userId)) {
+                throw new BusinessException("You are not allowed to delete this notification.");
+            }
+
+            notificationRepository.delete(notification);
+        }
     }
 
     @Override

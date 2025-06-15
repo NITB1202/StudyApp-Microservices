@@ -57,9 +57,9 @@ public class NotificationServiceImpl implements NotificationService {
     }
 
     @Override
-    public Mono<ActionResponseDto> deleteNotifications(List<UUID> ids) {
+    public Mono<ActionResponseDto> deleteNotifications(UUID userId, List<UUID> ids) {
         return Mono.fromCallable(()->{
-            ActionResponse response = notificationGrpcClient.deleteNotifications(ids);
+            ActionResponse response = notificationGrpcClient.deleteNotifications(userId, ids);
             return ActionMapper.toResponseDto(response);
         }).subscribeOn(Schedulers.boundedElastic());
     }

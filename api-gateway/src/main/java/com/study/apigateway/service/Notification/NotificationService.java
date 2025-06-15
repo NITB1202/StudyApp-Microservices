@@ -14,6 +14,6 @@ public interface NotificationService {
     Mono<UnreadNotificationCountResponseDto> getUnreadNotificationCount(UUID userId);
     Mono<ActionResponseDto> markNotificationsAsRead(List<UUID> ids);
     Mono<ActionResponseDto> markAllNotificationsAsRead(UUID userId);
-    Mono<ActionResponseDto> deleteNotifications(List<UUID> ids);
+    Mono<ActionResponseDto> deleteNotifications(UUID userId, List<UUID> ids);
     Mono<ActionResponseDto> deleteAllNotifications(UUID userId);
 }
