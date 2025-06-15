@@ -1,5 +1,7 @@
 package com.study.apigateway.grpc;
 
+import com.google.protobuf.BoolValue;
+import com.study.apigateway.dto.Notification.request.UpdateTeamNotificationSettingsRequestDto;
 import com.study.common.grpc.ActionResponse;
 import com.study.notificationservice.grpc.*;
 import net.devh.boot.grpc.client.inject.GrpcClient;
@@ -115,5 +117,34 @@ public class NotificationGrpcClient {
                 .build();
 
         return blockingStub.removeDeviceToken(request);
+    }
+
+    //Team notification settings
+    public TeamNotificationSettingsResponse getTeamNotificationSettings(UUID teamId, UUID userId) {
+        GetTeamNotificationSettingsRequest request = GetTeamNotificationSettingsRequest.newBuilder()
+                .setTeamId(teamId.toString())
+                .setUserId(userId.toString())
+                .build();
+
+        return blockingStub.getTeamNotificationSettings(request);
+    }
+
+    public TeamNotificationSettingsResponse updateTeamNotificationSettings(UUID id, UpdateTeamNotificationSettingsRequestDto dto) {
+        UpdateTeamNotificationSettingsRequest.Builder builder = UpdateTeamNotificationSettingsRequest.newBuilder()
+                .setId(id.toString());
+
+        if (dto.getTeamNotification() != null) {
+            builder.setTeamNotification(BoolValue.of(dto.getTeamNotification()));
+        }
+        if (dto.getChatNotification() != null) {
+            builder.setChatNotification(BoolValue.of(dto.getChatNotification()));
+        }
+        if (dto.getTeamPlanReminder() != null) {
+            builder.setTeamPlanReminder(BoolValue.of(dto.getTeamPlanReminder()));
+        }
+
+        UpdateTeamNotificationSettingsRequest request = builder.build();
+
+        return blockingStub.updateTeamNotificationSettings(request);
     }
 }

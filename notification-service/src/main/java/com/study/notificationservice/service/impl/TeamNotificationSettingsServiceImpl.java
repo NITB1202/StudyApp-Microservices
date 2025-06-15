@@ -44,7 +44,7 @@ public class TeamNotificationSettingsServiceImpl implements TeamNotificationSett
     }
 
     @Override
-    public void updateTeamNotificationSettings(UpdateTeamNotificationSettingsRequest request) {
+    public TeamNotificationSettings updateTeamNotificationSettings(UpdateTeamNotificationSettingsRequest request) {
         UUID id = UUID.fromString(request.getId());
         TeamNotificationSettings settings = settingsRepository.findById(id).orElseThrow(
                 () -> new NotFoundException("Team id or user id is incorrect.")
@@ -62,7 +62,7 @@ public class TeamNotificationSettingsServiceImpl implements TeamNotificationSett
             settings.setChatNotification(request.getChatNotification().getValue());
         }
 
-        settingsRepository.save(settings);
+        return settingsRepository.save(settings);
     }
 
     @Override

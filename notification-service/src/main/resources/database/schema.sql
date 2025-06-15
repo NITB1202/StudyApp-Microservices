@@ -25,3 +25,13 @@ CREATE TABLE device_tokens (
     fcm_token TEXT NOT NULL,
     last_updated TIMESTAMP NOT NULL
 );
+
+CREATE TABLE team_notification_settings (
+    id UUID PRIMARY KEY,
+    user_id UUID NOT NULL,
+    team_id UUID NOT NULL,
+    team_notification BOOLEAN NOT NULL,
+    team_plan_reminder BOOLEAN NOT NULL,
+    chat_notification BOOLEAN NOT NULL
+);
+

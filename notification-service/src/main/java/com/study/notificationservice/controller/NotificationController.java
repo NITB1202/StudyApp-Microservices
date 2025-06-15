@@ -163,6 +163,7 @@ public class NotificationController extends NotificationServiceGrpc.Notification
         responseObserver.onCompleted();
     }
 
+    //Team notification settings
     @Override
     public void getTeamNotificationSettings(GetTeamNotificationSettingsRequest request, StreamObserver<TeamNotificationSettingsResponse> responseObserver) {
         TeamNotificationSettings settings = settingsService.getTeamNotificationSettings(request);
@@ -172,14 +173,9 @@ public class NotificationController extends NotificationServiceGrpc.Notification
     }
 
     @Override
-    public void updateTeamNotificationSettings(UpdateTeamNotificationSettingsRequest request, StreamObserver<ActionResponse> responseObserver) {
-        settingsService.updateTeamNotificationSettings(request);
-
-        ActionResponse response = ActionResponse.newBuilder()
-                .setSuccess(true)
-                .setMessage("Update successfully.")
-                .build();
-
+    public void updateTeamNotificationSettings(UpdateTeamNotificationSettingsRequest request, StreamObserver<TeamNotificationSettingsResponse> responseObserver) {
+        TeamNotificationSettings settings = settingsService.updateTeamNotificationSettings(request);
+        TeamNotificationSettingsResponse response = TeamNotificationSettingsMapper.toTeamNotificationSettingsResponse(settings);
         responseObserver.onNext(response);
         responseObserver.onCompleted();
     }
