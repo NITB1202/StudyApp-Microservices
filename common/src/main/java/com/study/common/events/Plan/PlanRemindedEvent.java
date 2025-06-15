@@ -16,6 +16,7 @@ public class PlanRemindedEvent {
     private String planName;
     private LocalDateTime endAt;
     private List<UUID> receiverIds;
+    private UUID teamId;
 }
 
 //Message:

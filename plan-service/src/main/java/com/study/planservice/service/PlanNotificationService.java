@@ -8,7 +8,7 @@ public interface PlanNotificationService {
     void publishPlanCompletedNotification(UUID planId);
     void publishPlanDeletedNotification(UUID userId, UUID planId);
     void publishPlanIncompleteNotification(UUID userId, UUID planId);
-    void publishPlanRemindedNotification(UUID planId, List<UUID> receiverIds);
+    void publishPlanRemindedNotification(UUID planId, UUID teamId, List<UUID> receiverIds);
     void publishPlanRestoredNotification(UUID userId, UUID planId);
     void publishPlanUpdatedNotification(UUID userId, UUID planId, List<UUID> receiverIds);
 }

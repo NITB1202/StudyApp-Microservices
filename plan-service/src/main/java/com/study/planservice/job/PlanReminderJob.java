@@ -24,6 +24,7 @@ public class PlanReminderJob implements Job {
         JobDataMap dataMap = context.getMergedJobDataMap();
 
         UUID planId = UUID.fromString(dataMap.getString("planId"));
+        UUID teamId = planService.getTeamId(planId);
 
         //If plan is completed, doesn't need to send notification
         if(planService.getPlanProgress(planId) == 1f) return;
@@ -33,6 +34,6 @@ public class PlanReminderJob implements Job {
                 .map(UUID::fromString)
                 .toList();
 
-        planNotificationService.publishPlanRemindedNotification(planId, receiverIds);
+        planNotificationService.publishPlanRemindedNotification(planId, teamId, receiverIds);
     }
 }

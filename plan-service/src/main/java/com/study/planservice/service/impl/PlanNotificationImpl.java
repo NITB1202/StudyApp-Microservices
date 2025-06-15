@@ -90,7 +90,7 @@ public class PlanNotificationImpl implements PlanNotificationService {
     }
 
     @Override
-    public void publishPlanRemindedNotification(UUID planId, List<UUID> receiverIds) {
+    public void publishPlanRemindedNotification(UUID planId, UUID teamId, List<UUID> receiverIds) {
         String planName = planService.getPlanName(planId);
         LocalDateTime endAt = planService.getPlanEndAt(planId);
 
@@ -99,6 +99,7 @@ public class PlanNotificationImpl implements PlanNotificationService {
                 .planName(planName)
                 .endAt(endAt)
                 .receiverIds(receiverIds)
+                .teamId(teamId)
                 .build();
 
         log.info("Publishing reminder notification for plan {}", planId);

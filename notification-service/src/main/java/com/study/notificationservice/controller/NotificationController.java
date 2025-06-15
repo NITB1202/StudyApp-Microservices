@@ -2,13 +2,16 @@ package com.study.notificationservice.controller;
 
 import com.study.notificationservice.entity.Invitation;
 import com.study.notificationservice.entity.Notification;
+import com.study.notificationservice.entity.TeamNotificationSettings;
 import com.study.notificationservice.mapper.InvitationMapper;
 import com.study.notificationservice.mapper.NotificationMapper;
+import com.study.notificationservice.mapper.TeamNotificationSettingsMapper;
 import com.study.notificationservice.service.DeviceTokenService;
 import com.study.notificationservice.service.InvitationService;
 import com.study.notificationservice.service.NotificationService;
 import com.study.common.grpc.ActionResponse;
 import com.study.notificationservice.grpc.*;
+import com.study.notificationservice.service.TeamNotificationSettingsService;
 import io.grpc.stub.StreamObserver;
 import lombok.RequiredArgsConstructor;
 import net.devh.boot.grpc.server.service.GrpcService;
@@ -22,6 +25,7 @@ public class NotificationController extends NotificationServiceGrpc.Notification
     private final InvitationService invitationService;
     private final NotificationService notificationService;
     private final DeviceTokenService deviceTokenService;
+    private final TeamNotificationSettingsService settingsService;
 
     //Notifications
     @Override
@@ -153,6 +157,27 @@ public class NotificationController extends NotificationServiceGrpc.Notification
         ActionResponse response = ActionResponse.newBuilder()
                 .setSuccess(true)
                 .setMessage("Remove successfully.")
+                .build();
+
+        responseObserver.onNext(response);
+        responseObserver.onCompleted();
+    }
+
+    @Override
+    public void getTeamNotificationSettings(GetTeamNotificationSettingsRequest request, StreamObserver<TeamNotificationSettingsResponse> responseObserver) {
+        TeamNotificationSettings settings = settingsService.getTeamNotificationSettings(request);
+        TeamNotificationSettingsResponse response = TeamNotificationSettingsMapper.toTeamNotificationSettingsResponse(settings);
+        responseObserver.onNext(response);
+        responseObserver.onCompleted();
+    }
+
+    @Override
+    public void updateTeamNotificationSettings(UpdateTeamNotificationSettingsRequest request, StreamObserver<ActionResponse> responseObserver) {
+        settingsService.updateTeamNotificationSettings(request);
+
+        ActionResponse response = ActionResponse.newBuilder()
+                .setSuccess(true)
+                .setMessage("Update successfully.")
                 .build();
 
         responseObserver.onNext(response);
