@@ -85,7 +85,8 @@ message InvitationsResponse {
 
 message ReplyToInvitationRequest {
   string id = 1;
-  bool accept = 2;
+  string userId = 2;
+  bool accept = 3;
 }
 
 //Device token

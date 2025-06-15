@@ -88,9 +88,10 @@ public class NotificationGrpcClient {
         return blockingStub.getInvitations(request);
     }
 
-    public ActionResponse replyToInvitation(UUID id, boolean accept) {
+    public ActionResponse replyToInvitation(UUID id, UUID userId, boolean accept) {
         ReplyToInvitationRequest request = ReplyToInvitationRequest.newBuilder()
                 .setId(id.toString())
+                .setUserId(userId.toString())
                 .setAccept(accept)
                 .build();
 

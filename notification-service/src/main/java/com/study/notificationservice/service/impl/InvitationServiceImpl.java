@@ -71,6 +71,10 @@ public class InvitationServiceImpl implements InvitationService {
                 () -> new NotFoundException("Invitation not found.")
         );
 
+        if(!request.getUserId().equals(invitation.getInviteeId().toString())) {
+            throw new BusinessException("You are not allowed to reply this invitation.");
+        }
+
         if(request.getAccept()) {
             InvitationAcceptEvent event = InvitationAcceptEvent.builder()
                     .teamId(invitation.getTeamId())
