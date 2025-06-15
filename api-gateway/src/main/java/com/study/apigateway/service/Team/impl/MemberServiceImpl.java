@@ -1,4 +1,4 @@
-package com.study.apigateway.service.Team;
+package com.study.apigateway.service.Team.impl;
 
 import com.study.apigateway.dto.Action.ActionResponseDto;
 import com.study.apigateway.dto.Notification.request.CreateInvitationRequestDto;
@@ -12,6 +12,7 @@ import com.study.apigateway.grpc.TeamServiceGrpcClient;
 import com.study.apigateway.grpc.UserServiceGrpcClient;
 import com.study.apigateway.mapper.ActionMapper;
 import com.study.apigateway.mapper.TeamMemberMapper;
+import com.study.apigateway.service.Team.MemberService;
 import com.study.common.grpc.ActionResponse;
 import com.study.common.utils.CursorUtil;
 import com.study.common.utils.DecodedCursor;

@@ -1,4 +1,4 @@
-package com.study.apigateway.service.User;
+package com.study.apigateway.service.User.impl;
 
 import com.study.apigateway.dto.User.request.CreateUserRequestDto;
 import com.study.apigateway.dto.User.request.UpdateUserRequestDto;
@@ -7,6 +7,7 @@ import com.study.apigateway.dto.User.response.UserDetailResponseDto;
 import com.study.apigateway.dto.User.response.UserResponseDto;
 import com.study.apigateway.grpc.UserServiceGrpcClient;
 import com.study.apigateway.mapper.UserMapper;
+import com.study.apigateway.service.User.UserService;
 import com.study.userservice.grpc.ListUserResponse;
 import com.study.userservice.grpc.UserDetailResponse;
 import com.study.userservice.grpc.UserResponse;
