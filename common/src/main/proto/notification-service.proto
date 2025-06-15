@@ -136,5 +136,5 @@ service NotificationService {
   rpc RemoveDeviceToken(RemoveDeviceTokenRequest) returns (common.ActionResponse);
 
   rpc GetTeamNotificationSettings(GetTeamNotificationSettingsRequest) returns (TeamNotificationSettingsResponse);
-  rpc UpdateTeamNotificationSettings(UpdateTeamNotificationSettingsRequest) returns (common.ActionResponse);
+  rpc UpdateTeamNotificationSettings(UpdateTeamNotificationSettingsRequest) returns (TeamNotificationSettingsResponse);
 }

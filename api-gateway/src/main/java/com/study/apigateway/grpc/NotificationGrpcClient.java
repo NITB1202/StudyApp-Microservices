@@ -1,5 +1,7 @@
 package com.study.apigateway.grpc;
 
+import com.google.protobuf.BoolValue;
+import com.study.apigateway.dto.Notification.request.UpdateTeamNotificationSettingsRequestDto;
 import com.study.common.grpc.ActionResponse;
 import com.study.notificationservice.grpc.*;
 import net.devh.boot.grpc.client.inject.GrpcClient;
@@ -115,5 +117,26 @@ public class NotificationGrpcClient {
                 .build();
 
         return blockingStub.removeDeviceToken(request);
+    }
+
+    //Team notification settings
+    public TeamNotificationSettingsResponse getTeamNotificationSettings(UUID teamId, UUID userId) {
+        GetTeamNotificationSettingsRequest request = GetTeamNotificationSettingsRequest.newBuilder()
+                .setTeamId(teamId.toString())
+                .setUserId(userId.toString())
+                .build();
+
+        return blockingStub.getTeamNotificationSettings(request);
+    }
+
+    public TeamNotificationSettingsResponse updateTeamNotificationSettings(UUID id, UpdateTeamNotificationSettingsRequestDto dto) {
+        UpdateTeamNotificationSettingsRequest request = UpdateTeamNotificationSettingsRequest.newBuilder()
+                .setId(id.toString())
+                .setTeamNotification(dto.getTeamNotification() == null ? null : BoolValue.of(dto.getTeamNotification()))
+                .setTeamPlanReminder(dto.getTeamPlanReminder() == null ? null : BoolValue.of(dto.getTeamPlanReminder()))
+                .setChatNotification(dto.getChatNotification() == null ? null : BoolValue.of(dto.getChatNotification()))
+                .build();
+
+        return blockingStub.updateTeamNotificationSettings(request);
     }
 }
