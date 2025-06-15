@@ -28,7 +28,7 @@ public class TaskController {
     @ApiResponse(responseCode = "400", description = "Invalid request body.",
             content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     public Mono<ResponseEntity<ActionResponseDto>> addTasksToPersonalPlan(@RequestParam UUID userId,
-                                                                           @Valid @RequestBody AddTasksToPersonalPlanRequestDto request) {
+                                                                          @Valid @RequestBody AddTasksToPersonalPlanRequestDto request) {
         return taskService.addTasksToPersonalPlan(userId, request).map(ResponseEntity::ok);
     }
 
@@ -38,7 +38,7 @@ public class TaskController {
     @ApiResponse(responseCode = "400", description = "Invalid request body.",
             content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     public Mono<ResponseEntity<ActionResponseDto>> addTasksToTeamPlan(@RequestParam UUID userId,
-                                                                       @Valid @RequestBody AddTasksToTeamPlanRequestDto request) {
+                                                                      @Valid @RequestBody AddTasksToTeamPlanRequestDto request) {
         return taskService.addTasksToTeamPlan(userId, request).map(ResponseEntity::ok);
     }
 

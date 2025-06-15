@@ -4,6 +4,7 @@ package team;
 
 import "common.proto";
 import "google/protobuf/empty.proto";
+import "google/protobuf/wrappers.proto";
 
 option java_multiple_files = true;
 option java_package = "com.study.teamservice.grpc";
@@ -183,6 +184,26 @@ message ValidateUsersInTeamRequest {
   repeated string userIds = 2;
 }
 
+//Team notification section
+message GetTeamNotificationSettingsRequest {
+  string userId = 1;
+  string teamId = 2;
+}
+
+message TeamNotificationSettingsResponse {
+  string id = 1;
+  bool teamNotification = 2;
+  bool teamPlanReminder = 3;
+  bool chatNotification = 4;
+}
+
+message UpdateTeamNotificationSettingsRequest {
+  string id = 1;
+  google.protobuf.BoolValue teamNotification = 2;
+  google.protobuf.BoolValue chatNotification = 3;
+  google.protobuf.BoolValue teamPlanReminder = 4;
+}
+
 service TeamService {
   //Team section
   rpc CreateTeam(CreateTeamRequest) returns (TeamResponse);
@@ -206,4 +227,8 @@ service TeamService {
   rpc LeaveTeam(LeaveTeamRequest) returns (common.ActionResponse); // -> notification
   rpc ValidateUpdateTeamResource(ValidateUpdateTeamResourceRequest) returns (google.protobuf.Empty);
   rpc ValidateUsersInTeam(ValidateUsersInTeamRequest) returns (google.protobuf.Empty);
+
+  //Team notification section
+  rpc GetTeamNotificationSettings(GetTeamNotificationSettingsRequest) returns (TeamNotificationSettingsResponse);
+  rpc UpdateTeamNotificationSettings(UpdateTeamNotificationSettingsRequest) returns (common.ActionResponse);
 }
