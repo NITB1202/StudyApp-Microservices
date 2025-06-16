@@ -169,7 +169,7 @@ service DocumentService {
   rpc GetFolderById(GetFolderByIdRequest) returns (FolderDetailResponse);
   rpc GetFolders(GetFoldersRequest) returns (FoldersResponse);
   rpc SearchFolderByName(SearchFolderByNameRequest) returns (FoldersResponse);
-  rpc UpdateFolderName(UpdateFolderNameRequest) returns (FolderResponse);
+  rpc UpdateFolderName(UpdateFolderNameRequest) returns (common.ActionResponse);
   rpc DeleteFolder(DeleteFolderRequest) returns (common.ActionResponse);
 
   //Document

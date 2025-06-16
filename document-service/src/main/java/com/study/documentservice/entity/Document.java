@@ -19,6 +19,9 @@ public class Document {
     @Column(name = "id", nullable = false)
     private UUID id;
 
+    @Column(name = "folder_id", nullable = false)
+    private UUID folderId;
+
     @Column(name = "name", nullable = false)
     private String name;
 
