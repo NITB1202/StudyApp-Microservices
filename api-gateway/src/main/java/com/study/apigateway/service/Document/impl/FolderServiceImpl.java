@@ -110,7 +110,7 @@ public class FolderServiceImpl implements FolderService {
     public Mono<ActionResponseDto> deleteFolder(UUID userId, UUID id) {
         return Mono.fromCallable(()->{
             validateUpdateFolder(userId, id);
-            ActionResponse response = documentClient.deleteDocument(id, userId);
+            ActionResponse response = documentClient.deleteFolder(id);
             return ActionMapper.toResponseDto(response);
         }).subscribeOn(Schedulers.boundedElastic());
     }

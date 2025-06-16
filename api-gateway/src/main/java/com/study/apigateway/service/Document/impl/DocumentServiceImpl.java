@@ -89,7 +89,7 @@ public class DocumentServiceImpl implements DocumentService {
     public Mono<ActionResponseDto> updateDocumentName(UUID userId, UUID id, String name) {
         return Mono.fromCallable(()->{
             validateUpdateDocument(userId, id);
-            ActionResponse response = documentClient.updateDocumentName(userId, id, name);
+            ActionResponse response = documentClient.updateDocumentName(id, userId, name);
             return ActionMapper.toResponseDto(response);
         }).subscribeOn(Schedulers.boundedElastic());
     }

@@ -204,7 +204,7 @@ public class FolderServiceImpl implements FolderService {
             usageService.decreaseUserUsage(folder.getCreatedBy(), folder.getBytes());
         }
         else {
-            usageService.decreaseTeamUsage(folder.getCreatedBy(), folder.getBytes());
+            usageService.decreaseTeamUsage(folder.getTeamId(), folder.getBytes());
         }
 
         folderRepository.delete(folder);
@@ -244,7 +244,7 @@ public class FolderServiceImpl implements FolderService {
             usageService.increaseUserUsage(folder.getCreatedBy(), bytes);
         }
         else {
-            usageService.increaseTeamUsage(folder.getCreatedBy(), bytes);
+            usageService.increaseTeamUsage(folder.getTeamId(), bytes);
         }
 
         folder.setDocumentCount(folder.getDocumentCount() + 1);
@@ -264,7 +264,7 @@ public class FolderServiceImpl implements FolderService {
             usageService.decreaseUserUsage(folder.getCreatedBy(), bytes);
         }
         else {
-            usageService.decreaseTeamUsage(folder.getCreatedBy(), bytes);
+            usageService.decreaseTeamUsage(folder.getTeamId(), bytes);
         }
 
         folder.setDocumentCount(folder.getDocumentCount() - 1);
