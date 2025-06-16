@@ -37,9 +37,9 @@ public class Document {
     @Column(name = "updated_at", nullable = false)
     private LocalDateTime updatedAt;
 
-    @Column(name = "bytes", nullable = false)
+    @Column(name = "bytes")
     private Long bytes;
 
-    @Column(name = "url", nullable = false)
+    @Column(name = "url")
     private String url;
 }

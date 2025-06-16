@@ -11,8 +11,8 @@ public interface DocumentService {
     Document getDocumentById(GetDocumentByIdRequest request);
     List<Document> getDocuments(GetDocumentsRequest request);
     List<Document> searchDocumentByName(SearchDocumentByNameRequest request);
-    int getDocumentCount(UUID folderId);
-    int getDocumentCountWithKeyword(UUID folderId, String keyword);
+    long getDocumentCount(UUID folderId);
+    long getDocumentCountWithKeyword(UUID folderId, String keyword);
     void updateDocumentName(UpdateDocumentNameRequest request);
     void moveDocument(MoveDocumentRequest request);
     void deleteDocument(DeleteDocumentRequest request);

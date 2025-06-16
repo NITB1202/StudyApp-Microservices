@@ -24,13 +24,21 @@ public class FolderServiceImpl implements FolderService {
 
     @Override
     public Folder createFolder(CreateFolderRequest request) {
+        UUID userId = UUID.fromString(request.getUserId());
+        UUID teamId = request.getTeamId().isEmpty() ? null : UUID.fromString(request.getTeamId());
+        LocalDateTime now = LocalDateTime.now();
+
         if(request.getName().isEmpty()) {
             throw new BusinessException("Folder name cannot be empty.");
         }
 
-        UUID userId = UUID.fromString(request.getUserId());
-        UUID teamId = request.getTeamId().isEmpty() ? null : UUID.fromString(request.getTeamId());
-        LocalDateTime now = LocalDateTime.now();
+        if(teamId == null && folderRepository.existsByNameAndCreatedByAndTeamIdIsNull(request.getName(), userId)) {
+            throw new BusinessException("Folder already exists.");
+        }
+
+        if(teamId != null && folderRepository.existsByNameAndTeamId(request.getName(), teamId)) {
+            throw new BusinessException("Folder already exists.");
+        }
 
         Folder folder = Folder.builder()
                 .name(request.getName())
@@ -147,6 +155,14 @@ public class FolderServiceImpl implements FolderService {
             throw new BusinessException("Folder name cannot be empty.");
         }
 
+        if(folder.getTeamId() == null && folderRepository.existsByNameAndCreatedByAndTeamIdIsNull(request.getName(), userId)) {
+            throw new BusinessException("Name already exists.");
+        }
+
+        if(folder.getTeamId() != null && folderRepository.existsByNameAndTeamId(request.getName(), folder.getTeamId())) {
+            throw new BusinessException("Name already exists.");
+        }
+
         folder.setName(request.getName());
         folder.setUpdatedBy(userId);
         folder.setUpdatedAt(LocalDateTime.now());
@@ -163,6 +179,11 @@ public class FolderServiceImpl implements FolderService {
         );
 
         folderRepository.delete(folder);
+    }
+
+    @Override
+    public boolean existsById(UUID id) {
+        return folderRepository.existsById(id);
     }
 
     @Override

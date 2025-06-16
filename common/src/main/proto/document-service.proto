@@ -85,7 +85,8 @@ message DeleteFolderRequest {
 message UploadDocumentRequest {
   string userId = 1;
   string folderId = 2;
-  bytes file = 3;
+  string name = 3;
+  bytes file = 4;
 }
 
 message DocumentResponse {
@@ -144,7 +145,6 @@ message MoveDocumentRequest {
 
 message DeleteDocumentRequest {
   string id = 1;
-  string userId = 2;
 }
 
 //Image

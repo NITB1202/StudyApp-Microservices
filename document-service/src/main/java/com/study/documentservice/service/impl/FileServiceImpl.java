@@ -4,6 +4,7 @@ import com.cloudinary.Cloudinary;
 import com.cloudinary.utils.ObjectUtils;
 import com.google.protobuf.ByteString;
 import com.study.common.exceptions.BusinessException;
+import com.study.documentservice.dto.FileResponseDto;
 import com.study.documentservice.service.FileService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -17,7 +18,7 @@ public class FileServiceImpl implements FileService {
     private final Cloudinary cloudinary;
 
     @Override
-    public String uploadFile(String folderPath, String publicId, ByteString byteString) {
+    public FileResponseDto uploadFile(String folderPath, String publicId, ByteString byteString) {
         byte[] bytes = byteString.toByteArray();
 
         Map params = ObjectUtils.asMap(
@@ -29,7 +30,13 @@ public class FileServiceImpl implements FileService {
 
         try {
             Map result = cloudinary.uploader().upload(bytes, params);
-            return result.get("secure_url").toString();
+            String url = result.get("secure_url").toString();
+            long fileSizeInBytes = ((Number) result.get("bytes")).longValue();
+
+            return FileResponseDto.builder()
+                    .url(url)
+                    .bytes(fileSizeInBytes)
+                    .build();
         }
         catch (IOException e) {
             throw new BusinessException("Error while uploading file.");

@@ -15,6 +15,7 @@ public interface FolderService {
     long getFolderCountWithKeyword(SearchFolderByNameRequest request);
     void updateFolderName(UpdateFolderNameRequest request);
     void deleteFolder(DeleteFolderRequest request);
+    boolean existsById(UUID id);
     void addDocument(UUID folderId, UUID userId, long bytes);
     void removeDocument(UUID folderId, UUID userId, long bytes);
 }
