@@ -7,18 +7,24 @@ import com.study.apigateway.dto.Team.Team.response.ListTeamResponseDto;
 import com.study.apigateway.dto.Team.Team.response.TeamDetailResponseDto;
 import com.study.apigateway.dto.Team.Team.response.TeamProfileResponseDto;
 import com.study.apigateway.dto.Team.Team.response.TeamResponseDto;
+import com.study.apigateway.grpc.DocumentServiceGrpcClient;
 import com.study.apigateway.grpc.TeamServiceGrpcClient;
 import com.study.apigateway.grpc.UserServiceGrpcClient;
 import com.study.apigateway.mapper.ActionMapper;
 import com.study.apigateway.mapper.TeamMapper;
 import com.study.apigateway.service.Team.TeamService;
+import com.study.apigateway.util.FileUtils;
+import com.study.common.exceptions.BusinessException;
 import com.study.common.grpc.ActionResponse;
+import com.study.documentservice.grpc.UploadImageResponse;
 import com.study.teamservice.grpc.ListTeamResponse;
 import com.study.teamservice.grpc.TeamDetailResponse;
 import com.study.teamservice.grpc.TeamProfileResponse;
 import com.study.teamservice.grpc.TeamResponse;
 import com.study.userservice.grpc.UserDetailResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.core.io.buffer.DataBufferUtils;
+import org.springframework.http.codec.multipart.FilePart;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
@@ -30,6 +36,8 @@ import java.util.UUID;
 public class TeamServiceImpl implements TeamService {
     private final TeamServiceGrpcClient grpcClient;
     private final UserServiceGrpcClient userClient;
+    private final DocumentServiceGrpcClient documentClient;
+    private final String AVATAR_FOLDER = "teams";
 
     @Override
     public Mono<TeamResponseDto> createTeam(UUID userId, CreateTeamRequestDto request) {
@@ -97,5 +105,25 @@ public class TeamServiceImpl implements TeamService {
             ActionResponse response = grpcClient.deleteTeam(id, userId);
             return ActionMapper.toResponseDto(response);
         }).subscribeOn(Schedulers.boundedElastic());
+    }
+
+    @Override
+    public Mono<ActionResponseDto> uploadTeamAvatar(UUID userId, UUID id, FilePart file) {
+        if(!FileUtils.isImage(file)) {
+            throw new BusinessException("Team's avatar must be an image.");
+        }
+
+        return DataBufferUtils.join(file.content())
+                .flatMap(buffer -> {
+                    byte[] bytes = new byte[buffer.readableByteCount()];
+                    buffer.read(bytes);
+                    DataBufferUtils.release(buffer);
+
+                    UploadImageResponse avatar = documentClient.uploadImage(AVATAR_FOLDER, id.toString(), bytes);
+                    ActionResponse response = grpcClient.uploadTeamAvatar(userId, id, avatar.getUrl());
+
+                    return Mono.fromCallable(() -> ActionMapper.toResponseDto(response))
+                            .subscribeOn(Schedulers.boundedElastic());
+                });
     }
 }

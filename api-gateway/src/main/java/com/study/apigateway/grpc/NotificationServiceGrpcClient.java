@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.UUID;
 
 @Service
-public class NotificationGrpcClient {
+public class NotificationServiceGrpcClient {
     @GrpcClient("notification-service")
     private NotificationServiceGrpc.NotificationServiceBlockingStub blockingStub;
 

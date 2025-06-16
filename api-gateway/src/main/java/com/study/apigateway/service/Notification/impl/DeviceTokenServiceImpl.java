@@ -2,7 +2,7 @@ package com.study.apigateway.service.Notification.impl;
 
 import com.study.apigateway.dto.Action.ActionResponseDto;
 import com.study.apigateway.dto.Notification.request.RegisterDeviceTokenRequestDto;
-import com.study.apigateway.grpc.NotificationGrpcClient;
+import com.study.apigateway.grpc.NotificationServiceGrpcClient;
 import com.study.apigateway.mapper.ActionMapper;
 import com.study.apigateway.service.Notification.DeviceTokenService;
 import com.study.common.grpc.ActionResponse;
@@ -16,7 +16,7 @@ import java.util.UUID;
 @Service
 @RequiredArgsConstructor
 public class DeviceTokenServiceImpl implements DeviceTokenService {
-    private final NotificationGrpcClient notificationGrpcClient;
+    private final NotificationServiceGrpcClient notificationGrpcClient;
 
     @Override
     public Mono<ActionResponseDto> registerDeviceToken(UUID userId, RegisterDeviceTokenRequestDto request) {

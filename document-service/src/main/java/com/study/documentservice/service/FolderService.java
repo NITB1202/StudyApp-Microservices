@@ -7,6 +7,8 @@ import java.util.List;
 import java.util.UUID;
 
 public interface FolderService {
+    boolean isFolderCreator(IsFolderCreatorRequest request);
+    UUID isTeamFolder(IsTeamFolderRequest request);
     Folder createFolder(CreateFolderRequest request);
     Folder getFolderById(GetFolderByIdRequest request);
     List<Folder> getFolders(GetFoldersRequest request);

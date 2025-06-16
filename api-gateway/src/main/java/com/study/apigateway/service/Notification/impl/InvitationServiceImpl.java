@@ -2,7 +2,7 @@ package com.study.apigateway.service.Notification.impl;
 
 import com.study.apigateway.dto.Action.ActionResponseDto;
 import com.study.apigateway.dto.Notification.response.InvitationsResponseDto;
-import com.study.apigateway.grpc.NotificationGrpcClient;
+import com.study.apigateway.grpc.NotificationServiceGrpcClient;
 import com.study.apigateway.mapper.ActionMapper;
 import com.study.apigateway.mapper.InvitationMapper;
 import com.study.apigateway.service.Notification.InvitationService;
@@ -19,7 +19,7 @@ import java.util.UUID;
 @Service
 @RequiredArgsConstructor
 public class InvitationServiceImpl implements InvitationService {
-    private final NotificationGrpcClient notificationGrpcClient;
+    private final NotificationServiceGrpcClient notificationGrpcClient;
 
     @Override
     public Mono<InvitationsResponseDto> getInvitations(UUID userId, LocalDateTime cursor, int size) {

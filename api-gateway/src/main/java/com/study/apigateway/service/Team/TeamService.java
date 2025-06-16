@@ -7,6 +7,7 @@ import com.study.apigateway.dto.Team.Team.response.ListTeamResponseDto;
 import com.study.apigateway.dto.Team.Team.response.TeamDetailResponseDto;
 import com.study.apigateway.dto.Team.Team.response.TeamProfileResponseDto;
 import com.study.apigateway.dto.Team.Team.response.TeamResponseDto;
+import org.springframework.http.codec.multipart.FilePart;
 import reactor.core.publisher.Mono;
 
 import java.util.UUID;
@@ -20,4 +21,5 @@ public interface TeamService {
     Mono<TeamResponseDto> updateTeam(UUID userId, UUID teamId, UpdateTeamRequestDto request);
     Mono<ActionResponseDto> resetTeamCode(UUID userId, UUID teamId);
     Mono<ActionResponseDto> deleteTeam(UUID id, UUID userId);
+    Mono<ActionResponseDto> uploadTeamAvatar(UUID userId, UUID id, FilePart file);
 }

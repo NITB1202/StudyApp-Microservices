@@ -1,5 +1,6 @@
 package com.study.apigateway.controller;
 
+import com.study.apigateway.dto.Action.ActionResponseDto;
 import com.study.apigateway.dto.User.request.CreateUserRequestDto;
 import com.study.apigateway.dto.User.request.UpdateUserRequestDto;
 import com.study.apigateway.dto.User.response.ListUserResponseDto;
@@ -13,7 +14,9 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.codec.multipart.FilePart;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
 
@@ -62,5 +65,16 @@ public class UserController {
     public Mono<ResponseEntity<UserResponseDto>> updateUser(@PathVariable UUID id,
                                                             @Valid @RequestBody UpdateUserRequestDto request) {
         return userService.updateUser(id, request).map(ResponseEntity::ok);
+    }
+
+    @PostMapping(value = "/avatar/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @Operation(summary = "Upload user's avatar.")
+    @ApiResponse(responseCode = "200", description = "Upload successfully.")
+    @ApiResponse(responseCode = "400", description = "Invalid request body.",
+            content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+    @ApiResponse(responseCode = "404", description = "Not found.",
+            content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+    public Mono<ResponseEntity<ActionResponseDto>> uploadUserAvatar(@PathVariable UUID id, @RequestPart("file") FilePart file) {
+        return userService.uploadUserAvatar(id, file).map(ResponseEntity::ok);
     }
 }

@@ -15,7 +15,9 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.codec.multipart.FilePart;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
 
@@ -109,5 +111,18 @@ public class TeamController {
     public Mono<ResponseEntity<ActionResponseDto>> deleteTeam(@PathVariable UUID teamId,
                                                               @RequestParam UUID userId){
         return teamService.deleteTeam(teamId, userId).map(ResponseEntity::ok);
+    }
+
+    @PostMapping(value = "/avatar/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @Operation(summary = "Upload team's avatar.")
+    @ApiResponse(responseCode = "200", description = "Upload successfully.")
+    @ApiResponse(responseCode = "400", description = "Invalid request body.",
+            content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+    @ApiResponse(responseCode = "404", description = "Not found.",
+            content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+    public Mono<ResponseEntity<ActionResponseDto>> uploadTeamAvatar(@RequestParam UUID userId,
+                                                                    @PathVariable UUID id,
+                                                                    @RequestPart("file") FilePart file) {
+        return teamService.uploadTeamAvatar(userId, id, file).map(ResponseEntity::ok);
     }
 }

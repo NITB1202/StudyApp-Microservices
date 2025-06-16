@@ -7,6 +7,8 @@ import java.util.List;
 import java.util.UUID;
 
 public interface DocumentService {
+    boolean isDocumentCreator(IsDocumentCreatorRequest request);
+    UUID inTeamFolder(InTeamFolderRequest request);
     Document uploadDocument(UploadDocumentRequest request);
     Document getDocumentById(GetDocumentByIdRequest request);
     List<Document> getDocuments(GetDocumentsRequest request);

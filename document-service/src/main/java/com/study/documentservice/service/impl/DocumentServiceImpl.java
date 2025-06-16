@@ -30,6 +30,33 @@ public class DocumentServiceImpl implements DocumentService {
     private final static int DEFAULT_SIZE = 10;
 
     @Override
+    public boolean isDocumentCreator(IsDocumentCreatorRequest request) {
+        UUID documentId = UUID.fromString(request.getDocumentId());
+        UUID userId = UUID.fromString(request.getUserId());
+
+        Document document = documentRepository.findById(documentId).orElseThrow(
+                () -> new NotFoundException("Document not found.")
+        );
+
+        return document.getCreatedBy().equals(userId);
+    }
+
+    @Override
+    public UUID inTeamFolder(InTeamFolderRequest request) {
+        UUID documentId = UUID.fromString(request.getDocumentId());
+
+        Document document = documentRepository.findById(documentId).orElseThrow(
+                () -> new NotFoundException("Document not found.")
+        );
+
+        IsTeamFolderRequest check = IsTeamFolderRequest.newBuilder()
+                .setId(document.getFolderId().toString())
+                .build();
+
+        return folderService.isTeamFolder(check);
+    }
+
+    @Override
     public Document uploadDocument(UploadDocumentRequest request) {
         UUID folderId = UUID.fromString(request.getFolderId());
         UUID userId = UUID.fromString(request.getUserId());

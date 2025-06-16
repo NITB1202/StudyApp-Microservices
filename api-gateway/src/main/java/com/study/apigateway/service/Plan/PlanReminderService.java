@@ -6,8 +6,10 @@ import com.study.apigateway.dto.Plan.Reminder.request.DeletePlanRemindersRequest
 import com.study.apigateway.dto.Plan.Reminder.request.UpdatePlanRemindersRequestDto;
 import reactor.core.publisher.Mono;
 
+import java.util.UUID;
+
 public interface PlanReminderService {
-    Mono<ActionResponseDto> addPlanReminders(AddPlanRemindersRequestDto request);
-    Mono<ActionResponseDto> updatePlanReminders(UpdatePlanRemindersRequestDto request);
-    Mono<ActionResponseDto> deletePlanReminders(DeletePlanRemindersRequestDto request);
+    Mono<ActionResponseDto> addPlanReminders(UUID userId, AddPlanRemindersRequestDto request);
+    Mono<ActionResponseDto> updatePlanReminders(UUID userId, UpdatePlanRemindersRequestDto request);
+    Mono<ActionResponseDto> deletePlanReminders(UUID userId, DeletePlanRemindersRequestDto request);
 }

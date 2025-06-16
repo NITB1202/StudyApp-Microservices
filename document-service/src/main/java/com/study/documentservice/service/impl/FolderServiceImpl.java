@@ -27,6 +27,29 @@ public class FolderServiceImpl implements FolderService {
     private static final int DEFAULT_SIZE = 10;
 
     @Override
+    public boolean isFolderCreator(IsFolderCreatorRequest request) {
+        UUID folderId = UUID.fromString(request.getFolderId());
+        UUID userId = UUID.fromString(request.getUserId());
+
+        Folder folder = folderRepository.findById(folderId).orElseThrow(
+                () -> new NotFoundException("Folder not found.")
+        );
+
+        return folder.getCreatedBy().equals(userId);
+    }
+
+    @Override
+    public UUID isTeamFolder(IsTeamFolderRequest request) {
+        UUID id = UUID.fromString(request.getId());
+
+        Folder folder = folderRepository.findById(id).orElseThrow(
+                () -> new NotFoundException("Folder not found.")
+        );
+
+        return folder.getTeamId();
+    }
+
+    @Override
     public Folder createFolder(CreateFolderRequest request) {
         UUID userId = UUID.fromString(request.getUserId());
         UUID teamId = request.getTeamId().isEmpty() ? null : UUID.fromString(request.getTeamId());
@@ -36,11 +59,8 @@ public class FolderServiceImpl implements FolderService {
             throw new BusinessException("Folder name cannot be empty.");
         }
 
-        if(teamId == null && folderRepository.existsByNameAndCreatedByAndTeamIdIsNull(request.getName(), userId)) {
-            throw new BusinessException("Folder already exists.");
-        }
-
-        if(teamId != null && folderRepository.existsByNameAndTeamId(request.getName(), teamId)) {
+        if(isPersonalFolderNameDuplicated(teamId, userId, request.getName()) ||
+                isTeamFolderNameDuplicated(teamId, request.getName())) {
             throw new BusinessException("Folder already exists.");
         }
 
@@ -159,12 +179,9 @@ public class FolderServiceImpl implements FolderService {
             throw new BusinessException("Folder name cannot be empty.");
         }
 
-        if(folder.getTeamId() == null && folderRepository.existsByNameAndCreatedByAndTeamIdIsNull(request.getName(), userId)) {
-            throw new BusinessException("Name already exists.");
-        }
-
-        if(folder.getTeamId() != null && folderRepository.existsByNameAndTeamId(request.getName(), folder.getTeamId())) {
-            throw new BusinessException("Name already exists.");
+        if(isPersonalFolderNameDuplicated(folder.getTeamId(), userId, request.getName()) ||
+                isTeamFolderNameDuplicated(folder.getTeamId(), request.getName())) {
+            throw new BusinessException("Folder already exists.");
         }
 
         folder.setName(request.getName());
@@ -187,7 +204,7 @@ public class FolderServiceImpl implements FolderService {
             usageService.decreaseUserUsage(folder.getCreatedBy(), folder.getBytes());
         }
         else {
-            usageService.decreaseTeamUsage(folder.getCreatedBy(), folder.getBytes());
+            usageService.decreaseTeamUsage(folder.getTeamId(), folder.getBytes());
         }
 
         folderRepository.delete(folder);
@@ -227,7 +244,7 @@ public class FolderServiceImpl implements FolderService {
             usageService.increaseUserUsage(folder.getCreatedBy(), bytes);
         }
         else {
-            usageService.increaseTeamUsage(folder.getCreatedBy(), bytes);
+            usageService.increaseTeamUsage(folder.getTeamId(), bytes);
         }
 
         folder.setDocumentCount(folder.getDocumentCount() + 1);
@@ -247,7 +264,7 @@ public class FolderServiceImpl implements FolderService {
             usageService.decreaseUserUsage(folder.getCreatedBy(), bytes);
         }
         else {
-            usageService.decreaseTeamUsage(folder.getCreatedBy(), bytes);
+            usageService.decreaseTeamUsage(folder.getTeamId(), bytes);
         }
 
         folder.setDocumentCount(folder.getDocumentCount() - 1);
@@ -266,5 +283,13 @@ public class FolderServiceImpl implements FolderService {
     @Override
     public void deleteAllById(List<UUID> ids) {
         folderRepository.deleteAllById(ids);
+    }
+
+    private boolean isPersonalFolderNameDuplicated(UUID teamId, UUID userId, String name) {
+        return teamId == null && folderRepository.existsByNameAndCreatedByAndTeamIdIsNull(name, userId);
+    }
+
+    private boolean isTeamFolderNameDuplicated(UUID teamId, String name) {
+        return teamId != null && folderRepository.existsByNameAndTeamId(name, teamId);
     }
 }
