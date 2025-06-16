@@ -56,7 +56,7 @@ public class MemberController {
         return memberService.getUserInTeam(userId, teamId).map(ResponseEntity::ok);
     }
 
-    @GetMapping("/list")
+    @GetMapping("/all")
     @Operation(summary = "Get a list of team members.")
     @ApiResponse(responseCode = "200", description = "Get successfully.")
     public Mono<ResponseEntity<ListTeamMemberResponseDto>> getTeamMembers(@RequestParam UUID teamId,

@@ -36,7 +36,7 @@ public class NotificationController {
         return notificationService.getNotifications(userId, cursor, size).map(ResponseEntity::ok);
     }
 
-    @GetMapping("/unread/count")
+    @GetMapping("/count/unread")
     @Operation(summary = "Get unread notifications count.")
     @ApiResponse(responseCode = "200", description = "Get successfully.")
     public Mono<ResponseEntity<UnreadNotificationCountResponseDto>> getUnreadNotificationCount(@RequestParam UUID userId) {
@@ -50,7 +50,7 @@ public class NotificationController {
         return notificationService.markNotificationsAsRead(request).map(ResponseEntity::ok);
     }
 
-    @PostMapping("/all/mark")
+    @PostMapping("/mark/all")
     @Operation(summary = "Mark all notifications as read.")
     @ApiResponse(responseCode = "200", description = "Mark successfully.")
     public Mono<ResponseEntity<ActionResponseDto>> markAllNotificationsAsRead(@RequestParam UUID userId) {
