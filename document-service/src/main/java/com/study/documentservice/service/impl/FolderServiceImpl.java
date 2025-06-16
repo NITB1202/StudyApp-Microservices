@@ -112,23 +112,26 @@ public class FolderServiceImpl implements FolderService {
     }
 
     @Override
-    public int getUserFolderCount(UUID userId) {
-        return folderRepository.countByCreatedByAndTeamIdIsNull(userId);
-    }
-
-    @Override
-    public int getTeamFolderCount(UUID teamId) {
+    public long getFolderCount(GetFoldersRequest request) {
+        if(request.getTeamId().isEmpty()) {
+            UUID userId = UUID.fromString(request.getUserId());
+            return folderRepository.countByCreatedByAndTeamIdIsNull(userId);
+        }
+        UUID teamId = UUID.fromString(request.getTeamId());
         return folderRepository.countByTeamId(teamId);
     }
 
     @Override
-    public int getUserFolderCountWithKeyword(UUID userId, String keyword) {
-        return folderRepository.countByCreatedByAndTeamIdIsNullAndNameContainingIgnoreCase(userId, keyword);
-    }
+    public long getFolderCountWithKeyword(SearchFolderByNameRequest request) {
+        String handledKeyword = request.getKeyword().trim().toLowerCase();
 
-    @Override
-    public int getTeamFolderCountWithKeyword(UUID teamId, String keyword) {
-        return folderRepository.countByTeamIdAndNameContainingIgnoreCase(teamId, keyword);
+        if(request.getTeamId().isEmpty()) {
+            UUID userId = UUID.fromString(request.getUserId());
+            return folderRepository.countByCreatedByAndTeamIdIsNullAndNameContainingIgnoreCase(userId, handledKeyword);
+        }
+
+        UUID teamId = UUID.fromString(request.getTeamId());
+        return folderRepository.countByTeamIdAndNameContainingIgnoreCase(teamId, handledKeyword);
     }
 
     @Override

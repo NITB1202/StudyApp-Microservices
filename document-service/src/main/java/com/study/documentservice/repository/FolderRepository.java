@@ -17,8 +17,8 @@ public interface FolderRepository extends JpaRepository<Folder, UUID> {
     List<Folder> findByTeamIdAndNameContainingIgnoreCase(UUID teamId, String name, Pageable pageable);
     List<Folder> findByCreatedByAndTeamIdIsNullAndNameContainingIgnoreCaseAndCreatedAtLessThan(UUID userId, String name, LocalDateTime createdAt, Pageable pageable);
     List<Folder> findByTeamIdAndNameContainingIgnoreCaseAndCreatedAtLessThan(UUID teamId, String name, LocalDateTime createdAt, Pageable pageable);
-    int countByCreatedByAndTeamIdIsNull(UUID userId);
-    int countByTeamId(UUID teamId);
-    int countByCreatedByAndTeamIdIsNullAndNameContainingIgnoreCase(UUID userId, String name);
-    int countByTeamIdAndNameContainingIgnoreCase(UUID teamId, String name);
+    long countByCreatedByAndTeamIdIsNull(UUID userId);
+    long countByTeamId(UUID teamId);
+    long countByCreatedByAndTeamIdIsNullAndNameContainingIgnoreCase(UUID userId, String name);
+    long countByTeamIdAndNameContainingIgnoreCase(UUID teamId, String name);
 }
