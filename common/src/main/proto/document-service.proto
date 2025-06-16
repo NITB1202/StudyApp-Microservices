@@ -145,6 +145,7 @@ message MoveDocumentRequest {
 
 message DeleteDocumentRequest {
   string id = 1;
+  string userId = 2;
 }
 
 //Image

@@ -6,6 +6,7 @@ import com.study.documentservice.entity.Folder;
 import com.study.documentservice.grpc.*;
 import com.study.documentservice.repository.FolderRepository;
 import com.study.documentservice.service.FolderService;
+import com.study.documentservice.service.UsageService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -20,6 +21,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class FolderServiceImpl implements FolderService {
     private final FolderRepository folderRepository;
+    private final UsageService usageService;
     private static final int DEFAULT_SIZE = 10;
 
     @Override
@@ -178,6 +180,13 @@ public class FolderServiceImpl implements FolderService {
                 () -> new NotFoundException("Folder not found.")
         );
 
+        if(folder.getTeamId() == null) {
+            usageService.decreaseUserUsage(folder.getCreatedBy(), folder.getBytes());
+        }
+        else {
+            usageService.decreaseTeamUsage(folder.getCreatedBy(), folder.getBytes());
+        }
+
         folderRepository.delete(folder);
     }
 
@@ -192,6 +201,13 @@ public class FolderServiceImpl implements FolderService {
                 () -> new NotFoundException("Folder not found.")
         );
 
+        if(folder.getTeamId() == null) {
+            usageService.increaseUserUsage(folder.getCreatedBy(), bytes);
+        }
+        else {
+            usageService.increaseTeamUsage(folder.getCreatedBy(), bytes);
+        }
+
         folder.setDocumentCount(folder.getDocumentCount() + 1);
         folder.setBytes(folder.getBytes() + bytes);
         folder.setUpdatedBy(userId);
@@ -204,6 +220,13 @@ public class FolderServiceImpl implements FolderService {
         Folder folder = folderRepository.findById(folderId).orElseThrow(
                 () -> new NotFoundException("Folder not found.")
         );
+
+        if(folder.getTeamId() == null) {
+            usageService.decreaseUserUsage(folder.getCreatedBy(), bytes);
+        }
+        else {
+            usageService.decreaseTeamUsage(folder.getCreatedBy(), bytes);
+        }
 
         folder.setDocumentCount(folder.getDocumentCount() - 1);
         folder.setBytes(folder.getBytes() - bytes);

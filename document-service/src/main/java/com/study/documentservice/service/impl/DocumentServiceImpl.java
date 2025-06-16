@@ -161,6 +161,9 @@ public class DocumentServiceImpl implements DocumentService {
         String folderPath = FOLDER_PATH + "/" + newFolderId;
         fileService.moveFile(id.toString(), folderPath);
 
+        folderService.removeDocument(document.getFolderId(), userId, document.getBytes());
+        folderService.addDocument(newFolderId, userId, document.getBytes());
+
         document.setFolderId(newFolderId);
         document.setUpdatedBy(userId);
         document.setUpdatedAt(LocalDateTime.now());
@@ -171,12 +174,14 @@ public class DocumentServiceImpl implements DocumentService {
     @Override
     public void deleteDocument(DeleteDocumentRequest request) {
         UUID id = UUID.fromString(request.getId());
+        UUID userId = UUID.fromString(request.getUserId());
 
         Document document = documentRepository.findById(id).orElseThrow(
                 () -> new NotFoundException("Document not found.")
         );
 
         fileService.deleteFile(id.toString());
+        folderService.removeDocument(document.getFolderId(), userId, document.getBytes());
         documentRepository.delete(document);
     }
 

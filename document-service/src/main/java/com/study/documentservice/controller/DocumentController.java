@@ -105,8 +105,8 @@ public class DocumentController extends DocumentServiceGrpc.DocumentServiceImplB
     @Override
     public void deleteFolder(DeleteFolderRequest request, StreamObserver<ActionResponse> responseObserver) {
         UUID id = UUID.fromString(request.getId());
-        folderService.deleteFolder(request);
         documentService.deleteAllDocuments(id);
+        folderService.deleteFolder(request);
 
         ActionResponse response = ActionResponse.newBuilder()
                 .setSuccess(true)
