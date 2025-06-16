@@ -3,8 +3,10 @@ package com.study.documentservice.mapper;
 import com.study.documentservice.entity.Folder;
 import com.study.documentservice.grpc.FolderDetailResponse;
 import com.study.documentservice.grpc.FolderResponse;
+import com.study.documentservice.grpc.FolderSummaryResponse;
 import com.study.documentservice.grpc.FoldersResponse;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class FolderMapper {
@@ -31,11 +33,20 @@ public class FolderMapper {
                 .build();
     }
 
+    public static FolderSummaryResponse toFolderSummaryResponse(Folder folder) {
+        return FolderSummaryResponse.newBuilder()
+                .setId(folder.getId().toString())
+                .setName(folder.getName())
+                .build();
+    }
+
     public static FoldersResponse toFoldersResponse(List<Folder> folders, long total, String nextCursor) {
-        List<String> names = folders.stream().map(Folder::getName).toList();
+        List<FolderSummaryResponse> responses = folders.stream()
+                .map(FolderMapper::toFolderSummaryResponse)
+                .toList();
 
         return FoldersResponse.newBuilder()
-                .addAllNames(names)
+                .addAllFolders(responses)
                 .setTotal(total)
                 .setNextCursor(nextCursor)
                 .build();

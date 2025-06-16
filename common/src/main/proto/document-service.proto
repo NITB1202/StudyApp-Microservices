@@ -75,8 +75,13 @@ message GetFoldersRequest {
   int32 size = 4;
 }
 
+message FolderSummaryResponse {
+  string id = 1;
+  string name = 2;
+}
+
 message FoldersResponse {
-  repeated string names = 1;
+  repeated FolderSummaryResponse folders = 1;
   int64 total = 2;
   string nextCursor = 3;
 }
