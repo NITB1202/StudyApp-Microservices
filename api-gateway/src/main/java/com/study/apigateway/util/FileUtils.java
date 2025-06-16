@@ -1,8 +1,9 @@
 package com.study.apigateway.util;
 
+import org.springframework.http.MediaType;
 import org.springframework.http.codec.multipart.FilePart;
 
-public class FileUtil {
+public class FileUtils {
 
     public static boolean isDocument(FilePart filePart) {
         String filename = filePart.filename().toLowerCase();
@@ -14,6 +15,16 @@ public class FileUtil {
                 filename.endsWith(".ppt") ||
                 filename.endsWith(".pptx") ||
                 filename.endsWith(".txt");
+    }
+
+    public static boolean isImage(FilePart file) {
+        MediaType mediaType = file.headers().getContentType();
+
+        String contentType = mediaType != null
+                ? mediaType.toString()
+                : "";
+
+        return contentType.startsWith("image/");
     }
 
 }
