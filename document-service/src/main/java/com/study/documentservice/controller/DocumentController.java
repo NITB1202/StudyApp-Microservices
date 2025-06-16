@@ -1,7 +1,11 @@
 package com.study.documentservice.controller;
 
 import com.study.common.grpc.ActionResponse;
+import com.study.documentservice.entity.TeamUsage;
+import com.study.documentservice.entity.UserUsage;
 import com.study.documentservice.grpc.*;
+import com.study.documentservice.mapper.UsageMapper;
+import com.study.documentservice.service.UsageService;
 import io.grpc.stub.StreamObserver;
 import lombok.RequiredArgsConstructor;
 import net.devh.boot.grpc.server.service.GrpcService;
@@ -9,17 +13,23 @@ import net.devh.boot.grpc.server.service.GrpcService;
 @GrpcService
 @RequiredArgsConstructor
 public class DocumentController extends DocumentServiceGrpc.DocumentServiceImplBase {
-
+    private final UsageService usageService;
 
     //Usage
     @Override
     public void getUserUsage(GetUserUsageRequest request, StreamObserver<UsageResponse> responseObserver) {
-
+        UserUsage usage = usageService.getUserUsage(request);
+        UsageResponse response = UsageMapper.toUsageResponse(usage);
+        responseObserver.onNext(response);
+        responseObserver.onCompleted();
     }
 
     @Override
     public void getTeamUsage(GetTeamUsageRequest request, StreamObserver<UsageResponse> responseObserver) {
-
+        TeamUsage usage = usageService.getTeamUsage(request);
+        UsageResponse response = UsageMapper.toUsageResponse(usage);
+        responseObserver.onNext(response);
+        responseObserver.onCompleted();
     }
 
     //Folder
