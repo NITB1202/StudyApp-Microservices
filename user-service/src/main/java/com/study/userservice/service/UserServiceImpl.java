@@ -1,9 +1,11 @@
 package com.study.userservice.service;
 
+import com.study.common.events.User.UserCreatedEvent;
 import com.study.common.exceptions.BusinessException;
 import com.study.common.exceptions.NotFoundException;
 import com.study.common.mappers.GenderMapper;
 import com.study.userservice.enity.User;
+import com.study.userservice.event.UserEventPublisher;
 import com.study.userservice.grpc.*;
 import com.study.userservice.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -21,6 +23,8 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
+    private final UserEventPublisher publisher;
+    private final static String CREATE_TOPIC = "user-created";
 
     @Override
     public User createUser(CreateUserRequest request) {
@@ -41,7 +45,15 @@ public class UserServiceImpl implements UserService {
                 .avatarUrl("")
                 .build();
 
-        return userRepository.save(user);
+        userRepository.save(user);
+
+        UserCreatedEvent event = UserCreatedEvent.builder()
+                .userId(user.getId())
+                .build();
+
+        publisher.publishEvent(CREATE_TOPIC, event);
+
+        return user;
     }
 
     @Override
