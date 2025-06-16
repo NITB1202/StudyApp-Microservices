@@ -36,6 +36,7 @@ public class FolderMapper {
         return FolderSummaryResponse.newBuilder()
                 .setId(folder.getId().toString())
                 .setName(folder.getName())
+                .setDocumentCount(folder.getDocumentCount())
                 .build();
     }
 
