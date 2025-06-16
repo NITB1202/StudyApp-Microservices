@@ -2,7 +2,7 @@ package com.study.apigateway.service.Notification.impl;
 
 import com.study.apigateway.dto.Notification.request.UpdateTeamNotificationSettingsRequestDto;
 import com.study.apigateway.dto.Notification.response.TeamNotificationSettingsResponseDto;
-import com.study.apigateway.grpc.NotificationGrpcClient;
+import com.study.apigateway.grpc.NotificationServiceGrpcClient;
 import com.study.apigateway.mapper.TeamNotificationSettingsMapper;
 import com.study.apigateway.service.Notification.TeamNotificationSettingsService;
 import com.study.notificationservice.grpc.TeamNotificationSettingsResponse;
@@ -16,7 +16,7 @@ import java.util.UUID;
 @Service
 @RequiredArgsConstructor
 public class TeamNotificationSettingsServiceImpl implements TeamNotificationSettingsService {
-    private final NotificationGrpcClient grpcClient;
+    private final NotificationServiceGrpcClient grpcClient;
 
     @Override
     public Mono<TeamNotificationSettingsResponseDto> getTeamNotificationSettings(UUID userId, UUID teamId) {

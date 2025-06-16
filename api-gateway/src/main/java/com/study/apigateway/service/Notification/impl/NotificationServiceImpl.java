@@ -5,7 +5,7 @@ import com.study.apigateway.dto.Notification.request.DeleteNotificationsRequestD
 import com.study.apigateway.dto.Notification.request.MarkNotificationsAsReadRequestDto;
 import com.study.apigateway.dto.Notification.response.NotificationsResponseDto;
 import com.study.apigateway.dto.Notification.response.UnreadNotificationCountResponseDto;
-import com.study.apigateway.grpc.NotificationGrpcClient;
+import com.study.apigateway.grpc.NotificationServiceGrpcClient;
 import com.study.apigateway.mapper.ActionMapper;
 import com.study.apigateway.mapper.NotificationMapper;
 import com.study.apigateway.service.Notification.NotificationService;
@@ -23,7 +23,7 @@ import java.util.UUID;
 @Service
 @RequiredArgsConstructor
 public class NotificationServiceImpl implements NotificationService {
-    private final NotificationGrpcClient notificationGrpcClient;
+    private final NotificationServiceGrpcClient notificationGrpcClient;
 
     @Override
     public Mono<NotificationsResponseDto> getNotifications(UUID userId, LocalDateTime cursor, int size) {
