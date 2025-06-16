@@ -26,7 +26,7 @@ public class FolderDetailResponseDto {
     private String updatedBy;
 
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
-    private String updatedAt;
+    private LocalDateTime updatedAt;
 
     private long bytes;
 

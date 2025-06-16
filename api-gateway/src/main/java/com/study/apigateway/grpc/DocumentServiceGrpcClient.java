@@ -1,6 +1,7 @@
 package com.study.apigateway.grpc;
 
 import com.google.protobuf.ByteString;
+import com.study.apigateway.dto.Document.Folder.request.CreateFolderRequestDto;
 import com.study.common.grpc.ActionResponse;
 import com.study.documentservice.grpc.*;
 import net.devh.boot.grpc.client.inject.GrpcClient;
@@ -49,13 +50,13 @@ public class DocumentServiceGrpcClient {
         return blockingStub.isTeamFolder(request);
     }
 
-    public FolderResponse createFolder(UUID userId, UUID teamId, String name) {
+    public FolderResponse createFolder(UUID userId, UUID teamId, CreateFolderRequestDto dto) {
         String teamIdStr = teamId != null ? teamId.toString() : "";
 
         CreateFolderRequest request = CreateFolderRequest.newBuilder()
                 .setUserId(userId.toString())
                 .setTeamId(teamIdStr)
-                .setName(name)
+                .setName(dto.getName())
                 .build();
 
         return blockingStub.createFolder(request);
