@@ -78,6 +78,7 @@ message GetFoldersRequest {
 message FolderSummaryResponse {
   string id = 1;
   string name = 2;
+  int32 documentCount = 3;
 }
 
 message FoldersResponse {

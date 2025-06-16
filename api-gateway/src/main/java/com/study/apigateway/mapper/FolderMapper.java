@@ -42,6 +42,7 @@ public class FolderMapper {
         return FolderSummaryResponseDto.builder()
                 .id(UUID.fromString(folder.getId()))
                 .name(folder.getName())
+                .documentCount(folder.getDocumentCount())
                 .build();
     }
 

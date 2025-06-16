@@ -15,4 +15,6 @@ public class FolderSummaryResponseDto {
     private UUID id;
 
     private String name;
+
+    private int documentCount;
 }
