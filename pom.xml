@@ -20,6 +20,7 @@
         <module>team-service</module>
         <module>plan-service</module>
         <module>notification-service</module>
+        <module>document-service</module>
         <module>api-gateway</module>
     </modules>
 

@@ -1,0 +1,186 @@
+syntax = "proto3";
+
+package document;
+
+import "common.proto";
+
+option java_multiple_files = true;
+option java_package = "com.study.documentservice.grpc";
+option java_outer_classname = "DocumentProto";
+
+//Usage
+message GetUserUsageRequest {
+  string userId = 1;
+}
+
+message UsageResponse {
+  int64 used = 1;
+  int64 total = 2;
+}
+
+message GetTeamUsageRequest {
+  string teamId = 1;
+}
+
+//Folder
+message CreateFolderRequest {
+  string userId = 1;
+  string name = 2;
+  string teamId = 3;
+}
+
+message FolderResponse {
+  string id = 1;
+  string name = 2;
+  int32 documentCount = 3;
+}
+
+message GetFolderByIdRequest {
+  string id = 1;
+}
+
+message FolderDetailResponse {
+  string id = 1;
+  string name = 2;
+  string createdBy = 3;
+  string createdAt = 4;
+  string updatedBy = 5;
+  string updatedAt = 6;
+  int64 bytes = 7;
+  int32 documentCount = 8;
+}
+
+message GetFoldersRequest {
+  string userId = 1;
+  string teamId = 2;
+  string cursor = 3;
+  int32 size = 4;
+}
+
+message FoldersResponse {
+  repeated string names = 1;
+  int64 total = 2;
+  string nextCursor = 3;
+}
+
+message SearchFolderByNameRequest {
+  string userId = 1;
+  string teamId = 2;
+  string keyword = 3;
+  string cursor = 4;
+  int32 size = 5;
+}
+
+message UpdateFolderNameRequest {
+  string id = 1;
+  string userId = 2;
+  string name = 3;
+}
+
+message DeleteFolderRequest {
+  string id = 1;
+}
+
+//Document
+message UploadDocumentRequest {
+  string userId = 1;
+  string folderId = 2;
+  string name = 3;
+  bytes file = 4;
+}
+
+message DocumentResponse {
+  string id = 1;
+  string name = 2;
+  string url = 3;
+  string updatedAt = 4;
+  int64 bytes = 5;
+}
+
+message GetDocumentByIdRequest {
+  string id = 1;
+}
+
+message DocumentDetailResponse {
+  string id = 1;
+  string name = 2;
+  string createdBy = 3;
+  string createdAt = 4;
+  string updatedBy = 5;
+  string updatedAt = 6;
+  int64 bytes = 7;
+  string url = 8;
+}
+
+message GetDocumentsRequest {
+  string folderId = 1;
+  string cursor = 2;
+  int32 size = 3;
+}
+
+message DocumentsResponse {
+  repeated DocumentResponse documents = 1;
+  int64 total = 2;
+  string nextCursor = 3;
+}
+
+message SearchDocumentByNameRequest {
+  string folderId = 1;
+  string keyword = 2;
+  string cursor = 3;
+  int32 size = 4;
+}
+
+message UpdateDocumentNameRequest {
+  string id = 1;
+  string userId = 2;
+  string name = 3;
+}
+
+message MoveDocumentRequest {
+  string id = 1;
+  string userId = 2;
+  string newFolderId = 3;
+}
+
+message DeleteDocumentRequest {
+  string id = 1;
+  string userId = 2;
+}
+
+//Image
+message UploadImageRequest {
+  string folder_path = 1;
+  string public_id = 2;
+  bytes file = 3;
+}
+
+message UploadImageResponse {
+  string url = 1;
+}
+
+service DocumentService {
+  //Usage
+  rpc GetUserUsage(GetUserUsageRequest) returns (UsageResponse);
+  rpc GetTeamUsage(GetTeamUsageRequest) returns (UsageResponse);
+
+  //Folder
+  rpc CreateFolder(CreateFolderRequest) returns (FolderResponse);
+  rpc GetFolderById(GetFolderByIdRequest) returns (FolderDetailResponse);
+  rpc GetFolders(GetFoldersRequest) returns (FoldersResponse);
+  rpc SearchFolderByName(SearchFolderByNameRequest) returns (FoldersResponse);
+  rpc UpdateFolderName(UpdateFolderNameRequest) returns (common.ActionResponse);
+  rpc DeleteFolder(DeleteFolderRequest) returns (common.ActionResponse);
+
+  //Document
+  rpc UploadDocument(UploadDocumentRequest) returns (DocumentResponse);
+  rpc GetDocumentById(GetDocumentByIdRequest) returns (DocumentDetailResponse);
+  rpc GetDocuments(GetDocumentsRequest) returns (DocumentsResponse);
+  rpc SearchDocumentByName(SearchDocumentByNameRequest) returns (DocumentsResponse);
+  rpc UpdateDocumentName(UpdateDocumentNameRequest) returns (common.ActionResponse);
+  rpc MoveDocument(MoveDocumentRequest) returns (common.ActionResponse);
+  rpc DeleteDocument(DeleteDocumentRequest) returns (common.ActionResponse);
+
+  //Image
+  rpc UploadImage(UploadImageRequest) returns (UploadImageResponse);
+}
