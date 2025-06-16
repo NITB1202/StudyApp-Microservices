@@ -16,6 +16,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
 
+import java.util.UUID;
+
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/reminders")
@@ -27,8 +29,9 @@ public class PlanReminderController {
     @ApiResponse(responseCode = "200", description = "Add successfully.")
     @ApiResponse(responseCode = "400", description = "Invalid request body.",
             content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
-    public Mono<ResponseEntity<ActionResponseDto>> addPlanReminders(@Valid @RequestBody AddPlanRemindersRequestDto request) {
-        return planReminderService.addPlanReminders(request).map(ResponseEntity::ok);
+    public Mono<ResponseEntity<ActionResponseDto>> addPlanReminders(@RequestParam UUID userId,
+                                                                    @Valid @RequestBody AddPlanRemindersRequestDto request) {
+        return planReminderService.addPlanReminders(userId, request).map(ResponseEntity::ok);
     }
 
     @PatchMapping
@@ -38,8 +41,9 @@ public class PlanReminderController {
             content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     @ApiResponse(responseCode = "404", description = "Not found.",
             content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
-    public Mono<ResponseEntity<ActionResponseDto>> updatePlanReminders(@Valid @RequestBody UpdatePlanRemindersRequestDto request) {
-        return planReminderService.updatePlanReminders(request).map(ResponseEntity::ok);
+    public Mono<ResponseEntity<ActionResponseDto>> updatePlanReminders(@RequestParam UUID userId,
+                                                                       @Valid @RequestBody UpdatePlanRemindersRequestDto request) {
+        return planReminderService.updatePlanReminders(userId, request).map(ResponseEntity::ok);
     }
 
     @DeleteMapping
@@ -49,7 +53,8 @@ public class PlanReminderController {
             content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     @ApiResponse(responseCode = "404", description = "Not found.",
             content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
-    public Mono<ResponseEntity<ActionResponseDto>> deletePlanReminders(@Valid @RequestBody DeletePlanRemindersRequestDto request) {
-        return planReminderService.deletePlanReminders(request).map(ResponseEntity::ok);
+    public Mono<ResponseEntity<ActionResponseDto>> deletePlanReminders(@RequestParam UUID userId,
+                                                                       @Valid @RequestBody DeletePlanRemindersRequestDto request) {
+        return planReminderService.deletePlanReminders(userId, request).map(ResponseEntity::ok);
     }
 }
