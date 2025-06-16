@@ -6,7 +6,6 @@ import com.study.documentservice.grpc.FolderResponse;
 import com.study.documentservice.grpc.FolderSummaryResponse;
 import com.study.documentservice.grpc.FoldersResponse;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class FolderMapper {
