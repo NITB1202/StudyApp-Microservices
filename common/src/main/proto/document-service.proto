@@ -23,6 +23,24 @@ message GetTeamUsageRequest {
 }
 
 //Folder
+message IsFolderCreatorRequest {
+  string userId = 1;
+  string folderId = 2;
+}
+
+message IsFolderCreatorResponse {
+  bool isFolderCreator = 1;
+}
+
+message IsTeamFolderRequest {
+  string id = 1;
+}
+
+message IsTeamFolderResponse {
+  bool isTeamFolder = 1;
+  string teamId = 2;
+}
+
 message CreateFolderRequest {
   string userId = 1;
   string name = 2;
@@ -82,6 +100,15 @@ message DeleteFolderRequest {
 }
 
 //Document
+message IsDocumentCreatorRequest {
+  string userId = 1;
+  string documentId = 2;
+}
+
+message IsDocumentCreatorResponse {
+  bool isDocumentCreator = 1;
+}
+
 message UploadDocumentRequest {
   string userId = 1;
   string folderId = 2;
@@ -165,6 +192,8 @@ service DocumentService {
   rpc GetTeamUsage(GetTeamUsageRequest) returns (UsageResponse);
 
   //Folder
+  rpc IsFolderCreator(IsFolderCreatorRequest) returns (IsFolderCreatorResponse);
+  rpc IsTeamFolder(IsTeamFolderRequest) returns (IsTeamFolderResponse);
   rpc CreateFolder(CreateFolderRequest) returns (FolderResponse);
   rpc GetFolderById(GetFolderByIdRequest) returns (FolderDetailResponse);
   rpc GetFolders(GetFoldersRequest) returns (FoldersResponse);
@@ -173,6 +202,7 @@ service DocumentService {
   rpc DeleteFolder(DeleteFolderRequest) returns (common.ActionResponse);
 
   //Document
+  rpc IsDocumentCreator(IsDocumentCreatorRequest) returns (IsDocumentCreatorResponse);
   rpc UploadDocument(UploadDocumentRequest) returns (DocumentResponse);
   rpc GetDocumentById(GetDocumentByIdRequest) returns (DocumentDetailResponse);
   rpc GetDocuments(GetDocumentsRequest) returns (DocumentsResponse);

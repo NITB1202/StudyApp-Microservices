@@ -32,6 +32,23 @@ public class DocumentServiceGrpcClient {
     }
 
     //Folder
+    public boolean isFolderCreator(UUID userId, UUID folderId) {
+        IsFolderCreatorRequest request = IsFolderCreatorRequest.newBuilder()
+                .setUserId(userId.toString())
+                .setFolderId(folderId.toString())
+                .build();
+
+        return blockingStub.isFolderCreator(request).getIsFolderCreator();
+    }
+
+    public IsTeamFolderResponse isTeamFolder(UUID folderId) {
+        IsTeamFolderRequest request = IsTeamFolderRequest.newBuilder()
+                .setId(folderId.toString())
+                .build();
+
+        return blockingStub.isTeamFolder(request);
+    }
+
     public FolderResponse createFolder(UUID userId, UUID teamId, String name) {
         String teamIdStr = teamId != null ? teamId.toString() : "";
 
@@ -102,6 +119,15 @@ public class DocumentServiceGrpcClient {
     }
 
     //Document
+    public boolean isDocumentCreator(UUID userId, UUID documentId) {
+        IsDocumentCreatorRequest request = IsDocumentCreatorRequest.newBuilder()
+                .setUserId(userId.toString())
+                .setDocumentId(documentId.toString())
+                .build();
+
+        return blockingStub.isDocumentCreator(request).getIsDocumentCreator();
+    }
+
     public DocumentResponse uploadDocument(UUID userId, UUID folderId, String name, byte[] file) {
         ByteString byteString = ByteString.copyFrom(file);
 

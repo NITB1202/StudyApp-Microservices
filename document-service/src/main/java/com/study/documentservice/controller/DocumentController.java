@@ -48,6 +48,32 @@ public class DocumentController extends DocumentServiceGrpc.DocumentServiceImplB
 
     //Folder
     @Override
+    public void isFolderCreator(IsFolderCreatorRequest request, StreamObserver<IsFolderCreatorResponse> responseObserver) {
+        boolean isFolderCreator = folderService.isFolderCreator(request);
+
+        IsFolderCreatorResponse response = IsFolderCreatorResponse.newBuilder()
+                .setIsFolderCreator(isFolderCreator)
+                .build();
+
+        responseObserver.onNext(response);
+        responseObserver.onCompleted();
+    }
+
+    @Override
+    public void isTeamFolder(IsTeamFolderRequest request, StreamObserver<IsTeamFolderResponse> responseObserver) {
+        UUID teamId = folderService.isTeamFolder(request);
+        String teamIdStr = teamId != null ? teamId.toString() : "";
+
+        IsTeamFolderResponse response = IsTeamFolderResponse.newBuilder()
+                .setIsTeamFolder(teamId != null)
+                .setTeamId(teamIdStr)
+                .build();
+
+        responseObserver.onNext(response);
+        responseObserver.onCompleted();
+    }
+
+    @Override
     public void createFolder(CreateFolderRequest request, StreamObserver<FolderResponse> responseObserver) {
         Folder folder = folderService.createFolder(request);
         FolderResponse response = FolderMapper.toFolderResponse(folder);
@@ -118,6 +144,18 @@ public class DocumentController extends DocumentServiceGrpc.DocumentServiceImplB
     }
 
     //Document
+    @Override
+    public void isDocumentCreator(IsDocumentCreatorRequest request, StreamObserver<IsDocumentCreatorResponse> responseObserver) {
+        boolean isDocumentCreator = documentService.isDocumentCreator(request);
+
+        IsDocumentCreatorResponse response = IsDocumentCreatorResponse.newBuilder()
+                .setIsDocumentCreator(isDocumentCreator)
+                .build();
+
+        responseObserver.onNext(response);
+        responseObserver.onCompleted();
+    }
+
     @Override
     public void uploadDocument(UploadDocumentRequest request, StreamObserver<DocumentResponse> responseObserver) {
         Document document = documentService.uploadDocument(request);
