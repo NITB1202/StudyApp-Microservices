@@ -234,4 +234,15 @@ public class FolderServiceImpl implements FolderService {
         folder.setUpdatedAt(LocalDateTime.now());
         folderRepository.save(folder);
     }
+
+    @Override
+    public List<UUID> getAllIdsByTeamId(UUID teamId) {
+        List<Folder> folders = folderRepository.findByTeamId(teamId);
+        return folders.stream().map(Folder::getId).toList();
+    }
+
+    @Override
+    public void deleteAllById(List<UUID> ids) {
+        folderRepository.deleteAllById(ids);
+    }
 }

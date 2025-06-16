@@ -115,4 +115,9 @@ public class UsageServiceImpl implements UsageService {
         usage.setUsed(usage.getUsed() - bytes);
         teamUsageRepository.save(usage);
     }
+
+    @Override
+    public void deleteTeamUsage(UUID teamId) {
+        teamUsageRepository.deleteById(teamId);
+    }
 }

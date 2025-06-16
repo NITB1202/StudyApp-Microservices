@@ -12,6 +12,7 @@ public interface FolderRepository extends JpaRepository<Folder, UUID> {
     boolean existsByNameAndCreatedByAndTeamIdIsNull(String name, UUID createdBy);
     boolean existsByNameAndTeamId(String name, UUID teamId);
     List<Folder> findByCreatedByAndTeamIdIsNull(UUID userId, Pageable pageable);
+    List<Folder> findByTeamId(UUID teamId);
     List<Folder> findByTeamId(UUID teamId, Pageable pageable);
     List<Folder> findByCreatedByAndTeamIdIsNullAndCreatedAtLessThan(UUID userId, LocalDateTime createdAt, Pageable pageable);
     List<Folder> findByTeamIdAndCreatedAtLessThan(UUID teamId, LocalDateTime createdAt, Pageable pageable);

@@ -16,4 +16,5 @@ public interface UsageService {
     void increaseTeamUsage(UUID teamId, long bytes);
     void decreaseUserUsage(UUID userId, long bytes);
     void decreaseTeamUsage(UUID teamId, long bytes);
+    void deleteTeamUsage(UUID teamId);
 }
