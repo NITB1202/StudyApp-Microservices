@@ -46,7 +46,12 @@ public class FileServiceImpl implements FileService {
     @Override
     public void moveFile(String publicId, String newFolder) {
         try {
-            cloudinary.api().update(publicId,ObjectUtils.asMap("asset_folder", newFolder));
+            Map params =  ObjectUtils.asMap(
+                    "asset_folder", newFolder,
+                    "resource_type", "raw"
+            );
+
+            cloudinary.api().update(publicId, params);
         } catch (Exception e) {
             throw new BusinessException("Error while moving file.");
         }
@@ -55,7 +60,7 @@ public class FileServiceImpl implements FileService {
     @Override
     public void deleteFile(String publicId) {
         try {
-            cloudinary.uploader().destroy(publicId, ObjectUtils.emptyMap());
+            cloudinary.uploader().destroy(publicId, ObjectUtils.asMap("resource_type", "raw"));
         }
         catch (IOException e) {
             throw new BusinessException("Error while deleting file.");

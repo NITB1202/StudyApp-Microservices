@@ -9,6 +9,7 @@ import com.study.documentservice.repository.DocumentRepository;
 import com.study.documentservice.service.DocumentService;
 import com.study.documentservice.service.FileService;
 import com.study.documentservice.service.FolderService;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -150,12 +151,8 @@ public class DocumentServiceImpl implements DocumentService {
                 () -> new NotFoundException("Document not found.")
         );
 
-        if(!folderService.existsById(newFolderId)) {
-            throw new NotFoundException("Folder not found.");
-        }
-
-        if(document.getFolderId().equals(newFolderId)) {
-            throw new BusinessException("Document already exists in the folder.");
+        if(!folderService.validateMoveDocument(document.getFolderId(), newFolderId)) {
+            throw new BusinessException("Invalid folder.");
         }
 
         String folderPath = FOLDER_PATH + "/" + newFolderId;
@@ -172,6 +169,7 @@ public class DocumentServiceImpl implements DocumentService {
     }
 
     @Override
+    @Transactional
     public void deleteDocument(DeleteDocumentRequest request) {
         UUID id = UUID.fromString(request.getId());
         UUID userId = UUID.fromString(request.getUserId());
@@ -186,6 +184,7 @@ public class DocumentServiceImpl implements DocumentService {
     }
 
     @Override
+    @Transactional
     public void deleteAllDocuments(UUID folderId) {
         documentRepository.deleteAllByFolderId(folderId);
     }

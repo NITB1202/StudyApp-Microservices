@@ -7,6 +7,7 @@ import com.study.documentservice.grpc.*;
 import com.study.documentservice.repository.FolderRepository;
 import com.study.documentservice.service.FolderService;
 import com.study.documentservice.service.UsageService;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -15,6 +16,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 
 @Service
@@ -173,6 +175,7 @@ public class FolderServiceImpl implements FolderService {
     }
 
     @Override
+    @Transactional
     public void deleteFolder(DeleteFolderRequest request) {
         UUID id = UUID.fromString(request.getId());
 
@@ -193,6 +196,25 @@ public class FolderServiceImpl implements FolderService {
     @Override
     public boolean existsById(UUID id) {
         return folderRepository.existsById(id);
+    }
+
+    @Override
+    public boolean validateMoveDocument(UUID oldFolderId, UUID newFolderId) {
+        if(oldFolderId.equals(newFolderId)) return false;
+
+        Folder oldFolder = folderRepository.findById(oldFolderId).orElseThrow(
+                ()-> new NotFoundException("Folder with id " + oldFolderId + " doesn't exist.")
+        );
+
+        Folder newFolder = folderRepository.findById(newFolderId).orElseThrow(
+                () -> new NotFoundException("Folder with id " + newFolderId + " doesn't exist.")
+        );
+
+        if (!Objects.equals(oldFolder.getTeamId(), newFolder.getTeamId())) {
+            return false;
+        }
+
+        return oldFolder.getTeamId() != null || oldFolder.getCreatedBy().equals(newFolder.getCreatedBy());
     }
 
     @Override

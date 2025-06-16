@@ -16,6 +16,7 @@ public interface FolderService {
     void updateFolderName(UpdateFolderNameRequest request);
     void deleteFolder(DeleteFolderRequest request);
     boolean existsById(UUID id);
+    boolean validateMoveDocument(UUID oldFolderId, UUID newFolderId);
     void addDocument(UUID folderId, UUID userId, long bytes);
     void removeDocument(UUID folderId, UUID userId, long bytes);
     List<UUID> getAllIdsByTeamId(UUID teamId);
