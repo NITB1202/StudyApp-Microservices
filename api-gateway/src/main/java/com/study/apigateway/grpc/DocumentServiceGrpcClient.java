@@ -42,7 +42,7 @@ public class DocumentServiceGrpcClient {
         return blockingStub.isFolderCreator(request).getIsFolderCreator();
     }
 
-    public IsTeamFolderResponse isTeamFolder(UUID folderId) {
+    public TeamFolderResponse isTeamFolder(UUID folderId) {
         IsTeamFolderRequest request = IsTeamFolderRequest.newBuilder()
                 .setId(folderId.toString())
                 .build();
@@ -127,6 +127,14 @@ public class DocumentServiceGrpcClient {
                 .build();
 
         return blockingStub.isDocumentCreator(request).getIsDocumentCreator();
+    }
+
+    public TeamFolderResponse inTeamFolder(UUID documentId) {
+        InTeamFolderRequest request = InTeamFolderRequest.newBuilder()
+                .setDocumentId(documentId.toString())
+                .build();
+
+        return blockingStub.inTeamFolder(request);
     }
 
     public DocumentResponse uploadDocument(UUID userId, UUID folderId, String name, byte[] file) {

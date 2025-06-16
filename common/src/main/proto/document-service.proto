@@ -36,7 +36,7 @@ message IsTeamFolderRequest {
   string id = 1;
 }
 
-message IsTeamFolderResponse {
+message TeamFolderResponse {
   bool isTeamFolder = 1;
   string teamId = 2;
 }
@@ -112,6 +112,10 @@ message IsDocumentCreatorRequest {
 
 message IsDocumentCreatorResponse {
   bool isDocumentCreator = 1;
+}
+
+message InTeamFolderRequest {
+  string documentId = 1;
 }
 
 message UploadDocumentRequest {
@@ -198,7 +202,7 @@ service DocumentService {
 
   //Folder
   rpc IsFolderCreator(IsFolderCreatorRequest) returns (IsFolderCreatorResponse);
-  rpc IsTeamFolder(IsTeamFolderRequest) returns (IsTeamFolderResponse);
+  rpc IsTeamFolder(IsTeamFolderRequest) returns (TeamFolderResponse);
   rpc CreateFolder(CreateFolderRequest) returns (FolderResponse);
   rpc GetFolderById(GetFolderByIdRequest) returns (FolderDetailResponse);
   rpc GetFolders(GetFoldersRequest) returns (FoldersResponse);
@@ -208,6 +212,7 @@ service DocumentService {
 
   //Document
   rpc IsDocumentCreator(IsDocumentCreatorRequest) returns (IsDocumentCreatorResponse);
+  rpc InTeamFolder(InTeamFolderRequest) returns (TeamFolderResponse);
   rpc UploadDocument(UploadDocumentRequest) returns (DocumentResponse);
   rpc GetDocumentById(GetDocumentByIdRequest) returns (DocumentDetailResponse);
   rpc GetDocuments(GetDocumentsRequest) returns (DocumentsResponse);

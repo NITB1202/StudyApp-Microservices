@@ -16,7 +16,7 @@ import com.study.common.grpc.ActionResponse;
 import com.study.documentservice.grpc.FolderDetailResponse;
 import com.study.documentservice.grpc.FolderResponse;
 import com.study.documentservice.grpc.FoldersResponse;
-import com.study.documentservice.grpc.IsTeamFolderResponse;
+import com.study.documentservice.grpc.TeamFolderResponse;
 import com.study.userservice.grpc.UserDetailResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -117,7 +117,7 @@ public class FolderServiceImpl implements FolderService {
 
     private void validateUpdateFolder(UUID userId, UUID folderId) {
         if(!documentClient.isFolderCreator(userId, folderId)) {
-            IsTeamFolderResponse check = documentClient.isTeamFolder(folderId);
+            TeamFolderResponse check = documentClient.isTeamFolder(folderId);
 
             if(!check.getIsTeamFolder()) {
                 throw new BusinessException("You can't update other's folder.");

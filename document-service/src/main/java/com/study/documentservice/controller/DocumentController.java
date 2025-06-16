@@ -60,11 +60,11 @@ public class DocumentController extends DocumentServiceGrpc.DocumentServiceImplB
     }
 
     @Override
-    public void isTeamFolder(IsTeamFolderRequest request, StreamObserver<IsTeamFolderResponse> responseObserver) {
+    public void isTeamFolder(IsTeamFolderRequest request, StreamObserver<TeamFolderResponse> responseObserver) {
         UUID teamId = folderService.isTeamFolder(request);
         String teamIdStr = teamId != null ? teamId.toString() : "";
 
-        IsTeamFolderResponse response = IsTeamFolderResponse.newBuilder()
+        TeamFolderResponse response = TeamFolderResponse.newBuilder()
                 .setIsTeamFolder(teamId != null)
                 .setTeamId(teamIdStr)
                 .build();
@@ -150,6 +150,20 @@ public class DocumentController extends DocumentServiceGrpc.DocumentServiceImplB
 
         IsDocumentCreatorResponse response = IsDocumentCreatorResponse.newBuilder()
                 .setIsDocumentCreator(isDocumentCreator)
+                .build();
+
+        responseObserver.onNext(response);
+        responseObserver.onCompleted();
+    }
+
+    @Override
+    public void inTeamFolder(InTeamFolderRequest request, StreamObserver<TeamFolderResponse> responseObserver) {
+        UUID teamId = documentService.inTeamFolder(request);
+        String teamIdStr = teamId != null ? teamId.toString() : "";
+
+        TeamFolderResponse response = TeamFolderResponse.newBuilder()
+                .setIsTeamFolder(teamId != null)
+                .setTeamId(teamIdStr)
                 .build();
 
         responseObserver.onNext(response);

@@ -42,6 +42,21 @@ public class DocumentServiceImpl implements DocumentService {
     }
 
     @Override
+    public UUID inTeamFolder(InTeamFolderRequest request) {
+        UUID documentId = UUID.fromString(request.getDocumentId());
+
+        Document document = documentRepository.findById(documentId).orElseThrow(
+                () -> new NotFoundException("Document not found.")
+        );
+
+        IsTeamFolderRequest check = IsTeamFolderRequest.newBuilder()
+                .setId(document.getFolderId().toString())
+                .build();
+
+        return folderService.isTeamFolder(check);
+    }
+
+    @Override
     public Document uploadDocument(UploadDocumentRequest request) {
         UUID folderId = UUID.fromString(request.getFolderId());
         UUID userId = UUID.fromString(request.getUserId());
