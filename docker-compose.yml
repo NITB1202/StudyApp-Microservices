@@ -168,6 +168,39 @@ services:
     networks:
       - backend
 
+  document-db:
+    image: postgres:15
+    container_name: document-db
+    ports:
+      - "5436:5432"
+    environment:
+      POSTGRES_DB: ${DOCUMENT_SERVICE_DB_NAME}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      - document-db-data:/var/lib/postgresql/data
+    networks:
+      - backend
+
+  document-service:
+    build:
+      context: ./document-service
+    container_name: document-service
+    depends_on:
+      - zookeeper
+      - kafka
+      - document-db
+      - eureka-server
+    environment:
+      SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE}
+      DOCUMENT_SERVICE_DB_HOST: ${DOCUMENT_SERVICE_DB_HOST}
+      DOCUMENT_SERVICE_DB_PORT: ${DOCUMENT_SERVICE_DB_PORT}
+      DOCUMENT_SERVICE_DB_NAME: ${DOCUMENT_SERVICE_DB_NAME}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    networks:
+      - backend
+
   api-gateway:
     build:
       context: ./api-gateway
@@ -186,6 +219,7 @@ volumes:
   team-db-data:
   plan-db-data:
   notification-db-data:
+  document-db-data:
 
 networks:
   backend:
