@@ -8,6 +8,20 @@ option java_multiple_files = true;
 option java_package = "com.study.documentservice.grpc";
 option java_outer_classname = "DocumentProto";
 
+//Usage
+message GetUserUsageRequest {
+  string userId = 1;
+}
+
+message UsageResponse {
+  int64 used = 1;
+  int64 total = 2;
+}
+
+message GetTeamUsageRequest {
+  string teamId = 1;
+}
+
 //Folder
 message CreateFolderRequest {
   string userId = 1;
@@ -32,7 +46,7 @@ message FolderDetailResponse {
   string createdAt = 4;
   string updatedBy = 5;
   string updatedAt = 6;
-  float size = 7;
+  int64 bytes = 7;
   int32 documentCount = 8;
 }
 
@@ -80,7 +94,7 @@ message DocumentResponse {
   string name = 2;
   string url = 3;
   string updatedAt = 4;
-  float size = 5;
+  int64 bytes = 5;
 }
 
 message GetDocumentByIdRequest {
@@ -94,7 +108,7 @@ message DocumentDetailResponse {
   string createdAt = 4;
   string updatedBy = 5;
   string updatedAt = 6;
-  float size = 7;
+  int64 bytes = 7;
   string url = 8;
 }
 
@@ -146,6 +160,10 @@ message UploadImageResponse {
 }
 
 service DocumentService {
+  //Usage
+  rpc GetUserUsage(GetUserUsageRequest) returns (UsageResponse);
+  rpc GetTeamUsage(GetTeamUsageRequest) returns (UsageResponse);
+
   //Folder
   rpc CreateFolder(CreateFolderRequest) returns (FolderResponse);
   rpc GetFolderById(GetFolderByIdRequest) returns (FolderDetailResponse);
