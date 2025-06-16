@@ -16,4 +16,5 @@ public interface DocumentService {
     void updateDocumentName(UpdateDocumentNameRequest request);
     void moveDocument(MoveDocumentRequest request);
     void deleteDocument(DeleteDocumentRequest request);
+    void deleteAllDocuments(UUID folderId);
 }

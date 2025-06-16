@@ -17,7 +17,6 @@ public interface FolderService {
     int getTeamFolderCountWithKeyword(UUID teamId, String keyword);
     void updateFolderName(UpdateFolderNameRequest request);
     void deleteFolder(DeleteFolderRequest request);
-    void updateLastModified(UUID folderId, UUID userId);
-    void addDocument(UUID folderId, long bytes);
-    void removeDocument(UUID folderId, long bytes);
+    void addDocument(UUID folderId, UUID userId, long bytes);
+    void removeDocument(UUID folderId, UUID userId, long bytes);
 }

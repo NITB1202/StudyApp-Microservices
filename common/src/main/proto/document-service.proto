@@ -79,7 +79,6 @@ message UpdateFolderNameRequest {
 
 message DeleteFolderRequest {
   string id = 1;
-  string userId = 2;
 }
 
 //Document

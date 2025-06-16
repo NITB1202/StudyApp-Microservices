@@ -5,6 +5,7 @@ import com.study.documentservice.entity.TeamUsage;
 import com.study.documentservice.entity.UserUsage;
 import com.study.documentservice.grpc.*;
 import com.study.documentservice.mapper.UsageMapper;
+import com.study.documentservice.service.FolderService;
 import com.study.documentservice.service.UsageService;
 import io.grpc.stub.StreamObserver;
 import lombok.RequiredArgsConstructor;
@@ -14,6 +15,7 @@ import net.devh.boot.grpc.server.service.GrpcService;
 @RequiredArgsConstructor
 public class DocumentController extends DocumentServiceGrpc.DocumentServiceImplBase {
     private final UsageService usageService;
+    private final FolderService folderService;
 
     //Usage
     @Override
