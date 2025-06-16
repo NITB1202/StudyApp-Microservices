@@ -5,8 +5,6 @@ import com.study.documentservice.grpc.DocumentDetailResponse;
 import com.study.documentservice.grpc.DocumentResponse;
 import com.study.documentservice.grpc.DocumentsResponse;
 
-import javax.print.Doc;
-import java.util.ArrayList;
 import java.util.List;
 
 public class DocumentMapper {
