@@ -32,7 +32,7 @@ import java.util.UUID;
 public class UserServiceImpl implements UserService {
     private final UserServiceGrpcClient userServiceGrpcClient;
     private final DocumentServiceGrpcClient documentServiceGrpcClient;
-    private final String AVATAR_FOLDER = "avatars";
+    private final String AVATAR_FOLDER = "users";
 
     @Override
     public Mono<UserResponseDto> createUser(CreateUserRequestDto request) {
