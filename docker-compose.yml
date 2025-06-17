@@ -28,6 +28,8 @@ services:
     container_name: user-service
     depends_on:
       - user-db
+      - zookeeper
+      - kafka
       - eureka-server
     environment:
       SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE}
@@ -201,6 +203,37 @@ services:
     networks:
       - backend
 
+  session-db:
+    image: postgres:15
+    container_name: session-db
+    ports:
+      - "5437:5432"
+    environment:
+      POSTGRES_DB: ${SESSION_SERVICE_DB_NAME}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      - session-db-data:/var/lib/postgresql/data
+    networks:
+      - backend
+
+  session-service:
+    build:
+      context: ./session-service
+    container_name: session-service
+    depends_on:
+      - session-db
+      - eureka-server
+    environment:
+      SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE}
+      SESSION_SERVICE_DB_HOST: ${SESSION_SERVICE_DB_HOST}
+      SESSION_SERVICE_DB_PORT: ${SESSION_SERVICE_DB_PORT}
+      SESSION_SERVICE_DB_NAME: ${SESSION_SERVICE_DB_NAME}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    networks:
+      - backend
+
   api-gateway:
     build:
       context: ./api-gateway
@@ -220,6 +253,7 @@ volumes:
   plan-db-data:
   notification-db-data:
   document-db-data:
+  session-db-data:
 
 networks:
   backend:

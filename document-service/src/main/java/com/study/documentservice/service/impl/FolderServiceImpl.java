@@ -200,12 +200,7 @@ public class FolderServiceImpl implements FolderService {
                 () -> new NotFoundException("Folder not found.")
         );
 
-        if(folder.getTeamId() == null) {
-            usageService.decreaseUserUsage(folder.getCreatedBy(), folder.getBytes());
-        }
-        else {
-            usageService.decreaseTeamUsage(folder.getTeamId(), folder.getBytes());
-        }
+        decreaseUsage(folder.getTeamId(), folder.getCreatedBy(), folder.getBytes());
 
         folderRepository.delete(folder);
     }
@@ -240,12 +235,7 @@ public class FolderServiceImpl implements FolderService {
                 () -> new NotFoundException("Folder not found.")
         );
 
-        if(folder.getTeamId() == null) {
-            usageService.increaseUserUsage(folder.getCreatedBy(), bytes);
-        }
-        else {
-            usageService.increaseTeamUsage(folder.getTeamId(), bytes);
-        }
+        increaseUsage(folder.getTeamId(), folder.getCreatedBy(), bytes);
 
         folder.setDocumentCount(folder.getDocumentCount() + 1);
         folder.setBytes(folder.getBytes() + bytes);
@@ -260,12 +250,7 @@ public class FolderServiceImpl implements FolderService {
                 () -> new NotFoundException("Folder not found.")
         );
 
-        if(folder.getTeamId() == null) {
-            usageService.decreaseUserUsage(folder.getCreatedBy(), bytes);
-        }
-        else {
-            usageService.decreaseTeamUsage(folder.getTeamId(), bytes);
-        }
+        decreaseUsage(folder.getTeamId(), folder.getCreatedBy(), bytes);
 
         folder.setDocumentCount(folder.getDocumentCount() - 1);
         folder.setBytes(folder.getBytes() - bytes);
@@ -291,5 +276,23 @@ public class FolderServiceImpl implements FolderService {
 
     private boolean isTeamFolderNameDuplicated(UUID teamId, String name) {
         return teamId != null && folderRepository.existsByNameAndTeamId(name, teamId);
+    }
+
+    private void increaseUsage(UUID teamId, UUID creatorId, long bytes) {
+        if(teamId == null) {
+            usageService.increaseUserUsage(creatorId, bytes);
+        }
+        else {
+            usageService.increaseTeamUsage(teamId, bytes);
+        }
+    }
+
+    private void decreaseUsage(UUID teamId, UUID creatorId, long bytes) {
+        if(teamId == null) {
+            usageService.decreaseUserUsage(creatorId, bytes);
+        }
+        else {
+            usageService.decreaseTeamUsage(teamId, bytes);
+        }
     }
 }
