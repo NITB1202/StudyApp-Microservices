@@ -1,0 +1,43 @@
+syntax = "proto3";
+
+package session;
+
+import "common.proto";
+
+option java_multiple_files = true;
+option java_package = "com.study.sessionservice.grpc";
+option java_outer_classname = "TeamProto";
+
+enum SessionStatus {
+  INCOMPLETE = 0;
+  COMPLETED = 1;
+}
+
+message SaveSessionRequest {
+  string userId = 1;
+  string duration = 2;
+  string elapsedTime = 3;
+}
+
+message SessionResponse {
+  string id = 1;
+  string duration = 2;
+  string elapsedTime = 3;
+  string studyDate = 4;
+  SessionStatus status = 5;
+}
+
+message GetSessionWeeklyStatisticsRequest {
+  string userId = 1;
+}
+
+message SessionStatisticsResponse {
+  int32 totalHoursSpent = 1;
+  int32 incompleteSessionCount = 2;
+  int32 completedSessionCount = 3;
+}
+
+service SessionService {
+    rpc SaveSession(SaveSessionRequest) returns (SessionResponse);
+    rpc GetSessionWeeklyStatistics(GetSessionWeeklyStatisticsRequest) returns (SessionStatisticsResponse);
+}
