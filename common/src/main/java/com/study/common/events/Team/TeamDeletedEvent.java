@@ -10,7 +10,6 @@ import java.util.UUID;
 @AllArgsConstructor
 @Builder
 public class TeamDeletedEvent {
-    private UUID id;
     private UUID teamId;
     private String teamName;
     private UUID deletedBy;

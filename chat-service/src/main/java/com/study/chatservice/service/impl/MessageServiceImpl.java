@@ -181,6 +181,12 @@ public class MessageServiceImpl implements MessageService {
     }
 
     @Override
+    public List<UUID> getAllTeamMessageIds(UUID teamId) {
+        List<Message> messages = messageRepository.findByTeamId(teamId);
+        return messages.stream().map(Message::getId).toList();
+    }
+
+    @Override
     public void deleteAllMessagesInTeam(UUID teamId) {
         messageRepository.deleteAllByTeamId(teamId);
     }

@@ -62,7 +62,6 @@ public class TeamNotificationServiceImpl implements TeamNotificationService {
         List<UUID> memberIds = memberService.getTeamMemberIds(teamId);
 
         TeamDeletedEvent event = TeamDeletedEvent.builder()
-                .id(teamId)
                 .teamId(teamId)
                 .teamName(teamName)
                 .deletedBy(userId)

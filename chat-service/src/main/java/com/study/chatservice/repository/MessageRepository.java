@@ -23,10 +23,8 @@ public interface MessageRepository extends JpaRepository<Message, UUID> {
           WHERE rs.userId = :userId
       )
     """)
-    long countUnreadMessages(
-            @Param("userId") UUID userId,
-            @Param("teamId") UUID teamId
-    );
+    long countUnreadMessages(@Param("userId") UUID userId, @Param("teamId") UUID teamId);
+    List<Message> findByTeamId(UUID teamId);
     List<Message> findByTeamId(UUID teamId, Pageable pageable);
     List<Message> findByTeamIdAndCreatedAtLessThan(UUID teamId, LocalDateTime createdAt, Pageable pageable);
     long countByTeamId(UUID teamId);

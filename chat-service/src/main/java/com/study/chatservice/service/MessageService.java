@@ -23,5 +23,6 @@ public interface MessageService {
     void deleteMessage(UUID userId, UUID messageId);
 
     void validateMarkAsReadRequest(UUID userId, List<UUID> messageIds);
+    List<UUID> getAllTeamMessageIds(UUID teamId);
     void deleteAllMessagesInTeam(UUID teamId);
 }
