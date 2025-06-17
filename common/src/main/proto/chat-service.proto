@@ -12,8 +12,7 @@ message GetUnreadMessageCountRequest {
 }
 
 message GetUnreadMessageCountResponse {
-  string userId = 1;
-  string teamId = 2;
+  int32 count = 1;
 }
 
 message GetMessagesRequest {
