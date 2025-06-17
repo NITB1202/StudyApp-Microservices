@@ -16,7 +16,7 @@ message GetUnreadMessageCountResponse {
   string teamId = 2;
 }
 
-message GetMessageRequest {
+message GetMessagesRequest {
   string teamId = 1;
   string cursor = 2;
   int32 size = 3;
@@ -40,5 +40,5 @@ message MessagesResponse {
 
 service ChatService {
   rpc GetUnreadMessageCount(GetUnreadMessageCountRequest) returns (GetUnreadMessageCountResponse) ;
-  rpc GetMessages(GetMessageRequest) returns (MessagesResponse);
+  rpc GetMessages(GetMessagesRequest) returns (MessagesResponse);
 }
