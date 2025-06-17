@@ -1,0 +1,44 @@
+syntax = "proto3";
+
+package chat;
+
+option java_multiple_files = true;
+option java_package = "com.study.chatservice.grpc";
+option java_outer_classname = "ChatProto";
+
+message GetUnreadMessageCountRequest {
+  string userId = 1;
+  string teamId = 2;
+}
+
+message GetUnreadMessageCountResponse {
+  string userId = 1;
+  string teamId = 2;
+}
+
+message GetMessageRequest {
+  string teamId = 1;
+  string cursor = 2;
+  int32 size = 3;
+}
+
+message MessageResponse {
+  string id = 1;
+  string userId = 2;
+  string content = 3;
+  string createdAt = 4;
+  string imageUrl = 5;
+}
+
+message MessagesResponse {
+  repeated MessageResponse messages = 1;
+  int64 total = 2;
+  string nextCursor = 3;
+  int32 readCount = 4;
+  repeated string readBy = 5;
+}
+
+service ChatService {
+  rpc GetUnreadMessageCount(GetUnreadMessageCountRequest) returns (GetUnreadMessageCountResponse) ;
+  rpc GetMessages(GetMessageRequest) returns (MessagesResponse);
+}
