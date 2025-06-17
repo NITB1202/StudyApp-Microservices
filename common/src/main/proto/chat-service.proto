@@ -27,6 +27,7 @@ message MessageResponse {
   string content = 3;
   string createdAt = 4;
   string imageUrl = 5;
+  bool isDeleted = 6;
 }
 
 message MessagesResponse {

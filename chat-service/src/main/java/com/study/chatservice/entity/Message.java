@@ -33,4 +33,7 @@ public class Message {
 
     @Column(name = "image_url")
     private String imageUrl;
+
+    @Column(name = "is_deleted", nullable = false)
+    private Boolean isDeleted;
 }
