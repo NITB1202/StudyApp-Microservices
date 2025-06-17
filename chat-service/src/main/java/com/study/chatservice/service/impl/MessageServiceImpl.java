@@ -8,6 +8,7 @@ import com.study.chatservice.entity.Message;
 import com.study.chatservice.grpc.*;
 import com.study.chatservice.mapper.MessageMapper;
 import com.study.chatservice.repository.MessageRepository;
+import com.study.chatservice.service.MessageReadStatusService;
 import com.study.chatservice.service.MessageService;
 import com.study.common.exceptions.BusinessException;
 import com.study.common.utils.FileUtils;
@@ -21,6 +22,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
@@ -29,6 +31,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class MessageServiceImpl implements MessageService {
     private final MessageRepository messageRepository;
+    private final MessageReadStatusService statusService;
 
     private final UserServiceGrpcClient userClient;
     private final TeamServiceGrpcClient teamClient;
@@ -46,18 +49,20 @@ public class MessageServiceImpl implements MessageService {
     }
 
     @Override
-    public List<Message> getMessages(GetMessagesRequest request) {
+    public List<MessageResponse> getMessages(GetMessagesRequest request) {
         UUID teamId = UUID.fromString(request.getTeamId());
         int size = request.getSize() > 0 ? request.getSize() : DEFAULT_SIZE;
 
         Pageable pageable = PageRequest.of(0, size, Sort.by("createdAt").descending());
 
         if(request.getCursor().isEmpty()){
-            return messageRepository.findByTeamId(teamId, pageable);
+            List<Message> messages = messageRepository.findByTeamId(teamId, pageable);
+            return toListMessageResponse(messages);
         }
 
         LocalDateTime cursor = LocalDateTime.parse(request.getCursor());
-        return messageRepository.findByTeamIdAndCreatedAtLessThan(teamId, cursor, pageable);
+        List<Message> messages = messageRepository.findByTeamIdAndCreatedAtLessThan(teamId, cursor, pageable);
+        return toListMessageResponse(messages);
     }
 
     @Override
@@ -178,5 +183,26 @@ public class MessageServiceImpl implements MessageService {
     @Override
     public void deleteAllMessagesInTeam(UUID teamId) {
         messageRepository.deleteAllByTeamId(teamId);
+    }
+
+    private List<MessageResponse> toListMessageResponse(List<Message> messages) {
+        List<MessageResponse> result = new ArrayList<>();
+
+        for(Message message : messages) {
+            UserDetailResponse user = userClient.getUserById(message.getUserId());
+
+            List<UUID> readByIds = statusService.getReadByList(message.getId());
+            List<String> readBy = new ArrayList<>();
+
+            for(UUID readById : readByIds){
+                UserDetailResponse readUser = userClient.getUserById(readById);
+                readBy.add(readUser.getUsername());
+            }
+
+            MessageResponse response = MessageMapper.toMessageResponse(message, user, readBy);
+            result.add(response);
+        }
+
+        return result;
     }
 }

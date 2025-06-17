@@ -34,6 +34,12 @@ public class MessageReadStatusServiceImpl implements MessageReadStatusService {
     }
 
     @Override
+    public List<UUID> getReadByList(UUID messageId) {
+        List<MessageReadStatus> read = statusRepository.findByMessageId(messageId);
+        return read.stream().map(MessageReadStatus::getUserId).toList();
+    }
+
+    @Override
     public void deleteAllReadStatus(UUID messageId) {
         statusRepository.deleteAllByMessageId(messageId);
     }

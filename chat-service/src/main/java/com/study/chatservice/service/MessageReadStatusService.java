@@ -5,5 +5,6 @@ import java.util.UUID;
 
 public interface MessageReadStatusService {
     void markMessageAsRead(UUID userId, List<UUID> messageIds);
+    List<UUID> getReadByList(UUID messageId);
     void deleteAllReadStatus(UUID messageId);
 }
