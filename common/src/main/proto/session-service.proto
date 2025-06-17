@@ -8,23 +8,17 @@ option java_multiple_files = true;
 option java_package = "com.study.sessionservice.grpc";
 option java_outer_classname = "TeamProto";
 
-enum SessionStatus {
-  INCOMPLETE = 0;
-  COMPLETED = 1;
-}
-
 message SaveSessionRequest {
   string userId = 1;
-  string duration = 2;
-  string elapsedTime = 3;
+  int32 durationInMinutes = 2;
+  int32 elapsedTimeInMinutes = 3;
 }
 
 message SessionResponse {
   string id = 1;
-  string duration = 2;
-  string elapsedTime = 3;
+  int32 durationInMinutes = 2;
+  int32 elapsedTimeInMinutes = 3;
   string studyDate = 4;
-  SessionStatus status = 5;
 }
 
 message GetSessionWeeklyStatisticsRequest {
@@ -32,9 +26,9 @@ message GetSessionWeeklyStatisticsRequest {
 }
 
 message SessionStatisticsResponse {
-  int32 totalHoursSpent = 1;
-  int32 incompleteSessionCount = 2;
-  int32 completedSessionCount = 3;
+  float totalHoursSpent = 1;
+  int64 incompleteSessionCount = 2;
+  int64 completedSessionCount = 3;
 }
 
 service SessionService {
