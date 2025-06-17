@@ -22,6 +22,7 @@
         <module>notification-service</module>
         <module>document-service</module>
         <module>session-service</module>
+        <module>chat-service</module>
         <module>api-gateway</module>
     </modules>
 
