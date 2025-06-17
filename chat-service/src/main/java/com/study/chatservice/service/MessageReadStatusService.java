@@ -1,11 +1,9 @@
 package com.study.chatservice.service;
 
-import com.study.chatservice.grpc.GetUnreadMessageCountRequest;
-
+import java.util.List;
 import java.util.UUID;
 
 public interface MessageReadStatusService {
-    void markMessageAsRead(UUID userId, UUID messageId);
-    int getUnreadMessageCount(GetUnreadMessageCountRequest request);
+    void markMessageAsRead(UUID userId, List<UUID> messageIds);
     void deleteAllReadStatus(UUID messageId);
 }
