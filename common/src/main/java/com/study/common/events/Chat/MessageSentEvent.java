@@ -10,7 +10,7 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class MessageCreatedEvent {
+public class MessageSentEvent {
     private UUID teamId;
     private String teamName;
     private int newMessageCount;
