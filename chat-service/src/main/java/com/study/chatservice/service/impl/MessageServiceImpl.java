@@ -5,10 +5,7 @@ import com.study.chatservice.dto.request.UpdateMessageRequestDto;
 import com.study.chatservice.dto.response.MessageResponseDto;
 import com.study.chatservice.dto.response.UpdateMessageResponseDto;
 import com.study.chatservice.entity.Message;
-import com.study.chatservice.grpc.DocumentServiceGrpcClient;
-import com.study.chatservice.grpc.GetMessagesRequest;
-import com.study.chatservice.grpc.TeamServiceGrpcClient;
-import com.study.chatservice.grpc.UserServiceGrpcClient;
+import com.study.chatservice.grpc.*;
 import com.study.chatservice.mapper.MessageMapper;
 import com.study.chatservice.repository.MessageRepository;
 import com.study.chatservice.service.MessageService;
@@ -39,6 +36,14 @@ public class MessageServiceImpl implements MessageService {
 
     private static final int DEFAULT_SIZE = 10;
     private final static String FOLDER_PATH = "chats";
+
+    @Override
+    public long getUnreadMessageCount(GetUnreadMessageCountRequest request) {
+        UUID userId = UUID.fromString(request.getUserId());
+        UUID teamId = UUID.fromString(request.getTeamId());
+
+        return messageRepository.countUnreadMessages(userId, teamId);
+    }
 
     @Override
     public List<Message> getMessages(GetMessagesRequest request) {
@@ -140,6 +145,34 @@ public class MessageServiceImpl implements MessageService {
 
         message.setIsDeleted(true);
         messageRepository.save(message);
+    }
+
+    @Override
+    public void validateMarkAsReadRequest(UUID userId, List<UUID> messageIds) {
+        if(messageIds.isEmpty()){
+            throw new BusinessException("No messages found.");
+        }
+
+        UUID firstId = messageIds.get(0);
+        Message firstMessage = messageRepository.findById(firstId).orElseThrow(
+                () -> new BusinessException("Message with id " + firstId + " not found.")
+        );
+
+        UUID teamId = firstMessage.getTeamId();
+
+        teamClient.validateUsersInTeam(teamId, Set.of(userId));
+
+        for(int i = 1; i < messageIds.size(); i++){
+            UUID id = messageIds.get(i);
+
+            Message message = messageRepository.findById(id).orElseThrow(
+                    () -> new BusinessException("Message with id " + id + " not found.")
+            );
+
+            if(!message.getTeamId().equals(teamId)){
+                throw new BusinessException("The message with id " + id + " is not from the team " + teamId + ".");
+            }
+        }
     }
 
     @Override
