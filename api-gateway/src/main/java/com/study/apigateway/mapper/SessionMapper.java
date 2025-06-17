@@ -5,6 +5,8 @@ import com.study.apigateway.dto.Session.response.SessionStatisticsResponseDto;
 import com.study.sessionservice.grpc.SessionResponse;
 import com.study.sessionservice.grpc.SessionStatisticsResponse;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
@@ -21,8 +23,12 @@ public class SessionMapper {
     }
 
     public static SessionStatisticsResponseDto toSessionStatisticsResponseDto(SessionStatisticsResponse statistics) {
+        float roundedHours = BigDecimal.valueOf(statistics.getTotalHoursSpent())
+                .setScale(2, RoundingMode.HALF_UP)
+                .floatValue();
+
         return SessionStatisticsResponseDto.builder()
-                .totalHoursSpent(statistics.getTotalHoursSpent())
+                .totalHoursSpent(roundedHours)
                 .incompleteSessionsCount(statistics.getIncompleteSessionCount())
                 .completedSessionsCount(statistics.getCompletedSessionCount())
                 .build();
