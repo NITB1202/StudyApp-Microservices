@@ -1,7 +1,8 @@
-package com.study.apigateway.util;
+package com.study.common.utils;
 
 import org.springframework.http.MediaType;
 import org.springframework.http.codec.multipart.FilePart;
+import org.springframework.web.multipart.MultipartFile;
 
 public class FileUtils {
 
@@ -25,6 +26,13 @@ public class FileUtils {
                 : "";
 
         return contentType.startsWith("image/");
+    }
+
+    public static boolean isImage(MultipartFile file) {
+        if (file == null || file.isEmpty()) return false;
+
+        String contentType = file.getContentType();
+        return contentType != null && contentType.startsWith("image/");
     }
 
 }
