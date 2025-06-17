@@ -69,6 +69,7 @@ public class MessageServiceImpl implements MessageService {
                 .teamId(teamId)
                 .content(dto.getContent())
                 .createdAt(LocalDateTime.now())
+                .isDeleted(false)
                 .build();
 
         messageRepository.save(message);
@@ -89,6 +90,7 @@ public class MessageServiceImpl implements MessageService {
                 .userId(userId)
                 .teamId(teamId)
                 .createdAt(LocalDateTime.now())
+                .isDeleted(false)
                 .build();
 
         messageRepository.save(message);
@@ -136,7 +138,8 @@ public class MessageServiceImpl implements MessageService {
             throw new BusinessException("Only the creator can delete his/her message.");
         }
 
-        messageRepository.deleteById(messageId);
+        message.setIsDeleted(true);
+        messageRepository.save(message);
     }
 
     @Override
