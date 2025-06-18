@@ -145,9 +145,9 @@ public class MessageServiceImpl implements MessageService {
 
     @Override
     public MarkMessageAsReadResponseDto markMessagesAsRead(UUID userId, UUID teamId, MarkMessagesAsReadRequestDto dto) {
-        validateMarkAsReadRequest(userId, teamId, dto.getMessageIds());
-        statusService.markMessagesAsRead(userId, dto.getMessageIds());
-        return MessageMapper.toMarkMessageAsReadResponseDto(userId, dto.getMessageIds());
+        List<UUID> validatedList = validateMarkAsReadRequest(userId, teamId, dto.getMessageIds());
+        statusService.markMessagesAsRead(userId, validatedList);
+        return MessageMapper.toMarkMessageAsReadResponseDto(userId, validatedList);
     }
 
     @Override
@@ -210,12 +210,14 @@ public class MessageServiceImpl implements MessageService {
         return result;
     }
 
-    private void validateMarkAsReadRequest(UUID userId, UUID teamId, List<UUID> messageIds) {
+    private List<UUID> validateMarkAsReadRequest(UUID userId, UUID teamId, List<UUID> messageIds) {
         if(messageIds.isEmpty()){
             throw new BusinessException("No messages found.");
         }
 
         teamClient.validateUsersInTeam(teamId, Set.of(userId));
+
+        List<UUID> result = new ArrayList<>();
 
         for(UUID messageId : messageIds){
             Message message = messageRepository.findById(messageId).orElseThrow(
@@ -225,6 +227,12 @@ public class MessageServiceImpl implements MessageService {
             if(!message.getTeamId().equals(teamId)){
                 throw new BusinessException("The message with id " + messageId + " is not from the team " + teamId + ".");
             }
+
+            if(!message.getUserId().equals(userId)){
+                result.add(messageId);
+            }
         }
+
+        return result;
     }
 }

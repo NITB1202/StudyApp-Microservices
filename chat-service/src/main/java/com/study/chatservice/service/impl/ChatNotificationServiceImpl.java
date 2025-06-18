@@ -43,7 +43,7 @@ public class ChatNotificationServiceImpl implements ChatNotificationService {
                     .usingJobData("teamId", teamId.toString())
                     .build();
 
-            //Trigger at 10s after creating
+            //Trigger after creating 10s
             Trigger trigger = TriggerBuilder.newTrigger()
                     .withIdentity("trigger_" + teamId)
                     .startAt(Timestamp.valueOf(LocalDateTime.now().plusSeconds(PUSH_SECONDS)))

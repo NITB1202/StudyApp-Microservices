@@ -43,9 +43,15 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
     }
 
     @Override
+    public void handleTextMessage(WebSocketSession session, TextMessage message) throws IOException {
+        System.out.println("Received: " + message.getPayload());
+    }
+
+    @Override
     public void afterConnectionClosed(WebSocketSession session, CloseStatus status) {
+        ConnectedUser connectedUser = sessionUserMap.get(session);
+        System.out.println("User " + connectedUser.getUserId() + " disconnected from team " + connectedUser.getTeamId());
         sessionUserMap.remove(session);
-        System.out.println("Connection closed: " + session.getId());
     }
 
     public void sendMessageToOnlineMembers(UUID teamId, String type, Object payload){
