@@ -1,13 +1,13 @@
 package com.study.documentservice.service.impl;
 
+import com.study.common.dto.FileResponseDto;
 import com.study.common.exceptions.BusinessException;
 import com.study.common.exceptions.NotFoundException;
-import com.study.documentservice.dto.FileResponseDto;
+import com.study.common.service.FileService;
 import com.study.documentservice.entity.Document;
 import com.study.documentservice.grpc.*;
 import com.study.documentservice.repository.DocumentRepository;
 import com.study.documentservice.service.DocumentService;
-import com.study.documentservice.service.FileService;
 import com.study.documentservice.service.FolderService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -86,7 +86,7 @@ public class DocumentServiceImpl implements DocumentService {
         documentRepository.save(document);
 
         String folderPath = FOLDER_PATH + "/" + folderId;
-        FileResponseDto file = fileService.uploadFile(folderPath, document.getId().toString(), request.getFile());
+        FileResponseDto file = fileService.uploadFile(folderPath, document.getId().toString(), request.getFile().toByteArray());
 
         folderService.addDocument(folderId, userId, file.getBytes());
 

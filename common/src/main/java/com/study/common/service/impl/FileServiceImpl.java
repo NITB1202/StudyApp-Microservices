@@ -1,11 +1,10 @@
-package com.study.documentservice.service.impl;
+package com.study.common.service.impl;
 
 import com.cloudinary.Cloudinary;
 import com.cloudinary.utils.ObjectUtils;
-import com.google.protobuf.ByteString;
+import com.study.common.dto.FileResponseDto;
 import com.study.common.exceptions.BusinessException;
-import com.study.documentservice.dto.FileResponseDto;
-import com.study.documentservice.service.FileService;
+import com.study.common.service.FileService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -18,9 +17,7 @@ public class FileServiceImpl implements FileService {
     private final Cloudinary cloudinary;
 
     @Override
-    public FileResponseDto uploadFile(String folderPath, String publicId, ByteString byteString) {
-        byte[] bytes = byteString.toByteArray();
-
+    public FileResponseDto uploadFile(String folderPath, String publicId, byte[] bytes) {
         Map params = ObjectUtils.asMap(
                 "resource_type", "auto",
                 "public_id", publicId,

@@ -1,4 +1,4 @@
-package com.study.documentservice.config;
+package com.study.common.config;
 
 import com.cloudinary.Cloudinary;
 import io.github.cdimascio.dotenv.Dotenv;

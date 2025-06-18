@@ -12,6 +12,7 @@ import com.study.chatservice.service.MessageReadStatusService;
 import com.study.chatservice.service.MessageService;
 import com.study.common.exceptions.BusinessException;
 import com.study.common.exceptions.NotFoundException;
+import com.study.common.service.FileService;
 import com.study.userservice.grpc.UserDetailResponse;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -31,10 +32,10 @@ import java.util.UUID;
 public class MessageServiceImpl implements MessageService {
     private final MessageRepository messageRepository;
     private final MessageReadStatusService statusService;
+    private final FileService fileService;
 
     private final UserServiceGrpcClient userClient;
     private final TeamServiceGrpcClient teamClient;
-    private final DocumentServiceGrpcClient documentClient;
 
     private static final int DEFAULT_SIZE = 10;
     private final static String FOLDER_PATH = "chats";
@@ -104,7 +105,7 @@ public class MessageServiceImpl implements MessageService {
         String folderPath = FOLDER_PATH + "/" + teamId;
         String publicId = message.getId().toString();
 
-        String url = documentClient.uploadImage(folderPath, publicId, bytes).getUrl();
+        String url = fileService.uploadFile(folderPath, publicId, bytes).getUrl();
         message.setImageUrl(url);
         messageRepository.save(message);
 

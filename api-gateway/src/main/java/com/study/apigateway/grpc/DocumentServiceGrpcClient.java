@@ -211,17 +211,4 @@ public class DocumentServiceGrpcClient {
 
         return blockingStub.deleteDocument(request);
     }
-
-    //Image
-    public UploadImageResponse uploadImage(String folderPath, String publicId, byte[] file) {
-        ByteString byteString = ByteString.copyFrom(file);
-
-        UploadImageRequest request = UploadImageRequest.newBuilder()
-                .setFolderPath(folderPath)
-                .setPublicId(publicId)
-                .setFile(byteString)
-                .build();
-
-        return blockingStub.uploadImage(request);
-    }
 }
