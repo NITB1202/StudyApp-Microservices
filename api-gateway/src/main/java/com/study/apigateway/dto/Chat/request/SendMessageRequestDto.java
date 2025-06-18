@@ -1,4 +1,4 @@
-package com.study.chatservice.dto.request;
+package com.study.apigateway.dto.Chat.request;
 
 import jakarta.validation.constraints.NotEmpty;
 import lombok.AllArgsConstructor;
@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class UpdateMessageRequestDto {
+public class SendMessageRequestDto {
     @NotEmpty(message = "Content is required.")
     private String content;
 }
