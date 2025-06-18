@@ -15,4 +15,8 @@ public class OAuthUserInfo {
     private String email;
 
     private String picture;
+
+    private String gender;
+
+    private String birthday;
 }

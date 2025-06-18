@@ -31,18 +31,13 @@ public class UserServiceImpl implements UserService {
         if(userRepository.existsByUsernameIgnoreCase(request.getUsername()))
             throw new BusinessException("Username already exists");
 
-        LocalDate dateOfBirth;
-        try {
-            dateOfBirth = LocalDate.parse(request.getDateOfBirth());
-        } catch (DateTimeParseException e) {
-            throw new BusinessException("Invalid date format. Expected yyyy-MM-dd");
-        }
+        LocalDate dateOfBirth = request.getDateOfBirth().isEmpty() ? null : LocalDate.parse(request.getDateOfBirth());
 
         User user = User.builder()
                 .username(request.getUsername())
                 .dateOfBirth(dateOfBirth)
                 .gender(GenderMapper.toEnum(request.getGender()))
-                .avatarUrl("")
+                .avatarUrl(request.getAvatarUrl())
                 .build();
 
         userRepository.save(user);

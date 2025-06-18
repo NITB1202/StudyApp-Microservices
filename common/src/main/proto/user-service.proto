@@ -12,13 +12,13 @@ enum Gender {
   UNSPECIFIED = 0;
   FEMALE = 1;
   MALE = 2;
-  OTHER = 3;
 }
 
 message CreateUserRequest {
   string username = 1;
   string dateOfBirth = 2;
   Gender gender = 3;
+  string avatarUrl = 4;
 }
 
 message UserResponse {
