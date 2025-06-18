@@ -13,9 +13,8 @@ import java.util.UUID;
 public class MessageSentEvent {
     private UUID teamId;
     private String teamName;
-    private String teamAvatarUrl;
     private int newMessageCount;
     private List<UUID> receiverIds;
 }
 
-//Message: 3 new messages in team 'TEAM01'.
+//Message: You have 3 new messages from team 'TEAM 01'.

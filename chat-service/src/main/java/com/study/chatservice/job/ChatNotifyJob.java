@@ -34,7 +34,6 @@ public class ChatNotifyJob implements Job {
         MessageSentEvent event = MessageSentEvent.builder()
                 .teamId(teamId)
                 .teamName(notification.getTeamName())
-                .teamAvatarUrl(notification.getTeamAvatarUrl())
                 .newMessageCount(notification.getNewMessageCount())
                 .receiverIds(receiverIds)
                 .build();

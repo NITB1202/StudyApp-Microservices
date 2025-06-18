@@ -1,5 +1,6 @@
 package com.study.notificationservice.event;
 
+import com.study.common.events.Chat.MessageSentEvent;
 import com.study.common.events.Team.*;
 import com.study.notificationservice.dto.CreateInvitationDto;
 import com.study.notificationservice.dto.CreateNotificationDto;
@@ -312,5 +313,26 @@ public class NotificationEventListener {
         }
 
         settingsService.deleteByTeamIdAndUserId(event.getTeamId(), event.getUserId());
+    }
+
+    @KafkaListener(topics = "message-sent", groupId = "notification-message-sent")
+    public void consumeMessageSentEvent(MessageSentEvent event) {
+        String title = "New message";
+        String content = "You have " + event.getNewMessageCount() + " new messages from team '" + event.getTeamName() +"'.";
+
+        for(UUID receiverId : event.getReceiverIds()) {
+            if(!settingsService.getChatNotification(event.getTeamId(), receiverId)) continue;
+
+            CreateNotificationDto dto = CreateNotificationDto.builder()
+                    .userId(receiverId)
+                    .title(title)
+                    .content(content)
+                    .subject(LinkedSubject.CHAT)
+                    .subjectId(event.getTeamId())
+                    .build();
+
+            notificationService.createNotification(dto);
+            deviceTokenService.sendPushNotification(dto);
+        }
     }
 }
