@@ -234,6 +234,39 @@ services:
     networks:
       - backend
 
+  chat-db:
+    image: postgres:15
+    container_name: chat-db
+    ports:
+      - "5438:5432"
+    environment:
+      POSTGRES_DB: ${CHAT_SERVICE_DB_NAME}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      - chat-db-data:/var/lib/postgresql/data
+    networks:
+      - backend
+
+  chat-service:
+    build:
+      context: ./chat-service
+    container_name: chat-service
+    depends_on:
+      - chat-db
+      - eureka-server
+      - user-service
+      - team-service
+    environment:
+      SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE}
+      CHAT_SERVICE_DB_HOST: ${CHAT_SERVICE_DB_HOST}
+      CHAT_SERVICE_DB_PORT: ${CHAT_SERVICE_DB_PORT}
+      CHAT_SERVICE_DB_NAME: ${CHAT_SERVICE_DB_NAME}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    networks:
+      - backend
+
   api-gateway:
     build:
       context: ./api-gateway
@@ -254,6 +287,7 @@ volumes:
   notification-db-data:
   document-db-data:
   session-db-data:
+  chat-db-data:
 
 networks:
   backend:
