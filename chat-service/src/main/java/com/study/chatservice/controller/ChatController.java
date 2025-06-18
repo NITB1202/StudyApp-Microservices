@@ -1,6 +1,5 @@
 package com.study.chatservice.controller;
 
-import com.study.chatservice.entity.Message;
 import com.study.chatservice.grpc.*;
 import com.study.chatservice.mapper.MessageMapper;
 import com.study.chatservice.service.MessageService;
@@ -35,7 +34,7 @@ public class ChatController extends ChatServiceGrpc.ChatServiceImplBase {
         List<MessageResponse> messages = messageService.getMessages(request);
         long total = messageService.countTeamMessages(teamId);
         String nextCursor = !messages.isEmpty() && messages.size() == request.getSize() ?
-                messages.get(messages.size() - 1).getCreatedAt().toString() : "";
+                messages.get(messages.size() - 1).getCreatedAt() : "";
 
         MessagesResponse response = MessageMapper.toMessagesResponse(messages, nextCursor, total);
 

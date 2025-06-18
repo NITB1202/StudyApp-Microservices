@@ -39,5 +39,6 @@ public class ChatNotifyJob implements Job {
                 .build();
 
         publisher.publishEvent(SEND_TOPIC, event);
+        chatNotificationService.deleteChatNotification(teamId);
     }
 }

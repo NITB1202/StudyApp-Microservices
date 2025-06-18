@@ -1,5 +1,6 @@
 package com.study.chatservice.service.impl;
 
+import com.study.chatservice.dto.request.MarkMessagesAsReadRequestDto;
 import com.study.chatservice.dto.request.SendMessageRequestDto;
 import com.study.chatservice.dto.request.UpdateMessageRequestDto;
 import com.study.chatservice.dto.response.MessageResponseDto;
@@ -13,6 +14,7 @@ import com.study.chatservice.service.MessageService;
 import com.study.common.exceptions.BusinessException;
 import com.study.common.utils.FileUtils;
 import com.study.userservice.grpc.UserDetailResponse;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -139,6 +141,12 @@ public class MessageServiceImpl implements MessageService {
     }
 
     @Override
+    public void markMessagesAsRead(UUID userId, MarkMessagesAsReadRequestDto dto) {
+        validateMarkAsReadRequest(userId, dto.getMessageIds());
+        statusService.markMessagesAsRead(userId, dto.getMessageIds());
+    }
+
+    @Override
     public void deleteMessage(UUID userId, UUID messageId) {
         Message message = messageRepository.findById(messageId).orElseThrow(
                 () -> new BusinessException("Message not found.")
@@ -153,7 +161,41 @@ public class MessageServiceImpl implements MessageService {
     }
 
     @Override
-    public void validateMarkAsReadRequest(UUID userId, List<UUID> messageIds) {
+    @Transactional
+    public void deleteAllMessagesInTeam(UUID teamId) {
+        List<UUID> teamMessagesIds = messageRepository.findByTeamId(teamId).stream()
+                .map(Message::getId)
+                .toList();
+
+        for(UUID teamMessageId : teamMessagesIds){
+            statusService.deleteAllReadStatus(teamMessageId);
+        }
+
+        messageRepository.deleteAllByTeamId(teamId);
+    }
+
+    private List<MessageResponse> toListMessageResponse(List<Message> messages) {
+        List<MessageResponse> result = new ArrayList<>();
+
+        for(Message message : messages) {
+            UserDetailResponse user = userClient.getUserById(message.getUserId());
+
+            List<UUID> readByIds = statusService.getReadByList(message.getId());
+            List<String> readBy = new ArrayList<>();
+
+            for(UUID readById : readByIds){
+                UserDetailResponse readUser = userClient.getUserById(readById);
+                readBy.add(readUser.getUsername());
+            }
+
+            MessageResponse response = MessageMapper.toMessageResponse(message, user, readBy);
+            result.add(response);
+        }
+
+        return result;
+    }
+
+    private void validateMarkAsReadRequest(UUID userId, List<UUID> messageIds) {
         if(messageIds.isEmpty()){
             throw new BusinessException("No messages found.");
         }
@@ -178,37 +220,5 @@ public class MessageServiceImpl implements MessageService {
                 throw new BusinessException("The message with id " + id + " is not from the team " + teamId + ".");
             }
         }
-    }
-
-    @Override
-    public List<UUID> getAllTeamMessageIds(UUID teamId) {
-        List<Message> messages = messageRepository.findByTeamId(teamId);
-        return messages.stream().map(Message::getId).toList();
-    }
-
-    @Override
-    public void deleteAllMessagesInTeam(UUID teamId) {
-        messageRepository.deleteAllByTeamId(teamId);
-    }
-
-    private List<MessageResponse> toListMessageResponse(List<Message> messages) {
-        List<MessageResponse> result = new ArrayList<>();
-
-        for(Message message : messages) {
-            UserDetailResponse user = userClient.getUserById(message.getUserId());
-
-            List<UUID> readByIds = statusService.getReadByList(message.getId());
-            List<String> readBy = new ArrayList<>();
-
-            for(UUID readById : readByIds){
-                UserDetailResponse readUser = userClient.getUserById(readById);
-                readBy.add(readUser.getUsername());
-            }
-
-            MessageResponse response = MessageMapper.toMessageResponse(message, user, readBy);
-            result.add(response);
-        }
-
-        return result;
     }
 }

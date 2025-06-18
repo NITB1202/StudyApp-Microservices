@@ -3,6 +3,7 @@ package com.study.chatservice.service.impl;
 import com.study.chatservice.entity.MessageReadStatus;
 import com.study.chatservice.repository.MessageReadStatusRepository;
 import com.study.chatservice.service.MessageReadStatusService;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -16,7 +17,7 @@ public class MessageReadStatusServiceImpl implements MessageReadStatusService {
     private final MessageReadStatusRepository statusRepository;
 
     @Override
-    public void markMessageAsRead(UUID userId, List<UUID> messageIds) {
+    public void markMessagesAsRead(UUID userId, List<UUID> messageIds) {
         List<MessageReadStatus> statuses = new ArrayList<>();
 
         for(UUID messageId : messageIds) {
@@ -40,6 +41,7 @@ public class MessageReadStatusServiceImpl implements MessageReadStatusService {
     }
 
     @Override
+    @Transactional
     public void deleteAllReadStatus(UUID messageId) {
         statusRepository.deleteAllByMessageId(messageId);
     }
