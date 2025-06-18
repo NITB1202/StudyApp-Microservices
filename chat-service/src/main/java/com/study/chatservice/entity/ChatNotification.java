@@ -23,9 +23,6 @@ public class ChatNotification {
     @Column(name = "team_name", nullable = false)
     private String teamName;
 
-    @Column(name = "team_avatar_url")
-    private String teamAvatarUrl;
-
     @Column(name = "new_message_count", nullable = false)
     private int newMessageCount;
 }

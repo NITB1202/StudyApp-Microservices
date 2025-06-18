@@ -34,7 +34,6 @@ public class ChatNotificationServiceImpl implements ChatNotificationService {
             notification = ChatNotification.builder()
                     .teamId(teamId)
                     .teamName(teamDetail.getName())
-                    .teamAvatarUrl(teamDetail.getAvatarUrl())
                     .newMessageCount(1)
                     .build();
 
