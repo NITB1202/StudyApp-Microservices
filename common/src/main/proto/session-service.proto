@@ -2,8 +2,6 @@ syntax = "proto3";
 
 package session;
 
-import "common.proto";
-
 option java_multiple_files = true;
 option java_package = "com.study.sessionservice.grpc";
 option java_outer_classname = "TeamProto";

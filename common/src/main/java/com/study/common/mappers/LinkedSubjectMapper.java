@@ -12,6 +12,7 @@ public class LinkedSubjectMapper {
             case PLAN -> com.study.notificationservice.grpc.LinkedSubject.PLAN;
             case TEAM -> com.study.notificationservice.grpc.LinkedSubject.TEAM;
             case INVITATION -> com.study.notificationservice.grpc.LinkedSubject.INVITATION;
+            case CHAT -> com.study.notificationservice.grpc.LinkedSubject.CHAT;
         };
     }
 
@@ -20,6 +21,7 @@ public class LinkedSubjectMapper {
             case PLAN -> LinkedSubject.PLAN;
             case TEAM -> LinkedSubject.TEAM;
             case INVITATION -> LinkedSubject.INVITATION;
+            case CHAT -> LinkedSubject.CHAT;
             default -> throw new NotFoundException("Subject not found.");
         };
     }

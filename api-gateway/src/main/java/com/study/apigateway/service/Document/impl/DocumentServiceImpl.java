@@ -10,7 +10,7 @@ import com.study.apigateway.grpc.UserServiceGrpcClient;
 import com.study.apigateway.mapper.ActionMapper;
 import com.study.apigateway.mapper.DocumentMapper;
 import com.study.apigateway.service.Document.DocumentService;
-import com.study.apigateway.util.FileUtils;
+import com.study.common.utils.FileUtils;
 import com.study.common.exceptions.BusinessException;
 import com.study.common.grpc.ActionResponse;
 import com.study.documentservice.grpc.DocumentDetailResponse;

@@ -13,6 +13,7 @@ enum LinkedSubject {
   PLAN = 0;
   TEAM = 1;
   INVITATION = 2;
+  CHAT = 3;
 }
 
 //Notification

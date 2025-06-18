@@ -1,0 +1,80 @@
+syntax = "proto3";
+
+package chat;
+
+import "common.proto";
+
+option java_multiple_files = true;
+option java_package = "com.study.chatservice.grpc";
+option java_outer_classname = "ChatProto";
+
+message SendMessageRequest {
+  string userId = 1;
+  string teamId = 2;
+  string content = 3;
+}
+
+message SendImageMessageRequest {
+  string userId = 1;
+  string teamId = 2;
+  bytes file = 3;
+}
+
+message GetUnreadMessageCountRequest {
+  string userId = 1;
+  string teamId = 2;
+}
+
+message GetUnreadMessageCountResponse {
+  int64 count = 1;
+}
+
+message GetMessagesRequest {
+  string teamId = 1;
+  string cursor = 2;
+  int32 size = 3;
+}
+
+message MessageResponse {
+  string id = 1;
+  string username = 2;
+  string avatarUrl = 3;
+  string content = 4;
+  string createdAt = 5;
+  string imageUrl = 6;
+  repeated string readBy = 7;
+  bool isDeleted = 8;
+}
+
+message MessagesResponse {
+  repeated MessageResponse messages = 1;
+  int64 total = 2;
+  string nextCursor = 3;
+}
+
+message UpdateMessageRequest {
+  string userId = 1;
+  string messageId = 2;
+  string content = 3;
+}
+
+message MarkMessagesAsReadRequest {
+  string userId = 1;
+  string teamId = 2;
+  repeated string messageIds = 3;
+}
+
+message DeleteMessageRequest {
+  string userId = 1;
+  string messageId = 2;
+}
+
+service ChatService {
+  rpc SendMessage(SendMessageRequest) returns (common.ActionResponse);
+  rpc SendImageMessage(SendImageMessageRequest) returns (common.ActionResponse);
+  rpc GetUnreadMessageCount(GetUnreadMessageCountRequest) returns (GetUnreadMessageCountResponse) ;
+  rpc GetMessages(GetMessagesRequest) returns (MessagesResponse);
+  rpc UpdateMessage(UpdateMessageRequest) returns (common.ActionResponse);
+  rpc MarkMessagesAsRead(MarkMessagesAsReadRequest) returns (common.ActionResponse);
+  rpc DeleteMessage(DeleteMessageRequest) returns (common.ActionResponse);
+}

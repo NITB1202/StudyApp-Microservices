@@ -1,4 +1,4 @@
-package com.study.apigateway.util;
+package com.study.common.utils;
 
 import org.springframework.http.MediaType;
 import org.springframework.http.codec.multipart.FilePart;
@@ -26,5 +26,4 @@ public class FileUtils {
 
         return contentType.startsWith("image/");
     }
-
 }
