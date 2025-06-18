@@ -3,6 +3,8 @@ package com.study.chatservice.service;
 import com.study.chatservice.dto.request.MarkMessagesAsReadRequestDto;
 import com.study.chatservice.dto.request.SendMessageRequestDto;
 import com.study.chatservice.dto.request.UpdateMessageRequestDto;
+import com.study.chatservice.dto.response.DeleteMessageResponseDto;
+import com.study.chatservice.dto.response.MarkMessageAsReadResponseDto;
 import com.study.chatservice.dto.response.MessageResponseDto;
 import com.study.chatservice.dto.response.UpdateMessageResponseDto;
 import com.study.chatservice.grpc.GetMessagesRequest;
@@ -21,8 +23,9 @@ public interface MessageService {
     MessageResponseDto saveMessage(UUID userId, UUID teamId, SendMessageRequestDto dto);
     MessageResponseDto saveImageMessage(UUID userId, UUID teamId, MultipartFile file);
     UpdateMessageResponseDto updateMessage(UUID userId, UUID messageId, UpdateMessageRequestDto dto);
-    void markMessagesAsRead(UUID userId, MarkMessagesAsReadRequestDto dto);
-    void deleteMessage(UUID userId, UUID messageId);
+    MarkMessageAsReadResponseDto markMessagesAsRead(UUID userId, UUID teamId, MarkMessagesAsReadRequestDto dto);
+    DeleteMessageResponseDto deleteMessage(UUID userId, UUID messageId);
 
+    UUID getTeamId(UUID messageId);
     void deleteAllMessagesInTeam(UUID teamId);
 }

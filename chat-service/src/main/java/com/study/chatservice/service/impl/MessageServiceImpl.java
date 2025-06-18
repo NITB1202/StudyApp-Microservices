@@ -3,6 +3,8 @@ package com.study.chatservice.service.impl;
 import com.study.chatservice.dto.request.MarkMessagesAsReadRequestDto;
 import com.study.chatservice.dto.request.SendMessageRequestDto;
 import com.study.chatservice.dto.request.UpdateMessageRequestDto;
+import com.study.chatservice.dto.response.DeleteMessageResponseDto;
+import com.study.chatservice.dto.response.MarkMessageAsReadResponseDto;
 import com.study.chatservice.dto.response.MessageResponseDto;
 import com.study.chatservice.dto.response.UpdateMessageResponseDto;
 import com.study.chatservice.entity.Message;
@@ -12,6 +14,7 @@ import com.study.chatservice.repository.MessageRepository;
 import com.study.chatservice.service.MessageReadStatusService;
 import com.study.chatservice.service.MessageService;
 import com.study.common.exceptions.BusinessException;
+import com.study.common.exceptions.NotFoundException;
 import com.study.common.utils.FileUtils;
 import com.study.userservice.grpc.UserDetailResponse;
 import jakarta.transaction.Transactional;
@@ -141,13 +144,14 @@ public class MessageServiceImpl implements MessageService {
     }
 
     @Override
-    public void markMessagesAsRead(UUID userId, MarkMessagesAsReadRequestDto dto) {
-        validateMarkAsReadRequest(userId, dto.getMessageIds());
+    public MarkMessageAsReadResponseDto markMessagesAsRead(UUID userId, UUID teamId, MarkMessagesAsReadRequestDto dto) {
+        validateMarkAsReadRequest(userId, teamId, dto.getMessageIds());
         statusService.markMessagesAsRead(userId, dto.getMessageIds());
+        return MessageMapper.toMarkMessageAsReadResponseDto(userId, dto.getMessageIds());
     }
 
     @Override
-    public void deleteMessage(UUID userId, UUID messageId) {
+    public DeleteMessageResponseDto deleteMessage(UUID userId, UUID messageId) {
         Message message = messageRepository.findById(messageId).orElseThrow(
                 () -> new BusinessException("Message not found.")
         );
@@ -158,6 +162,17 @@ public class MessageServiceImpl implements MessageService {
 
         message.setIsDeleted(true);
         messageRepository.save(message);
+
+        return MessageMapper.toDeleteMessageResponseDto(message);
+    }
+
+    @Override
+    public UUID getTeamId(UUID messageId) {
+        Message message = messageRepository.findById(messageId).orElseThrow(
+                () -> new NotFoundException("Message not found.")
+        );
+
+        return message.getTeamId();
     }
 
     @Override
@@ -195,29 +210,20 @@ public class MessageServiceImpl implements MessageService {
         return result;
     }
 
-    private void validateMarkAsReadRequest(UUID userId, List<UUID> messageIds) {
+    private void validateMarkAsReadRequest(UUID userId, UUID teamId, List<UUID> messageIds) {
         if(messageIds.isEmpty()){
             throw new BusinessException("No messages found.");
         }
 
-        UUID firstId = messageIds.get(0);
-        Message firstMessage = messageRepository.findById(firstId).orElseThrow(
-                () -> new BusinessException("Message with id " + firstId + " not found.")
-        );
-
-        UUID teamId = firstMessage.getTeamId();
-
         teamClient.validateUsersInTeam(teamId, Set.of(userId));
 
-        for(int i = 1; i < messageIds.size(); i++){
-            UUID id = messageIds.get(i);
-
-            Message message = messageRepository.findById(id).orElseThrow(
-                    () -> new BusinessException("Message with id " + id + " not found.")
+        for(UUID messageId : messageIds){
+            Message message = messageRepository.findById(messageId).orElseThrow(
+                    () -> new BusinessException("Message with id " + messageId + " not found.")
             );
 
             if(!message.getTeamId().equals(teamId)){
-                throw new BusinessException("The message with id " + id + " is not from the team " + teamId + ".");
+                throw new BusinessException("The message with id " + messageId + " is not from the team " + teamId + ".");
             }
         }
     }

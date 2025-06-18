@@ -13,6 +13,6 @@ public interface ChatService {
     void sendMessage(UUID userId, UUID teamId, SendMessageRequestDto dto);
     void sendImageMessage(UUID userId, UUID teamId, MultipartFile file);
     void updateMessage(UUID userId, UUID messageId, UpdateMessageRequestDto dto);
-    void markMessagesAsRead(UUID userId, MarkMessagesAsReadRequestDto dto);
+    void markMessagesAsRead(UUID userId, UUID teamId, MarkMessagesAsReadRequestDto dto);
     void deleteMessage(UUID userId, UUID messageId);
 }

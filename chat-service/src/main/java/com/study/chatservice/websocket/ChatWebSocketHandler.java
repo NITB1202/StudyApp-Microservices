@@ -1,5 +1,8 @@
 package com.study.chatservice.websocket;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.study.chatservice.dto.request.WebSocketMessage;
 import com.study.chatservice.dto.response.ConnectedUser;
 import com.study.common.exceptions.BusinessException;
 import org.springframework.stereotype.Component;
@@ -20,6 +23,7 @@ import java.util.stream.Collectors;
 public class ChatWebSocketHandler extends TextWebSocketHandler {
     //Save sessions -> connected users
     private final Map<WebSocketSession, ConnectedUser> sessionUserMap = new ConcurrentHashMap<>();
+    private final ObjectMapper objectMapper = new ObjectMapper();
 
     @Override
     public void afterConnectionEstablished(WebSocketSession session) {
@@ -44,16 +48,23 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
         System.out.println("Connection closed: " + session.getId());
     }
 
-    public void sendMessageToOnlineMembers(UUID teamId, String message) {
-        sessionUserMap.forEach((session, user) -> {
-            if (user.getTeamId().equals(teamId) && session.isOpen()) {
-                try {
-                    session.sendMessage(new TextMessage(message));
-                } catch (IOException e) {
-                    e.printStackTrace();
+    public void sendMessageToOnlineMembers(UUID teamId, String type, Object payload){
+        WebSocketMessage message = new WebSocketMessage(type, payload);
+        try {
+            String json = objectMapper.writeValueAsString(message);
+
+            sessionUserMap.forEach((session, user) -> {
+                if (user.getTeamId().equals(teamId) && session.isOpen()) {
+                    try {
+                        session.sendMessage(new TextMessage(json));
+                    } catch (IOException e) {
+                        throw new BusinessException("Error while sending message: " + e.getMessage());
+                    }
                 }
-            }
-        });
+            });
+        } catch (JsonProcessingException e) {
+            throw new BusinessException("Error deserialize message.");
+        }
     }
 
     public boolean isUserInTeam(UUID userId, UUID teamId) {

@@ -1,9 +1,6 @@
 package com.study.chatservice.grpc;
 
-import com.study.teamservice.grpc.GetTeamByIdRequest;
-import com.study.teamservice.grpc.TeamDetailResponse;
-import com.study.teamservice.grpc.TeamServiceGrpc;
-import com.study.teamservice.grpc.ValidateUsersInTeamRequest;
+import com.study.teamservice.grpc.*;
 import net.devh.boot.grpc.client.inject.GrpcClient;
 import org.springframework.stereotype.Service;
 
@@ -16,12 +13,20 @@ public class TeamServiceGrpcClient {
     @GrpcClient("team-service")
     private TeamServiceGrpc.TeamServiceBlockingStub blockingStub;
 
-    public TeamDetailResponse getTeamById(UUID id){
+    public TeamDetailResponse getTeamById(UUID id) {
         GetTeamByIdRequest request = GetTeamByIdRequest.newBuilder()
                 .setId(id.toString())
                 .build();
 
         return blockingStub.getTeamById(request);
+    }
+
+    public AllTeamMembersResponse getAllTeamMembers(UUID teamId) {
+        GetAllTeamMembersRequest request = GetAllTeamMembersRequest.newBuilder()
+                .setTeamId(teamId.toString())
+                .build();
+
+        return blockingStub.getAllTeamMembers(request);
     }
 
     public void validateUsersInTeam(UUID teamId, Set<UUID> userIds) {
