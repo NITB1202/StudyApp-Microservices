@@ -1,7 +1,7 @@
-package com.study.documentservice.service;
+package com.study.common.service;
 
 import com.google.protobuf.ByteString;
-import com.study.documentservice.dto.FileResponseDto;
+import com.study.common.dto.FileResponseDto;
 
 public interface FileService {
     FileResponseDto uploadFile(String folderPath, String publicId, ByteString byteString);

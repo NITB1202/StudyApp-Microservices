@@ -1,7 +1,8 @@
 package com.study.documentservice.controller;
 
+import com.study.common.dto.FileResponseDto;
 import com.study.common.grpc.ActionResponse;
-import com.study.documentservice.dto.FileResponseDto;
+import com.study.common.service.FileService;
 import com.study.documentservice.entity.Document;
 import com.study.documentservice.entity.Folder;
 import com.study.documentservice.entity.TeamUsage;
@@ -11,7 +12,6 @@ import com.study.documentservice.mapper.DocumentMapper;
 import com.study.documentservice.mapper.FolderMapper;
 import com.study.documentservice.mapper.UsageMapper;
 import com.study.documentservice.service.DocumentService;
-import com.study.documentservice.service.FileService;
 import com.study.documentservice.service.FolderService;
 import com.study.documentservice.service.UsageService;
 import io.grpc.stub.StreamObserver;

@@ -1,11 +1,11 @@
-package com.study.documentservice.service.impl;
+package com.study.common.service.impl;
 
 import com.cloudinary.Cloudinary;
 import com.cloudinary.utils.ObjectUtils;
 import com.google.protobuf.ByteString;
+import com.study.common.dto.FileResponseDto;
 import com.study.common.exceptions.BusinessException;
-import com.study.documentservice.dto.FileResponseDto;
-import com.study.documentservice.service.FileService;
+import com.study.common.service.FileService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
