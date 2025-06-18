@@ -2,7 +2,6 @@ package com.study.common.service.impl;
 
 import com.cloudinary.Cloudinary;
 import com.cloudinary.utils.ObjectUtils;
-import com.google.protobuf.ByteString;
 import com.study.common.dto.FileResponseDto;
 import com.study.common.exceptions.BusinessException;
 import com.study.common.service.FileService;
@@ -18,9 +17,7 @@ public class FileServiceImpl implements FileService {
     private final Cloudinary cloudinary;
 
     @Override
-    public FileResponseDto uploadFile(String folderPath, String publicId, ByteString byteString) {
-        byte[] bytes = byteString.toByteArray();
-
+    public FileResponseDto uploadFile(String folderPath, String publicId, byte[] bytes) {
         Map params = ObjectUtils.asMap(
                 "resource_type", "auto",
                 "public_id", publicId,

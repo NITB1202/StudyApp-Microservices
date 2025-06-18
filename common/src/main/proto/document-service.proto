@@ -185,17 +185,6 @@ message DeleteDocumentRequest {
   string userId = 2;
 }
 
-//Image
-message UploadImageRequest {
-  string folder_path = 1;
-  string public_id = 2;
-  bytes file = 3;
-}
-
-message UploadImageResponse {
-  string url = 1;
-}
-
 service DocumentService {
   //Usage
   rpc GetUserUsage(GetUserUsageRequest) returns (UsageResponse);
@@ -221,7 +210,4 @@ service DocumentService {
   rpc UpdateDocumentName(UpdateDocumentNameRequest) returns (common.ActionResponse);
   rpc MoveDocument(MoveDocumentRequest) returns (common.ActionResponse);
   rpc DeleteDocument(DeleteDocumentRequest) returns (common.ActionResponse);
-
-  //Image
-  rpc UploadImage(UploadImageRequest) returns (UploadImageResponse);
 }

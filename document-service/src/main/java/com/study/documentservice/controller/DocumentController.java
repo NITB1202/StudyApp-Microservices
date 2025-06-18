@@ -1,8 +1,6 @@
 package com.study.documentservice.controller;
 
-import com.study.common.dto.FileResponseDto;
 import com.study.common.grpc.ActionResponse;
-import com.study.common.service.FileService;
 import com.study.documentservice.entity.Document;
 import com.study.documentservice.entity.Folder;
 import com.study.documentservice.entity.TeamUsage;
@@ -27,7 +25,6 @@ public class DocumentController extends DocumentServiceGrpc.DocumentServiceImplB
     private final UsageService usageService;
     private final FolderService folderService;
     private final DocumentService documentService;
-    private final FileService fileService;
 
     //Usage
     @Override
@@ -249,19 +246,6 @@ public class DocumentController extends DocumentServiceGrpc.DocumentServiceImplB
         ActionResponse response = ActionResponse.newBuilder()
                 .setSuccess(true)
                 .setMessage("Delete successfully.")
-                .build();
-
-        responseObserver.onNext(response);
-        responseObserver.onCompleted();
-    }
-
-    //Image
-    @Override
-    public void uploadImage(UploadImageRequest request, StreamObserver<UploadImageResponse> responseObserver) {
-        FileResponseDto file = fileService.uploadFile(request.getFolderPath(), request.getPublicId(), request.getFile());
-
-        UploadImageResponse response = UploadImageResponse.newBuilder()
-                .setUrl(file.getUrl())
                 .build();
 
         responseObserver.onNext(response);

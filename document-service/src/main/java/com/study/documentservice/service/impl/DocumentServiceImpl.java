@@ -86,7 +86,7 @@ public class DocumentServiceImpl implements DocumentService {
         documentRepository.save(document);
 
         String folderPath = FOLDER_PATH + "/" + folderId;
-        FileResponseDto file = fileService.uploadFile(folderPath, document.getId().toString(), request.getFile());
+        FileResponseDto file = fileService.uploadFile(folderPath, document.getId().toString(), request.getFile().toByteArray());
 
         folderService.addDocument(folderId, userId, file.getBytes());
 

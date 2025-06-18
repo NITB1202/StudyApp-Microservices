@@ -7,16 +7,15 @@ import com.study.apigateway.dto.Team.Team.response.ListTeamResponseDto;
 import com.study.apigateway.dto.Team.Team.response.TeamDetailResponseDto;
 import com.study.apigateway.dto.Team.Team.response.TeamProfileResponseDto;
 import com.study.apigateway.dto.Team.Team.response.TeamResponseDto;
-import com.study.apigateway.grpc.DocumentServiceGrpcClient;
 import com.study.apigateway.grpc.TeamServiceGrpcClient;
 import com.study.apigateway.grpc.UserServiceGrpcClient;
 import com.study.apigateway.mapper.ActionMapper;
 import com.study.apigateway.mapper.TeamMapper;
 import com.study.apigateway.service.Team.TeamService;
+import com.study.common.service.FileService;
 import com.study.common.utils.FileUtils;
 import com.study.common.exceptions.BusinessException;
 import com.study.common.grpc.ActionResponse;
-import com.study.documentservice.grpc.UploadImageResponse;
 import com.study.teamservice.grpc.ListTeamResponse;
 import com.study.teamservice.grpc.TeamDetailResponse;
 import com.study.teamservice.grpc.TeamProfileResponse;
@@ -36,7 +35,7 @@ import java.util.UUID;
 public class TeamServiceImpl implements TeamService {
     private final TeamServiceGrpcClient grpcClient;
     private final UserServiceGrpcClient userClient;
-    private final DocumentServiceGrpcClient documentClient;
+    private final FileService fileService;
     private final String AVATAR_FOLDER = "teams";
 
     @Override
@@ -119,8 +118,8 @@ public class TeamServiceImpl implements TeamService {
                     buffer.read(bytes);
                     DataBufferUtils.release(buffer);
 
-                    UploadImageResponse avatar = documentClient.uploadImage(AVATAR_FOLDER, id.toString(), bytes);
-                    ActionResponse response = grpcClient.uploadTeamAvatar(userId, id, avatar.getUrl());
+                    String avatarUrl = fileService.uploadFile(AVATAR_FOLDER, id.toString(), bytes).getUrl();
+                    ActionResponse response = grpcClient.uploadTeamAvatar(userId, id, avatarUrl);
 
                     return Mono.fromCallable(() -> ActionMapper.toResponseDto(response))
                             .subscribeOn(Schedulers.boundedElastic());

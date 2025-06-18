@@ -6,15 +6,14 @@ import com.study.apigateway.dto.User.request.UpdateUserRequestDto;
 import com.study.apigateway.dto.User.response.ListUserResponseDto;
 import com.study.apigateway.dto.User.response.UserDetailResponseDto;
 import com.study.apigateway.dto.User.response.UserResponseDto;
-import com.study.apigateway.grpc.DocumentServiceGrpcClient;
 import com.study.apigateway.grpc.UserServiceGrpcClient;
 import com.study.apigateway.mapper.ActionMapper;
 import com.study.apigateway.mapper.UserMapper;
 import com.study.apigateway.service.User.UserService;
+import com.study.common.service.FileService;
 import com.study.common.utils.FileUtils;
 import com.study.common.exceptions.BusinessException;
 import com.study.common.grpc.ActionResponse;
-import com.study.documentservice.grpc.UploadImageResponse;
 import com.study.userservice.grpc.ListUserResponse;
 import com.study.userservice.grpc.UserDetailResponse;
 import com.study.userservice.grpc.UserResponse;
@@ -31,7 +30,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
     private final UserServiceGrpcClient userServiceGrpcClient;
-    private final DocumentServiceGrpcClient documentServiceGrpcClient;
+    private final FileService fileService;
     private final String AVATAR_FOLDER = "users";
 
     @Override
@@ -78,8 +77,8 @@ public class UserServiceImpl implements UserService {
                     buffer.read(bytes);
                     DataBufferUtils.release(buffer);
 
-                    UploadImageResponse avatar = documentServiceGrpcClient.uploadImage(AVATAR_FOLDER, id.toString(), bytes);
-                    ActionResponse response = userServiceGrpcClient.uploadUserAvatar(id, avatar.getUrl());
+                    String avatarUrl = fileService.uploadFile(AVATAR_FOLDER, id.toString(), bytes).getUrl();
+                    ActionResponse response = userServiceGrpcClient.uploadUserAvatar(id, avatarUrl);
 
                     return Mono.fromCallable(() -> ActionMapper.toResponseDto(response))
                             .subscribeOn(Schedulers.boundedElastic());
