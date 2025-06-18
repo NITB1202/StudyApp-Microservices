@@ -1,18 +1,15 @@
 package com.study.chatservice.service;
 
-import com.study.chatservice.dto.request.MarkMessagesAsReadRequestDto;
-import com.study.chatservice.dto.request.SendMessageRequestDto;
-import com.study.chatservice.dto.request.UpdateMessageRequestDto;
-import org.springframework.web.multipart.MultipartFile;
+import com.study.chatservice.grpc.*;
 
 import java.util.List;
 import java.util.UUID;
 
 public interface ChatService {
     List<UUID> getOfflineUsersInTeam(UUID teamId);
-    void sendMessage(UUID userId, UUID teamId, SendMessageRequestDto dto);
-    void sendImageMessage(UUID userId, UUID teamId, MultipartFile file);
-    void updateMessage(UUID userId, UUID messageId, UpdateMessageRequestDto dto);
-    void markMessagesAsRead(UUID userId, UUID teamId, MarkMessagesAsReadRequestDto dto);
-    void deleteMessage(UUID userId, UUID messageId);
+    void sendMessage(SendMessageRequest request);
+    void sendImageMessage(SendImageMessageRequest request);
+    void updateMessage(UpdateMessageRequest request);
+    void markMessagesAsRead(MarkMessagesAsReadRequest request);
+    void deleteMessage(DeleteMessageRequest request);
 }

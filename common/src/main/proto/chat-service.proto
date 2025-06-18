@@ -2,9 +2,23 @@ syntax = "proto3";
 
 package chat;
 
+import "common.proto";
+
 option java_multiple_files = true;
 option java_package = "com.study.chatservice.grpc";
 option java_outer_classname = "ChatProto";
+
+message SendMessageRequest {
+  string userId = 1;
+  string teamId = 2;
+  string content = 3;
+}
+
+message SendImageMessageRequest {
+  string userId = 1;
+  string teamId = 2;
+  bytes file = 3;
+}
 
 message GetUnreadMessageCountRequest {
   string userId = 1;
@@ -38,7 +52,29 @@ message MessagesResponse {
   string nextCursor = 3;
 }
 
+message UpdateMessageRequest {
+  string userId = 1;
+  string messageId = 2;
+  string content = 3;
+}
+
+message MarkMessagesAsReadRequest {
+  string userId = 1;
+  string teamId = 2;
+  repeated string messageIds = 3;
+}
+
+message DeleteMessageRequest {
+  string userId = 1;
+  string messageId = 2;
+}
+
 service ChatService {
+  rpc SendMessage(SendMessageRequest) returns (common.ActionResponse);
+  rpc SendImageMessage(SendImageMessageRequest) returns (common.ActionResponse);
   rpc GetUnreadMessageCount(GetUnreadMessageCountRequest) returns (GetUnreadMessageCountResponse) ;
   rpc GetMessages(GetMessagesRequest) returns (MessagesResponse);
+  rpc UpdateMessage(UpdateMessageRequest) returns (common.ActionResponse);
+  rpc MarkMessagesAsRead(MarkMessagesAsReadRequest) returns (common.ActionResponse);
+  rpc DeleteMessage(DeleteMessageRequest) returns (common.ActionResponse);
 }

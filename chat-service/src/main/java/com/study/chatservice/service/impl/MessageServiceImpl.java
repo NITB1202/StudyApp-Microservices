@@ -1,8 +1,5 @@
 package com.study.chatservice.service.impl;
 
-import com.study.chatservice.dto.request.MarkMessagesAsReadRequestDto;
-import com.study.chatservice.dto.request.SendMessageRequestDto;
-import com.study.chatservice.dto.request.UpdateMessageRequestDto;
 import com.study.chatservice.dto.response.DeleteMessageResponseDto;
 import com.study.chatservice.dto.response.MarkMessageAsReadResponseDto;
 import com.study.chatservice.dto.response.MessageResponseDto;
@@ -15,7 +12,6 @@ import com.study.chatservice.service.MessageReadStatusService;
 import com.study.chatservice.service.MessageService;
 import com.study.common.exceptions.BusinessException;
 import com.study.common.exceptions.NotFoundException;
-import com.study.common.utils.FileUtils;
 import com.study.userservice.grpc.UserDetailResponse;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -23,9 +19,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -76,13 +70,13 @@ public class MessageServiceImpl implements MessageService {
     }
 
     @Override
-    public MessageResponseDto saveMessage(UUID userId, UUID teamId, SendMessageRequestDto dto) {
+    public MessageResponseDto saveMessage(UUID userId, UUID teamId, String content) {
         teamClient.validateUsersInTeam(teamId, Set.of(userId));
 
         Message message = Message.builder()
                 .userId(userId)
                 .teamId(teamId)
-                .content(dto.getContent())
+                .content(content)
                 .createdAt(LocalDateTime.now())
                 .isDeleted(false)
                 .build();
@@ -94,12 +88,8 @@ public class MessageServiceImpl implements MessageService {
     }
 
     @Override
-    public MessageResponseDto saveImageMessage(UUID userId, UUID teamId, MultipartFile file) {
+    public MessageResponseDto saveImageMessage(UUID userId, UUID teamId, byte[] bytes) {
         teamClient.validateUsersInTeam(teamId, Set.of(userId));
-
-        if(!FileUtils.isImage(file)) {
-            throw new BusinessException("This is not an image.");
-        }
 
         Message message = Message.builder()
                 .userId(userId)
@@ -114,13 +104,9 @@ public class MessageServiceImpl implements MessageService {
         String folderPath = FOLDER_PATH + "/" + teamId;
         String publicId = message.getId().toString();
 
-        try {
-            String url = documentClient.uploadImage(folderPath, publicId, file.getBytes()).getUrl();
-            message.setImageUrl(url);
-            messageRepository.save(message);
-        } catch (IOException e) {
-            throw new BusinessException("Upload image failed.");
-        }
+        String url = documentClient.uploadImage(folderPath, publicId, bytes).getUrl();
+        message.setImageUrl(url);
+        messageRepository.save(message);
 
         UserDetailResponse user = userClient.getUserById(userId);
 
@@ -128,7 +114,7 @@ public class MessageServiceImpl implements MessageService {
     }
 
     @Override
-    public UpdateMessageResponseDto updateMessage(UUID userId, UUID messageId, UpdateMessageRequestDto dto) {
+    public UpdateMessageResponseDto updateMessage(UUID userId, UUID messageId, String content) {
         Message message = messageRepository.findById(messageId).orElseThrow(
                 () -> new BusinessException("Message not found.")
         );
@@ -137,15 +123,15 @@ public class MessageServiceImpl implements MessageService {
             throw new BusinessException("Only the creator can edit his/her message.");
         }
 
-        message.setContent(dto.getContent());
+        message.setContent(content);
         messageRepository.save(message);
 
         return MessageMapper.toUpdateMessageResponseDto(message);
     }
 
     @Override
-    public MarkMessageAsReadResponseDto markMessagesAsRead(UUID userId, UUID teamId, MarkMessagesAsReadRequestDto dto) {
-        List<UUID> validatedList = validateMarkAsReadRequest(userId, teamId, dto.getMessageIds());
+    public MarkMessageAsReadResponseDto markMessagesAsRead(UUID userId, UUID teamId, List<UUID> messageIds) {
+        List<UUID> validatedList = validateMarkAsReadRequest(userId, teamId, messageIds);
         statusService.markMessagesAsRead(userId, validatedList);
         return MessageMapper.toMarkMessageAsReadResponseDto(userId, validatedList);
     }
