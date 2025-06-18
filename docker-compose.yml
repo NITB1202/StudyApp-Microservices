@@ -267,6 +267,16 @@ services:
     networks:
       - backend
 
+  redis:
+    image: redis:7.2
+    container_name: redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+    networks:
+      - backend
+
   api-gateway:
     build:
       context: ./api-gateway
@@ -288,6 +298,7 @@ volumes:
   document-db-data:
   session-db-data:
   chat-db-data:
+  redis-data:
 
 networks:
   backend:

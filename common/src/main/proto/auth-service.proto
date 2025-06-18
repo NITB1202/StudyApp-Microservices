@@ -1,0 +1,86 @@
+syntax = "proto3";
+
+package auth;
+
+import "common.proto";
+
+option java_multiple_files = true;
+option java_package = "com.study.authservice.grpc";
+option java_outer_classname = "AuthProto";
+
+enum SupportedProvider {
+  GOOGLE = 0;
+  FACEBOOK = 1;
+}
+
+enum VerificationType {
+  REGISTER = 0;
+  RESET_PASSWORD = 1;
+}
+
+message LoginWithCredentialsRequest {
+  string email = 1;
+  string password = 2;
+}
+
+message LoginResponse {
+  string access_token = 1;
+  string refresh_token = 2;
+}
+
+message LoginWithProviderRequest {
+  SupportedProvider provider = 1;
+  string provider_id = 2;
+}
+
+message IsAccountRegisteredRequest {
+  SupportedProvider provider = 1;
+  string provider_id = 2;
+}
+
+message IsAccountRegisteredResponse {
+  bool isRegistered = 1;
+}
+
+message ValidateRegisterInfoRequest {
+  string email = 1;
+  string password = 2;
+}
+
+message SendVerificationEmailRequest {
+  string email = 1;
+  VerificationType type = 2;
+}
+
+message RegisterWithCredentialsRequest {
+  string verification_code = 1;
+  string user_id = 2;
+  string email = 3;
+  string password = 4;
+}
+
+message RegisterWithProviderRequest {
+  string provider_id = 1;
+  SupportedProvider provider = 2;
+  string user_id = 3;
+  string email = 4;
+}
+
+message ResetPasswordRequest {
+  string verification_code = 1;
+  string email = 2;
+  string new_password = 3;
+}
+
+service AuthService {
+  rpc LoginWithCredentials(LoginWithCredentialsRequest) returns (LoginResponse);
+  rpc LoginWithProvider(LoginWithProviderRequest) returns (LoginResponse);
+
+  rpc IsAccountRegistered(IsAccountRegisteredRequest) returns (IsAccountRegisteredResponse);
+  rpc ValidateRegisterInfo(ValidateRegisterInfoRequest) returns (common.ActionResponse);
+  rpc SendVerificationEmail(SendVerificationEmailRequest) returns (common.ActionResponse);
+
+  rpc RegisterWithCredentials(RegisterWithCredentialsRequest) returns (common.ActionResponse);
+  rpc RegisterWithProvider(RegisterWithProviderRequest) returns (common.ActionResponse);
+  rpc ResetPassword(ResetPasswordRequest) returns (common.ActionResponse);
+}
