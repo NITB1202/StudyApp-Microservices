@@ -10,5 +10,5 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class UnreadMessageCountResponseDto {
-    private int count;
+    private long count;
 }
