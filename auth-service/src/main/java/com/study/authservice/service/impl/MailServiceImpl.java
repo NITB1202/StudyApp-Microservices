@@ -25,7 +25,7 @@ public class MailServiceImpl implements MailService {
                 + verificationCode
                 + "</div>"
                 + "<p>This code will expire in 5 minutes.</p>"
-                + "<p style='margin-top: 40px;'>Regards,<br><strong>English4U</strong></p>"
+                + "<p style='margin-top: 40px;'>Regards,<br><strong>StudyPal</strong></p>"
                 + "</div>";
 
         sendHtmlMail(email, subject, htmlContent);

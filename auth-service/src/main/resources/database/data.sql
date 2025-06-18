@@ -6,7 +6,7 @@ VALUES
         '041c77e0-ae77-4005-b745-ea12dca9bec6',
         'LOCAL',
         NULL,
-        'user1@english4u.com',
+        'user1@studypal.com',
         '$2a$10$BKfmTWy1Sq4NWfdXHa.08O1dMZke1Kl72tPWCJ4FGNIjFz/CxxbDu',
         'USER'
     ),
@@ -16,7 +16,7 @@ VALUES
         '618c10ee-923f-4323-b32b-086caa534b46',
         'LOCAL',
         NULL,
-        'user2@english4u.com',
+        'user2@studypal.com',
         '$2a$10$zpygZ72GKBRwd8PNiHcRMO5muGxZr/YfJ.V4Y2sCfai7CP76wpxHC',
         'USER'
     ),
@@ -26,7 +26,7 @@ VALUES
         '9f5d79f2-83a2-411d-bb66-caeb640a62b0',
         'LOCAL',
         NULL,
-        'user3@english4u.com',
+        'user3@studypal.com',
         '$2a$10$/j.77sEIl8aJBjOSj1G6.erGDyAE19Z2BsRcPABkhgb8GNfiwp6cO',
         'USER'
     );
