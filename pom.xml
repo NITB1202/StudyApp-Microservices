@@ -23,6 +23,7 @@
         <module>document-service</module>
         <module>session-service</module>
         <module>chat-service</module>
+        <module>auth-service</module>
         <module>api-gateway</module>
     </modules>
 
