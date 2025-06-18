@@ -61,9 +61,9 @@ public class MessageMapper {
                 .build();
     }
 
-    public static MarkMessageAsReadResponseDto toMarkMessageAsReadResponseDto(UUID userId, List<UUID> messageIds) {
+    public static MarkMessageAsReadResponseDto toMarkMessageAsReadResponseDto(UserDetailResponse user, List<UUID> messageIds) {
         return MarkMessageAsReadResponseDto.builder()
-                .userId(userId)
+                .username(user.getUsername())
                 .messageIds(messageIds)
                 .build();
     }

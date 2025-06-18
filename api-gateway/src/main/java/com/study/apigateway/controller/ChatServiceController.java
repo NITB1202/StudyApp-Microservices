@@ -32,7 +32,7 @@ public class ChatServiceController {
     private final ChatService chatService;
 
     @GetMapping("/ws")
-    @Operation(summary = "Get available web socket url(connect web socket to receive real-time message.")
+    @Operation(summary = "Get available web socket url (connect web socket to receive real-time message).")
     public Mono<ResponseEntity<StringWrapper>> getWebsocketUrl() {
         String url = "ws://localhost:8086/ws/chat?userId=<userId>&teamId=<teamId>";
 
@@ -54,7 +54,7 @@ public class ChatServiceController {
         return chatService.sendMessage(userId, teamId, dto).map(ResponseEntity::ok);
     }
 
-    @PostMapping(value = "/{teamId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PostMapping(value = "/{teamId}/image", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @Operation(summary = "Send an image to the team.")
     @ApiResponse(responseCode = "200", description = "Send successfully.")
     @ApiResponse(responseCode = "400", description = "Invalid request body.",
@@ -65,7 +65,7 @@ public class ChatServiceController {
         return chatService.sendImageMessage(userId, teamId, file).map(ResponseEntity::ok);
     }
 
-    @GetMapping("/unread/{teamId}")
+    @GetMapping("{teamId}/unread")
     @Operation(summary = "Get unread messages count for team chat notification.")
     @ApiResponse(responseCode = "200", description = "Get successfully.")
     public Mono<ResponseEntity<UnreadMessageCountResponseDto>> getUnreadMessageCount(@RequestParam UUID userId, @PathVariable UUID teamId) {

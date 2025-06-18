@@ -7,6 +7,7 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -26,6 +27,7 @@ public class MessageReadStatusServiceImpl implements MessageReadStatusService {
             MessageReadStatus status = MessageReadStatus.builder()
                     .userId(userId)
                     .messageId(messageId)
+                    .readAt(LocalDateTime.now())
                     .build();
 
             statuses.add(status);

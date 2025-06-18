@@ -35,7 +35,7 @@ public class PlanReminderServiceImpl implements PlanReminderService {
     public Mono<ActionResponseDto> updatePlanReminders(UUID userId, UUID planId, UpdatePlanRemindersRequestDto request) {
         return Mono.fromCallable(()->{
             validateIfUpdateTeamPlan(userId, planId);
-            ActionResponse response = planGrpc.updatePlanReminders(request);
+            ActionResponse response = planGrpc.updatePlanReminders(planId, request);
             return ActionMapper.toResponseDto(response);
         }).subscribeOn(Schedulers.boundedElastic());
     }
@@ -44,7 +44,7 @@ public class PlanReminderServiceImpl implements PlanReminderService {
     public Mono<ActionResponseDto> deletePlanReminders(UUID userId, UUID planId, DeletePlanRemindersRequestDto request) {
         return Mono.fromCallable(()->{
             validateIfUpdateTeamPlan(userId, planId);
-            ActionResponse response = planGrpc.deletePlanReminders(request);
+            ActionResponse response = planGrpc.deletePlanReminders(planId, request);
             return ActionMapper.toResponseDto(response);
         }).subscribeOn(Schedulers.boundedElastic());
     }

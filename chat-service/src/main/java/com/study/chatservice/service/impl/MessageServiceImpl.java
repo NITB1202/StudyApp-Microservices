@@ -131,9 +131,10 @@ public class MessageServiceImpl implements MessageService {
 
     @Override
     public MarkMessageAsReadResponseDto markMessagesAsRead(UUID userId, UUID teamId, List<UUID> messageIds) {
+        UserDetailResponse user = userClient.getUserById(userId);
         List<UUID> validatedList = validateMarkAsReadRequest(userId, teamId, messageIds);
         statusService.markMessagesAsRead(userId, validatedList);
-        return MessageMapper.toMarkMessageAsReadResponseDto(userId, validatedList);
+        return MessageMapper.toMarkMessageAsReadResponseDto(user, validatedList);
     }
 
     @Override
