@@ -242,26 +242,26 @@ public class PlanServiceGrpcClient {
         return planStub.getAllPlanRemindersInPlan(request);
     }
 
-    public ActionResponse updatePlanReminders(UpdatePlanRemindersRequestDto dto) {
+    public ActionResponse updatePlanReminders(UUID planId, UpdatePlanRemindersRequestDto dto) {
         List<UpdatePlanReminderRequest> reminderRequests = dto.getReminders().stream()
                 .map(PlanReminderMapper::toUpdatePlanReminderRequest)
                 .toList();
 
         UpdatePlanRemindersRequest request = UpdatePlanRemindersRequest.newBuilder()
-                .setPlanId(dto.getPlanId().toString())
+                .setPlanId(planId.toString())
                 .addAllRequests(reminderRequests)
                 .build();
 
         return planStub.updatePlanReminders(request);
     }
 
-    public ActionResponse deletePlanReminders(DeletePlanRemindersRequestDto dto) {
+    public ActionResponse deletePlanReminders(UUID planId, DeletePlanRemindersRequestDto dto) {
         List<String> idsStr = dto.getReminderIds().stream()
                 .map(UUID::toString)
                 .toList();
 
         DeletePlanRemindersRequest request = DeletePlanRemindersRequest.newBuilder()
-                .setPlanId(dto.getPlanId().toString())
+                .setPlanId(planId.toString())
                 .addAllReminderIds(idsStr)
                 .build();
 

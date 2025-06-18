@@ -31,14 +31,17 @@ public class ChatNotifyJob implements Job {
         ChatNotification notification = chatNotificationService.getChatNotificationByTeamId(teamId);
         List<UUID> receiverIds = chatService.getOfflineUsersInTeam(teamId);
 
-        MessageSentEvent event = MessageSentEvent.builder()
-                .teamId(teamId)
-                .teamName(notification.getTeamName())
-                .newMessageCount(notification.getNewMessageCount())
-                .receiverIds(receiverIds)
-                .build();
+        if(!receiverIds.isEmpty()) {
+            MessageSentEvent event = MessageSentEvent.builder()
+                    .teamId(teamId)
+                    .teamName(notification.getTeamName())
+                    .newMessageCount(notification.getNewMessageCount())
+                    .receiverIds(receiverIds)
+                    .build();
 
-        publisher.publishEvent(SEND_TOPIC, event);
+            publisher.publishEvent(SEND_TOPIC, event);
+        }
+
         chatNotificationService.deleteChatNotification(teamId);
     }
 }

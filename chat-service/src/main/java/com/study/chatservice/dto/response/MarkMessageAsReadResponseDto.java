@@ -13,7 +13,7 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 public class MarkMessageAsReadResponseDto {
-    private UUID userId;
+    private String username;
 
     private List<UUID> messageIds;
 }

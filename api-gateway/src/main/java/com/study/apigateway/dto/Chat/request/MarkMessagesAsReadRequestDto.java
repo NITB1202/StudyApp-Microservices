@@ -1,4 +1,4 @@
-package com.study.chatservice.dto.request;
+package com.study.apigateway.dto.Chat.request;
 
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;

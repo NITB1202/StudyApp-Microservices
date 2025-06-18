@@ -9,7 +9,7 @@ import reactor.core.publisher.Mono;
 import java.util.UUID;
 
 public interface PlanReminderService {
-    Mono<ActionResponseDto> addPlanReminders(UUID userId, AddPlanRemindersRequestDto request);
-    Mono<ActionResponseDto> updatePlanReminders(UUID userId, UpdatePlanRemindersRequestDto request);
-    Mono<ActionResponseDto> deletePlanReminders(UUID userId, DeletePlanRemindersRequestDto request);
+    Mono<ActionResponseDto> addPlanReminders(UUID userId, UUID planId, AddPlanRemindersRequestDto request);
+    Mono<ActionResponseDto> updatePlanReminders(UUID userId, UUID planId, UpdatePlanRemindersRequestDto request);
+    Mono<ActionResponseDto> deletePlanReminders(UUID userId, UUID planId, DeletePlanRemindersRequestDto request);
 }
