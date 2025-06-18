@@ -1,9 +1,11 @@
 package com.study.chatservice.service;
 
-import java.util.List;
+import com.study.chatservice.entity.ChatNotification;
+
 import java.util.UUID;
 
 public interface ChatNotificationService {
     void increaseNewMessageCount(UUID teamId);
-    void publishChatNotification(UUID teamId, String teamName, int newMessageCount, List<UUID> receiverIds);
+    ChatNotification getChatNotificationByTeamId(UUID teamId);
+    void deleteChatNotification(UUID teamId);
 }

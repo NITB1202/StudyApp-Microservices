@@ -13,6 +13,7 @@ import java.util.UUID;
 public class MessageSentEvent {
     private UUID teamId;
     private String teamName;
+    private String teamAvatarUrl;
     private int newMessageCount;
     private List<UUID> receiverIds;
 }
