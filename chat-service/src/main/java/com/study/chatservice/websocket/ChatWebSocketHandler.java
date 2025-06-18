@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.study.chatservice.dto.request.WebSocketMessage;
 import com.study.chatservice.dto.response.ConnectedUser;
 import com.study.common.exceptions.BusinessException;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.TextMessage;
@@ -20,10 +21,10 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 @Component
+@RequiredArgsConstructor
 public class ChatWebSocketHandler extends TextWebSocketHandler {
-    //Save sessions -> connected users
+    private final ObjectMapper objectMapper;
     private final Map<WebSocketSession, ConnectedUser> sessionUserMap = new ConcurrentHashMap<>();
-    private final ObjectMapper objectMapper = new ObjectMapper();
 
     @Override
     public void afterConnectionEstablished(WebSocketSession session) {
@@ -69,7 +70,7 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
                 }
             });
         } catch (JsonProcessingException e) {
-            throw new BusinessException("Error deserialize message.");
+            throw new BusinessException("Error serialize message.");
         }
     }
 
