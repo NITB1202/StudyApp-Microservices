@@ -15,9 +15,6 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 public class DeletePlanRemindersRequestDto {
-    @NotNull(message = "Plan id is required.")
-    private UUID planId;
-
     @NotNull(message = "Reminders id are required.")
     @Size(min = 1, message = "Must have at least 1 reminder.")
     private List<UUID> reminderIds;

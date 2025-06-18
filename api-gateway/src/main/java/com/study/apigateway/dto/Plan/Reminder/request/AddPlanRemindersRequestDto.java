@@ -9,16 +9,12 @@ import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.UUID;
 
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class AddPlanRemindersRequestDto {
-    @NotNull(message = "Plan id is required.")
-    private UUID planId;
-
     @NotNull(message = "Reminders are required.")
     @Size(min = 1, message = "Must have at least 1 reminder.")
     private List<LocalDateTime> reminders;

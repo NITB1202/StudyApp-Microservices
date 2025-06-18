@@ -23,27 +23,27 @@ public class PlanReminderServiceImpl implements PlanReminderService {
     private final TeamServiceGrpcClient teamGrpc;
 
     @Override
-    public Mono<ActionResponseDto> addPlanReminders(UUID userId, AddPlanRemindersRequestDto request) {
+    public Mono<ActionResponseDto> addPlanReminders(UUID userId, UUID planId, AddPlanRemindersRequestDto request) {
         return Mono.fromCallable(()->{
-            validateIfUpdateTeamPlan(userId, request.getPlanId());
-            ActionResponse response = planGrpc.createPlanReminders(request.getPlanId(), request.getReminders());
+            validateIfUpdateTeamPlan(userId, planId);
+            ActionResponse response = planGrpc.createPlanReminders(planId, request.getReminders());
             return ActionMapper.toResponseDto(response);
         }).subscribeOn(Schedulers.boundedElastic());
     }
 
     @Override
-    public Mono<ActionResponseDto> updatePlanReminders(UUID userId, UpdatePlanRemindersRequestDto request) {
+    public Mono<ActionResponseDto> updatePlanReminders(UUID userId, UUID planId, UpdatePlanRemindersRequestDto request) {
         return Mono.fromCallable(()->{
-            validateIfUpdateTeamPlan(userId, request.getPlanId());
+            validateIfUpdateTeamPlan(userId, planId);
             ActionResponse response = planGrpc.updatePlanReminders(request);
             return ActionMapper.toResponseDto(response);
         }).subscribeOn(Schedulers.boundedElastic());
     }
 
     @Override
-    public Mono<ActionResponseDto> deletePlanReminders(UUID userId, DeletePlanRemindersRequestDto request) {
+    public Mono<ActionResponseDto> deletePlanReminders(UUID userId, UUID planId, DeletePlanRemindersRequestDto request) {
         return Mono.fromCallable(()->{
-            validateIfUpdateTeamPlan(userId, request.getPlanId());
+            validateIfUpdateTeamPlan(userId, planId);
             ActionResponse response = planGrpc.deletePlanReminders(request);
             return ActionMapper.toResponseDto(response);
         }).subscribeOn(Schedulers.boundedElastic());
