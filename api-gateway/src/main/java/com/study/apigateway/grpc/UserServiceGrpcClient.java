@@ -1,6 +1,5 @@
 package com.study.apigateway.grpc;
 
-import com.study.apigateway.dto.User.request.CreateUserRequestDto;
 import com.study.apigateway.dto.User.request.UpdateUserRequestDto;
 import com.study.common.grpc.ActionResponse;
 import com.study.common.mappers.GenderMapper;
@@ -16,11 +15,16 @@ public class UserServiceGrpcClient {
     @GrpcClient("user-service")
     private UserServiceGrpc.UserServiceBlockingStub userServiceStub;
 
-    public UserResponse createUser(CreateUserRequestDto dto) {
+    public UserResponse createUser(String username, String dateOfBirth, String gender, String avatarUrl) {
+        String handledDateOfBirth = dateOfBirth != null ? dateOfBirth : "";
+        Gender handledGender = gender != null ? GenderMapper.fromString(gender) : Gender.UNSPECIFIED;
+        String handledAvatarUrl = avatarUrl != null ? avatarUrl : "";
+
         CreateUserRequest request = CreateUserRequest.newBuilder()
-                .setUsername(dto.getUsername())
-                .setDateOfBirth(dto.getDateOfBirth().toString())
-                .setGender(GenderMapper.toProtoEnum(dto.getGender()))
+                .setUsername(username)
+                .setDateOfBirth(handledDateOfBirth)
+                .setGender(handledGender)
+                .setAvatarUrl(handledAvatarUrl)
                 .build();
 
         return userServiceStub.createUser(request);
@@ -50,7 +54,7 @@ public class UserServiceGrpcClient {
         //Avoid null fields
         String username = dto.getUsername() != null ? dto.getUsername().trim() : "";
         String dateOfBirth = dto.getDateOfBirth() != null ? dto.getDateOfBirth().toString() : "";
-        Gender gender = dto.getGender() != null ? GenderMapper.toProtoEnum(dto.getGender()) : Gender.UNSPECIFIED;
+        Gender gender = dto.getGender() != null ? GenderMapper.toProtoEnum(dto.getGender()) : Gender.UNRECOGNIZED;
 
         UpdateUserRequest request = UpdateUserRequest.newBuilder()
                 .setId(id.toString())

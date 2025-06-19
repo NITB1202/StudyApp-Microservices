@@ -10,7 +10,7 @@ public class GenderMapper {
         return switch (protoGender) {
             case MALE -> Gender.MALE;
             case FEMALE -> Gender.FEMALE;
-            default -> Gender.OTHER;
+            default -> Gender.UNSPECIFIED;
         };
     }
 
@@ -18,7 +18,17 @@ public class GenderMapper {
         return switch (gender) {
             case MALE -> com.study.userservice.grpc.Gender.MALE;
             case FEMALE -> com.study.userservice.grpc.Gender.FEMALE;
-            default -> com.study.userservice.grpc.Gender.OTHER;
+            default -> com.study.userservice.grpc.Gender.UNSPECIFIED;
+        };
+    }
+
+    public static com.study.userservice.grpc.Gender fromString(String gender) {
+        String handledGender = gender.toUpperCase();
+
+        return switch (handledGender) {
+            case "MALE" -> com.study.userservice.grpc.Gender.MALE;
+            case "FEMALE" -> com.study.userservice.grpc.Gender.FEMALE;
+            default -> com.study.userservice.grpc.Gender.UNSPECIFIED;
         };
     }
 }

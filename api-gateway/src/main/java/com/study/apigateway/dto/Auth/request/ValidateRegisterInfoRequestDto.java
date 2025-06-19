@@ -1,23 +1,18 @@
-package com.study.apigateway.dto.User.request;
+package com.study.apigateway.dto.Auth.request;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.study.common.enums.Gender;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Past;
-import jakarta.validation.constraints.Size;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import jakarta.validation.constraints.*;
+import lombok.*;
 
 import java.time.LocalDate;
 
-@Data
-@Builder
-@NoArgsConstructor
+@Getter
+@Setter
 @AllArgsConstructor
-public class CreateUserRequestDto {
+@NoArgsConstructor
+@Builder
+public class ValidateRegisterInfoRequestDto {
     @NotBlank(message = "Username is required.")
     @Size(min = 3, max = 20, message = "Username must be between 3 and 20 characters.")
     private String username;
@@ -30,4 +25,11 @@ public class CreateUserRequestDto {
     @NotNull(message = "Gender is required.")
     @JsonFormat(shape = JsonFormat.Shape.STRING)
     private Gender gender;
+
+    @NotEmpty(message = "Email is required.")
+    @Email(message = "Invalid email format.")
+    private String email;
+
+    @NotEmpty(message = "Password is required.")
+    private String password;
 }

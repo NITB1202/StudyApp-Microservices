@@ -2,7 +2,9 @@ package com.study.authservice.controller;
 
 import com.study.authservice.entity.Account;
 import com.study.authservice.grpc.*;
+import com.study.authservice.mapper.AccountMapper;
 import com.study.authservice.mapper.AuthMapper;
+import com.study.authservice.service.AccountService;
 import com.study.authservice.service.AuthService;
 import com.study.authservice.service.CodeService;
 import com.study.authservice.service.MailService;
@@ -18,6 +20,7 @@ public class AuthController extends AuthServiceGrpc.AuthServiceImplBase {
     private final AuthService authService;
     private final CodeService codeService;
     private final MailService mailService;
+    private final AccountService accountService;
 
     @Override
     public void loginWithCredentials(LoginWithCredentialsRequest request, StreamObserver<LoginResponse> responseObserver) {
@@ -121,6 +124,14 @@ public class AuthController extends AuthServiceGrpc.AuthServiceImplBase {
                 .setMessage("Reset password successful.")
                 .build();
 
+        responseObserver.onNext(response);
+        responseObserver.onCompleted();
+    }
+
+    @Override
+    public void getAccountById(GetAccountByIdRequest request, StreamObserver<AccountSummaryResponse> responseObserver) {
+        Account account = accountService.getAccountById(request);
+        AccountSummaryResponse response = AccountMapper.toAccountSummaryResponse(account);
         responseObserver.onNext(response);
         responseObserver.onCompleted();
     }
