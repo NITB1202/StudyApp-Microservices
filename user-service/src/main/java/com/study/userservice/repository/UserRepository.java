@@ -10,19 +10,6 @@ import java.util.List;
 import java.util.UUID;
 
 public interface UserRepository extends JpaRepository<User, UUID> {
-    boolean existsByUsernameIgnoreCase(String username);
-
-    @Query("""
-    SELECT u 
-    FROM User u
-    WHERE u.id IN :ids
-      AND (:cursor IS NULL OR u.id > :cursor)
-    ORDER BY u.id ASC
-    """)
-    List<User> findByIdsWithCursor(@Param("ids") List<UUID> ids,
-                                   @Param("cursor") UUID cursor,
-                                   Pageable pageable);
-
     @Query("""
     SELECT u
     FROM User u

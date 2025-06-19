@@ -28,10 +28,9 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User createUser(CreateUserRequest request) {
-        if(userRepository.existsByUsernameIgnoreCase(request.getUsername()))
-            throw new BusinessException("Username already exists");
-
-        LocalDate dateOfBirth = request.getDateOfBirth().isEmpty() ? null : LocalDate.parse(request.getDateOfBirth());
+        LocalDate dateOfBirth = !request.getDateOfBirth().isEmpty() ?
+                LocalDate.parse(request.getDateOfBirth()) :
+                null;
 
         User user = User.builder()
                 .username(request.getUsername())
@@ -76,27 +75,19 @@ public class UserServiceImpl implements UserService {
     @Override
     public User updateUser(UpdateUserRequest request) {
         User user = userRepository.findById(UUID.fromString(request.getId())).orElseThrow(
-                () -> new NotFoundException("User not found")
+                () -> new NotFoundException("User not found.")
         );
-
-        //Check if username has already existed
-        if(!request.getUsername().isBlank()){
-            if(userRepository.existsByUsernameIgnoreCase(request.getUsername()))
-                throw new BusinessException("Username already exists");
-            else
-                user.setUsername(request.getUsername());
-        }
 
         if(!request.getDateOfBirth().isBlank()){
             try {
                 LocalDate dateOfBirth = LocalDate.parse(request.getDateOfBirth());
                 user.setDateOfBirth(dateOfBirth);
             } catch (DateTimeParseException e) {
-                throw new BusinessException("Invalid date format. Expected yyyy-MM-dd");
+                throw new BusinessException("Invalid date format. Expected yyyy-MM-dd.");
             }
         }
 
-        if(request.getGender() != com.study.userservice.grpc.Gender.UNSPECIFIED)
+        if(request.getGender() != Gender.UNRECOGNIZED)
             user.setGender(GenderMapper.toEnum(request.getGender()));
 
         return userRepository.save(user);
@@ -105,11 +96,11 @@ public class UserServiceImpl implements UserService {
     @Override
     public void uploadUserAvatar(UploadUserAvatarRequest request){
         User user = userRepository.findById(UUID.fromString(request.getId())).orElseThrow(
-                () -> new NotFoundException("User not found")
+                () -> new NotFoundException("User not found.")
         );
 
         if(request.getAvatarUrl().isBlank()){
-            throw new BusinessException("Avatar url is empty");
+            throw new BusinessException("Avatar url is empty.");
         }
 
         user.setAvatarUrl(request.getAvatarUrl());

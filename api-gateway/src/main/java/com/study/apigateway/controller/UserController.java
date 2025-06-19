@@ -1,7 +1,6 @@
 package com.study.apigateway.controller;
 
 import com.study.apigateway.dto.Action.ActionResponseDto;
-import com.study.apigateway.dto.User.request.CreateUserRequestDto;
 import com.study.apigateway.dto.User.request.UpdateUserRequestDto;
 import com.study.apigateway.dto.User.response.ListUserResponseDto;
 import com.study.apigateway.dto.User.response.UserDetailResponseDto;
@@ -27,15 +26,6 @@ import java.util.UUID;
 @RequestMapping("/api/users")
 public class UserController {
     private final UserService userService;
-
-    @PostMapping
-    @Operation(summary = "Create a new user.")
-    @ApiResponse(responseCode = "200", description = "Create successfully.")
-    @ApiResponse(responseCode = "400", description = "Invalid request body.",
-            content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
-    public Mono<ResponseEntity<UserResponseDto>> createUser(@Valid @RequestBody CreateUserRequestDto request) {
-        return userService.createUser(request).map(ResponseEntity::ok);
-    }
 
     @GetMapping("/{id}")
     @Operation(summary = "Get user's information by id.")
