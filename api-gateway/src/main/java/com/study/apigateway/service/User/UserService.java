@@ -11,7 +11,6 @@ import reactor.core.publisher.Mono;
 import java.util.UUID;
 
 public interface UserService {
-    Mono<UserResponseDto> createUser(String username, String dateOfBirth, String gender, String avatarUrl);
     Mono<UserDetailResponseDto> getUserById(UUID id);
     Mono<ListUserResponseDto> searchUserByUsername(String keyword, UUID cursor, int size);
     Mono<UserResponseDto> updateUser(UUID id, UpdateUserRequestDto user);

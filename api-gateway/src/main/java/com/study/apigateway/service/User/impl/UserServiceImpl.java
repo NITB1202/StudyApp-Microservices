@@ -33,14 +33,6 @@ public class UserServiceImpl implements UserService {
     private final String AVATAR_FOLDER = "users";
 
     @Override
-    public Mono<UserResponseDto> createUser(String username, String dateOfBirth, String gender, String avatarUrl) {
-        return Mono.fromCallable(() -> {
-            UserResponse user = userServiceGrpcClient.createUser(username, dateOfBirth, gender, avatarUrl);
-            return UserMapper.toUserResponseDto(user);
-        }).subscribeOn(Schedulers.boundedElastic());
-    }
-
-    @Override
     public Mono<UserDetailResponseDto> getUserById(UUID id) {
         return Mono.fromCallable(() -> {
             UserDetailResponse user = userServiceGrpcClient.getUserById(id);

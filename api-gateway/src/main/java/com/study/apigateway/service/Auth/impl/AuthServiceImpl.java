@@ -29,7 +29,6 @@ import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
 
-import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -64,7 +63,7 @@ public class AuthServiceImpl implements AuthService {
             boolean isRegistered = authGrpc.isAccountRegistered(userInfo.getId()).getIsRegistered();
 
             if(!isRegistered) {
-                UserResponse user = userGrpc.createUser(userInfo.getName(), userInfo.getBirthday(), userInfo.getGender(), userInfo.getPicture());
+                UserResponse user = userGrpc.createUser(userInfo.getName(), null, null, userInfo.getPicture());
                 UUID userId = UUID.fromString(user.getId());
                 authGrpc.registerWithProvider(userInfo.getId(), request.getProvider(), userId, userInfo.getEmail());
             }
@@ -140,58 +139,15 @@ public class AuthServiceImpl implements AuthService {
                 .bodyToMono(new ParameterizedTypeReference<>() {});
     }
 
-    private Mono<OAuthUserInfo> getUserInfoWithGoogle(String accessToken) {
-        String userInfoUrl = "https://www.googleapis.com/oauth2/v3/userinfo";
-        String peopleInfoUrl = "https://people.googleapis.com/v1/people/me?personFields=genders,birthdays";
-
-        Mono<Map<String, Object>> userInfoMono = sendRequest(accessToken, userInfoUrl);
-        Mono<Map<String, Object>> peopleInfoMono = sendRequest(accessToken, peopleInfoUrl);
-
-        return Mono.zip(userInfoMono, peopleInfoMono)
-                .map(tuple -> {
-                    Map<String, Object> userInfo = tuple.getT1();
-                    Map<String, Object> peopleInfo = tuple.getT2();
-
-                    String id = (String) userInfo.getOrDefault("sub", null);
-                    String name = (String) userInfo.getOrDefault("name", null);
-                    String email = (String) userInfo.getOrDefault("email", null);
-                    String picture = (String) userInfo.getOrDefault("picture", null);
-
-                    // Gender
-                    String gender = null;
-                    List<Map<String, Object>> genders = (List<Map<String, Object>>) peopleInfo.get("genders");
-                    if (genders != null && !genders.isEmpty()) {
-                        gender = (String) genders.get(0).get("value");
-                    }
-
-                    // Birthday
-                    String birthday = null;
-                    List<Map<String, Object>> birthdays = (List<Map<String, Object>>) peopleInfo.get("birthdays");
-                    if (birthdays != null && !birthdays.isEmpty()) {
-                        Map<String, Object> date = (Map<String, Object>) birthdays.get(0).get("date");
-                        if (date != null) {
-                            Integer year = (Integer) date.get("year");
-                            Integer month = (Integer) date.get("month");
-                            Integer day = (Integer) date.get("day");
-
-                            if (month != null && day != null) {
-                                if (year != null) {
-                                    birthday = String.format("%04d-%02d-%02d", year, month, day);
-                                } else {
-                                    birthday = String.format("0000-%02d-%02d", month, day);
-                                }
-                            }
-                        }
-                    }
-
-                    return OAuthUserInfo.builder()
-                            .id(id)
-                            .name(name)
-                            .email(email)
-                            .picture(picture)
-                            .gender(gender)
-                            .birthday(birthday)
-                            .build();
-                });
+    public Mono<OAuthUserInfo> getUserInfoWithGoogle(String accessToken) {
+        String url = "https://www.googleapis.com/oauth2/v3/userinfo";
+        return sendRequest(accessToken, url).map(response -> {
+            return OAuthUserInfo.builder()
+                    .id((String) response.get("sub"))
+                    .name((String) response.get("name"))
+                    .email((String) response.get("email"))
+                    .picture((String) response.get("picture"))
+                    .build();
+        });
     }
 }

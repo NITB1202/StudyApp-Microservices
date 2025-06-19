@@ -17,12 +17,13 @@ public class UserServiceGrpcClient {
 
     public UserResponse createUser(String username, String dateOfBirth, String gender, String avatarUrl) {
         String handledDateOfBirth = dateOfBirth != null ? dateOfBirth : "";
+        Gender handledGender = gender != null ? GenderMapper.fromString(gender) : Gender.UNSPECIFIED;
         String handledAvatarUrl = avatarUrl != null ? avatarUrl : "";
 
         CreateUserRequest request = CreateUserRequest.newBuilder()
                 .setUsername(username)
                 .setDateOfBirth(handledDateOfBirth)
-                .setGender(GenderMapper.fromString(gender))
+                .setGender(handledGender)
                 .setAvatarUrl(handledAvatarUrl)
                 .build();
 

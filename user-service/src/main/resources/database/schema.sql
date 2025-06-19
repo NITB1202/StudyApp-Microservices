@@ -1,7 +1,7 @@
 CREATE TABLE IF NOT EXISTS users (
-    id UUID DEFAULT RANDOM_UUID() PRIMARY KEY,
-    username VARCHAR(255) NOT NULL UNIQUE,
-    dob DATE NOT NULL,
-    gender VARCHAR(10) NOT NULL,
+    id UUID PRIMARY KEY,
+    username VARCHAR(255) NOT NULL,
+    dob DATE,
+    gender VARCHAR(50),
     avatar_url VARCHAR(255)
 );

@@ -14,19 +14,23 @@ public class UserMapper {
     private UserMapper() {}
 
     public static UserResponse toUserResponse(User user){
+        String handledDateOfBirth = user.getDateOfBirth() != null ? user.getDateOfBirth().toString() : "";
+
         return UserResponse.newBuilder()
                 .setId(user.getId().toString())
                 .setUsername(user.getUsername())
-                .setDateOfBirth(user.getDateOfBirth().toString())
+                .setDateOfBirth(handledDateOfBirth)
                 .setGender(GenderMapper.toProtoEnum(user.getGender()))
                 .build();
     }
 
     public static UserDetailResponse toUserDetailResponse(User user){
+        String handledDateOfBirth = user.getDateOfBirth() != null ? user.getDateOfBirth().toString() : "";
+
         return UserDetailResponse.newBuilder()
                 .setId(user.getId().toString())
                 .setUsername(user.getUsername())
-                .setDateOfBirth(user.getDateOfBirth().toString())
+                .setDateOfBirth(handledDateOfBirth)
                 .setGender(GenderMapper.toProtoEnum(user.getGender()))
                 .setAvatarUrl(user.getAvatarUrl())
                 .build();

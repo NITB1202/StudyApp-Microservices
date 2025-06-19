@@ -17,19 +17,23 @@ public class UserMapper {
     private UserMapper() {}
 
     public static UserResponseDto toUserResponseDto(UserResponse user) {
+        LocalDate handledDateOfBirth = user.getDateOfBirth().isEmpty() ? null : LocalDate.parse(user.getDateOfBirth());
+
         return UserResponseDto.builder()
                 .id(UUID.fromString(user.getId()))
                 .username(user.getUsername())
-                .dateOfBirth(LocalDate.parse(user.getDateOfBirth()))
+                .dateOfBirth(handledDateOfBirth)
                 .gender(user.getGender())
                 .build();
     }
 
     public static UserDetailResponseDto toUserDetailResponseDto(UserDetailResponse user) {
+        LocalDate handledDateOfBirth = user.getDateOfBirth().isEmpty() ? null : LocalDate.parse(user.getDateOfBirth());
+
         return UserDetailResponseDto.builder()
                 .id(UUID.fromString(user.getId()))
                 .username(user.getUsername())
-                .dateOfBirth(LocalDate.parse(user.getDateOfBirth()))
+                .dateOfBirth(handledDateOfBirth)
                 .gender(user.getGender())
                 .avatarUrl(user.getAvatarUrl())
                 .build();
