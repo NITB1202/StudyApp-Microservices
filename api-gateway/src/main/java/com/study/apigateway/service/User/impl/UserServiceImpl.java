@@ -1,7 +1,6 @@
 package com.study.apigateway.service.User.impl;
 
 import com.study.apigateway.dto.Action.ActionResponseDto;
-import com.study.apigateway.dto.User.request.CreateUserRequestDto;
 import com.study.apigateway.dto.User.request.UpdateUserRequestDto;
 import com.study.apigateway.dto.User.response.ListUserResponseDto;
 import com.study.apigateway.dto.User.response.UserDetailResponseDto;
@@ -34,9 +33,9 @@ public class UserServiceImpl implements UserService {
     private final String AVATAR_FOLDER = "users";
 
     @Override
-    public Mono<UserResponseDto> createUser(CreateUserRequestDto request) {
+    public Mono<UserResponseDto> createUser(String username, String dateOfBirth, String gender, String avatarUrl) {
         return Mono.fromCallable(() -> {
-            UserResponse user = userServiceGrpcClient.createUser(request);
+            UserResponse user = userServiceGrpcClient.createUser(username, dateOfBirth, gender, avatarUrl);
             return UserMapper.toUserResponseDto(user);
         }).subscribeOn(Schedulers.boundedElastic());
     }

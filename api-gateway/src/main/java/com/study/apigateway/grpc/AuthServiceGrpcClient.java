@@ -97,4 +97,12 @@ public class AuthServiceGrpcClient {
 
         return blockingStub.resetPassword(request);
     }
+
+    public AccountSummaryResponse getAccountById(UUID accountId) {
+        GetAccountByIdRequest request = GetAccountByIdRequest.newBuilder()
+                .setId(accountId.toString())
+                .build();
+
+        return blockingStub.getAccountById(request);
+    }
 }

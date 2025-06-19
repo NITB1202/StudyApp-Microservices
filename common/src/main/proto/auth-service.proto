@@ -10,7 +10,6 @@ option java_outer_classname = "AuthProto";
 
 enum SupportedProvider {
   GOOGLE = 0;
-  FACEBOOK = 1;
 }
 
 enum VerificationType {
@@ -72,6 +71,16 @@ message ResetPasswordRequest {
   string new_password = 3;
 }
 
+message GetAccountByIdRequest {
+  string id = 1;
+}
+
+message AccountSummaryResponse {
+  string id = 1;
+  string user_id = 2;
+  string role = 3;
+}
+
 service AuthService {
   rpc LoginWithCredentials(LoginWithCredentialsRequest) returns (LoginResponse);
   rpc LoginWithProvider(LoginWithProviderRequest) returns (LoginResponse);
@@ -83,4 +92,6 @@ service AuthService {
   rpc RegisterWithCredentials(RegisterWithCredentialsRequest) returns (common.ActionResponse);
   rpc RegisterWithProvider(RegisterWithProviderRequest) returns (common.ActionResponse);
   rpc ResetPassword(ResetPasswordRequest) returns (common.ActionResponse);
+
+  rpc GetAccountById(GetAccountByIdRequest) returns (AccountSummaryResponse);
 }
