@@ -11,6 +11,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
 
@@ -26,7 +27,7 @@ public class InvitationController {
     @GetMapping
     @Operation(summary = "Get a list of invitations.")
     @ApiResponse(responseCode = "200", description = "Get successfully.")
-    public Mono<ResponseEntity<InvitationsResponseDto>> getInvitations(@RequestParam UUID userId,
+    public Mono<ResponseEntity<InvitationsResponseDto>> getInvitations(@AuthenticationPrincipal UUID userId,
                                                                        @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime cursor,
                                                                        @RequestParam(defaultValue = "10") int size) {
         return invitationService.getInvitations(userId, cursor, size).map(ResponseEntity::ok);
@@ -37,7 +38,9 @@ public class InvitationController {
     @ApiResponse(responseCode = "200", description = "Reply successfully.")
     @ApiResponse(responseCode = "404", description = "Not found.",
             content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
-    public Mono<ResponseEntity<ActionResponseDto>> replyToInvitation(@PathVariable UUID id, @RequestParam UUID userId, @RequestParam boolean accept) {
+    public Mono<ResponseEntity<ActionResponseDto>> replyToInvitation(@PathVariable UUID id,
+                                                                     @AuthenticationPrincipal UUID userId,
+                                                                     @RequestParam boolean accept) {
         return invitationService.replyToInvitation(id, userId, accept).map(ResponseEntity::ok);
     }
 }

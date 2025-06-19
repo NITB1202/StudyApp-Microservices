@@ -13,6 +13,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
 
@@ -31,7 +32,7 @@ public class TeamPlanController {
     @ApiResponse(responseCode = "200", description = "Create successfully.")
     @ApiResponse(responseCode = "400", description = "Invalid request body.",
             content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
-    public Mono<ResponseEntity<PlanResponseDto>> createTeamPlan(@RequestParam UUID userId,
+    public Mono<ResponseEntity<PlanResponseDto>> createTeamPlan(@AuthenticationPrincipal UUID userId,
                                                                 @Valid @RequestBody CreateTeamPlanRequestDto request) {
         return planService.createTeamPlan(userId, request).map(ResponseEntity::ok);
     }
@@ -39,7 +40,7 @@ public class TeamPlanController {
     @GetMapping("/date")
     @Operation(summary = "Get team plans for a specific date.")
     @ApiResponse(responseCode = "200", description = "Get successfully.")
-    public Mono<ResponseEntity<List<TeamPlanSummaryResponseDto>>> getTeamPlansOnDate(@RequestParam UUID userId,
+    public Mono<ResponseEntity<List<TeamPlanSummaryResponseDto>>> getTeamPlansOnDate(@AuthenticationPrincipal UUID userId,
                                                                                      @RequestParam UUID teamId,
                                                                                      @RequestParam LocalDate date) {
         return planService.getTeamPlansOnDate(userId, teamId, date).map(ResponseEntity::ok);
@@ -48,7 +49,7 @@ public class TeamPlanController {
     @GetMapping("/month")
     @Operation(summary = "Get dates with team plan deadlines in a month.")
     @ApiResponse(responseCode = "200", description = "Get successfully.")
-    public Mono<ResponseEntity<List<LocalDate>>> getDatesWithTeamPlanDeadlineInMonth(@RequestParam UUID userId,
+    public Mono<ResponseEntity<List<LocalDate>>> getDatesWithTeamPlanDeadlineInMonth(@AuthenticationPrincipal UUID userId,
                                                                                      @RequestParam UUID teamId,
                                                                                      @RequestParam int month,
                                                                                      @RequestParam int year) {
@@ -58,7 +59,7 @@ public class TeamPlanController {
     @GetMapping("/missed")
     @Operation(summary = "Get team missed plans.")
     @ApiResponse(responseCode = "200", description = "Get successfully.")
-    public Mono<ResponseEntity<List<TeamPlanSummaryResponseDto>>> getTeamMissedPlans(@RequestParam UUID userId,
+    public Mono<ResponseEntity<List<TeamPlanSummaryResponseDto>>> getTeamMissedPlans(@AuthenticationPrincipal UUID userId,
                                                                                      @RequestParam UUID teamId){
         return planService.getTeamMissedPlans(userId, teamId).map(ResponseEntity::ok);
     }

@@ -19,6 +19,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.codec.multipart.FilePart;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
 
@@ -48,7 +49,7 @@ public class ChatServiceController {
     @ApiResponse(responseCode = "200", description = "Send successfully.")
     @ApiResponse(responseCode = "400", description = "Invalid request body.",
             content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
-    public Mono<ResponseEntity<ActionResponseDto>> sendMessage(@RequestParam UUID userId,
+    public Mono<ResponseEntity<ActionResponseDto>> sendMessage(@AuthenticationPrincipal UUID userId,
                                                                @PathVariable UUID teamId,
                                                                @Valid @RequestBody SendMessageRequestDto dto) {
         return chatService.sendMessage(userId, teamId, dto).map(ResponseEntity::ok);
@@ -59,7 +60,7 @@ public class ChatServiceController {
     @ApiResponse(responseCode = "200", description = "Send successfully.")
     @ApiResponse(responseCode = "400", description = "Invalid request body.",
             content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
-    public Mono<ResponseEntity<ActionResponseDto>> sendImageMessage(@RequestParam UUID userId,
+    public Mono<ResponseEntity<ActionResponseDto>> sendImageMessage(@AuthenticationPrincipal UUID userId,
                                                                     @PathVariable UUID teamId,
                                                                     @RequestPart("file") FilePart file) {
         return chatService.sendImageMessage(userId, teamId, file).map(ResponseEntity::ok);
@@ -68,7 +69,7 @@ public class ChatServiceController {
     @GetMapping("{teamId}/unread")
     @Operation(summary = "Get unread messages count for team chat notification.")
     @ApiResponse(responseCode = "200", description = "Get successfully.")
-    public Mono<ResponseEntity<UnreadMessageCountResponseDto>> getUnreadMessageCount(@RequestParam UUID userId, @PathVariable UUID teamId) {
+    public Mono<ResponseEntity<UnreadMessageCountResponseDto>> getUnreadMessageCount(@AuthenticationPrincipal UUID userId, @PathVariable UUID teamId) {
         return chatService.getUnreadMessageCount(userId, teamId).map(ResponseEntity::ok);
     }
 
@@ -88,7 +89,7 @@ public class ChatServiceController {
             content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     @ApiResponse(responseCode = "404", description = "Not found.",
             content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
-    public Mono<ResponseEntity<ActionResponseDto>> updateMessage(@RequestParam UUID userId,
+    public Mono<ResponseEntity<ActionResponseDto>> updateMessage(@AuthenticationPrincipal UUID userId,
                                                                  @PathVariable UUID messageId,
                                                                  @Valid @RequestBody UpdateMessageRequestDto dto) {
         return chatService.updateMessage(userId, messageId, dto).map(ResponseEntity::ok);
@@ -100,7 +101,7 @@ public class ChatServiceController {
     @ApiResponse(responseCode = "200", description = "Mark successfully.")
     @ApiResponse(responseCode = "400", description = "Invalid request body.",
             content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
-    public Mono<ResponseEntity<ActionResponseDto>> markMessagesAsRead(@RequestParam UUID userId,
+    public Mono<ResponseEntity<ActionResponseDto>> markMessagesAsRead(@AuthenticationPrincipal UUID userId,
                                                                       @PathVariable UUID teamId,
                                                                       @Valid @RequestBody MarkMessagesAsReadRequestDto dto) {
         return chatService.markMessagesAsRead(userId, teamId, dto).map(ResponseEntity::ok);
@@ -113,7 +114,7 @@ public class ChatServiceController {
             content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     @ApiResponse(responseCode = "404", description = "Not found.",
             content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
-    public Mono<ResponseEntity<ActionResponseDto>> deleteMessage(@RequestParam UUID userId, @PathVariable UUID messageId) {
+    public Mono<ResponseEntity<ActionResponseDto>> deleteMessage(@AuthenticationPrincipal UUID userId, @PathVariable UUID messageId) {
         return chatService.deleteMessage(userId, messageId).map(ResponseEntity::ok);
     }
 }

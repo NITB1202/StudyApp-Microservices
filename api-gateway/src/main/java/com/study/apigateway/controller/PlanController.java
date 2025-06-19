@@ -17,6 +17,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
 
@@ -35,7 +36,7 @@ public class PlanController {
     @ApiResponse(responseCode = "200", description = "Create successfully.")
     @ApiResponse(responseCode = "400", description = "Invalid request body.",
             content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
-    public Mono<ResponseEntity<PlanResponseDto>> createPersonalPlan(@RequestParam UUID userId,
+    public Mono<ResponseEntity<PlanResponseDto>> createPersonalPlan(@AuthenticationPrincipal UUID userId,
                                                                     @Valid @RequestBody CreatePersonalPlanRequestDto request) {
         return planService.createPersonalPlan(userId, request).map(ResponseEntity::ok);
     }
@@ -52,7 +53,7 @@ public class PlanController {
     @GetMapping("/date")
     @Operation(summary = "Get assigned plans for a specific date.")
     @ApiResponse(responseCode = "200", description = "Get successfully.")
-    public Mono<ResponseEntity<List<PlanSummaryResponseDto>>> getAssignedPlansOnDate(@RequestParam UUID userId,
+    public Mono<ResponseEntity<List<PlanSummaryResponseDto>>> getAssignedPlansOnDate(@AuthenticationPrincipal UUID userId,
                                                                                      @RequestParam LocalDate date) {
         return planService.getAssignedPlansOnDate(userId, date).map(ResponseEntity::ok);
     }
@@ -60,7 +61,7 @@ public class PlanController {
     @GetMapping("/month")
     @Operation(summary = "Get dates with assigned plan deadlines in a month.")
     @ApiResponse(responseCode = "200", description = "Get successfully.")
-    public Mono<ResponseEntity<List<LocalDate>>> getDatesWithAssignedPlanDeadlineInMonth(@RequestParam UUID userId,
+    public Mono<ResponseEntity<List<LocalDate>>> getDatesWithAssignedPlanDeadlineInMonth(@AuthenticationPrincipal UUID userId,
                                                                                          @RequestParam int month,
                                                                                          @RequestParam int year) {
         return planService.getDatesWithAssignedPlanDeadlineInMonth(userId, month, year).map(ResponseEntity::ok);
@@ -69,7 +70,7 @@ public class PlanController {
     @GetMapping("/missed")
     @Operation(summary = "Get personal missed plans.")
     @ApiResponse(responseCode = "200", description = "Get successfully.")
-    public Mono<ResponseEntity<List<PlanSummaryResponseDto>>> getPersonalMissedPlans(@RequestParam UUID userId){
+    public Mono<ResponseEntity<List<PlanSummaryResponseDto>>> getPersonalMissedPlans(@AuthenticationPrincipal UUID userId){
         return planService.getPersonalMissedPlans(userId).map(ResponseEntity::ok);
     }
 
@@ -80,7 +81,7 @@ public class PlanController {
             content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     @ApiResponse(responseCode = "404", description = "Not found.",
             content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
-    public Mono<ResponseEntity<PlanResponseDto>> updatePlan(@RequestParam UUID userId,
+    public Mono<ResponseEntity<PlanResponseDto>> updatePlan(@AuthenticationPrincipal UUID userId,
                                                             @PathVariable UUID planId,
                                                             @Valid @RequestBody UpdatePlanRequestDto request) {
         return planService.updatePlan(userId, planId, request).map(ResponseEntity::ok);
@@ -91,7 +92,7 @@ public class PlanController {
     @ApiResponse(responseCode = "200", description = "Delete successfully.")
     @ApiResponse(responseCode = "404", description = "Not found.",
             content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
-    public Mono<ResponseEntity<ActionResponseDto>> deletePlan(@RequestParam UUID userId,
+    public Mono<ResponseEntity<ActionResponseDto>> deletePlan(@AuthenticationPrincipal UUID userId,
                                                               @PathVariable UUID planId) {
         return planService.deletePlan(userId, planId).map(ResponseEntity::ok);
     }
@@ -103,7 +104,7 @@ public class PlanController {
             content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     @ApiResponse(responseCode = "404", description = "Not found.",
             content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
-    public Mono<ResponseEntity<ActionResponseDto>> restorePlan(@RequestParam UUID userId,
+    public Mono<ResponseEntity<ActionResponseDto>> restorePlan(@AuthenticationPrincipal UUID userId,
                                                                @PathVariable UUID planId,
                                                                @Valid @RequestBody RestorePlanRequestDto request){
         return planService.restorePlan(userId, planId, request).map(ResponseEntity::ok);
@@ -112,7 +113,7 @@ public class PlanController {
     @GetMapping("/statistic")
     @Operation(summary = "Get weekly plan statistics.")
     @ApiResponse(responseCode = "200", description = "Get successfully.")
-    public Mono<ResponseEntity<PlanStatisticsResponseDto>> getWeeklyPlanStatistics(@RequestParam UUID userId) {
+    public Mono<ResponseEntity<PlanStatisticsResponseDto>> getWeeklyPlanStatistics(@AuthenticationPrincipal UUID userId) {
         return planService.getWeeklyPlanStatistics(userId).map(ResponseEntity::ok);
     }
 }

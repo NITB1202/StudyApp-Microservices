@@ -9,6 +9,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
 
@@ -23,7 +24,7 @@ public class UsageController {
     @GetMapping("/user")
     @Operation(summary = "Get user's usage.")
     @ApiResponse(responseCode = "200", description = "Get successfully.")
-    public Mono<ResponseEntity<UsageResponseDto>> getUserUsage(@RequestParam UUID userId) {
+    public Mono<ResponseEntity<UsageResponseDto>> getUserUsage(@AuthenticationPrincipal UUID userId) {
         return usageService.getUserUsage(userId).map(ResponseEntity::ok);
     }
 
