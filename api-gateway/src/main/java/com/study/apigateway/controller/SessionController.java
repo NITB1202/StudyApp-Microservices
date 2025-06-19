@@ -12,6 +12,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
 
@@ -28,7 +29,7 @@ public class SessionController {
     @ApiResponse(responseCode = "200", description = "Save successfully.")
     @ApiResponse(responseCode = "400", description = "Invalid request body.",
             content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
-    public Mono<ResponseEntity<SessionResponseDto>> saveSession(@RequestParam UUID userId,
+    public Mono<ResponseEntity<SessionResponseDto>> saveSession(@AuthenticationPrincipal UUID userId,
                                                                 @Valid @RequestBody SaveSessionRequestDto request) {
         return sessionService.saveSession(userId, request).map(ResponseEntity::ok);
     }
@@ -36,7 +37,7 @@ public class SessionController {
     @GetMapping
     @Operation(summary = "Get the study session's weekly statistics.")
     @ApiResponse(responseCode = "200", description = "Get successfully.")
-    public Mono<ResponseEntity<SessionStatisticsResponseDto>> getSessionWeeklyStatistics(@RequestParam UUID userId) {
+    public Mono<ResponseEntity<SessionStatisticsResponseDto>> getSessionWeeklyStatistics(@AuthenticationPrincipal UUID userId) {
         return sessionService.getSessionWeeklyStatistics(userId).map(ResponseEntity::ok);
     }
 }

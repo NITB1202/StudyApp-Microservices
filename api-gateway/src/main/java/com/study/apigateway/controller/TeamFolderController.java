@@ -13,6 +13,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
 
@@ -33,7 +34,7 @@ public class TeamFolderController {
             content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     @ApiResponse(responseCode = "404", description = "Not found.",
             content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
-    public Mono<ResponseEntity<FolderResponseDto>> createTeamFolder(@RequestParam UUID userId,
+    public Mono<ResponseEntity<FolderResponseDto>> createTeamFolder(@AuthenticationPrincipal UUID userId,
                                                                     @PathVariable UUID teamId,
                                                                     @Valid @RequestBody CreateFolderRequestDto request) {
         return folderService.createTeamFolder(userId, teamId, request).map(ResponseEntity::ok);

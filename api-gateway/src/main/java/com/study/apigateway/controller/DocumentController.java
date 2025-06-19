@@ -15,6 +15,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.codec.multipart.FilePart;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
 
@@ -32,7 +33,7 @@ public class DocumentController {
     @ApiResponse(responseCode = "200", description = "Upload successfully.")
     @ApiResponse(responseCode = "400", description = "Invalid request body.",
             content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
-    public Mono<ResponseEntity<DocumentResponseDto>> uploadDocument(@RequestParam UUID userId,
+    public Mono<ResponseEntity<DocumentResponseDto>> uploadDocument(@AuthenticationPrincipal UUID userId,
                                                                     @PathVariable UUID folderId,
                                                                     @RequestParam String name,
                                                                     @RequestPart("file") FilePart file) {
@@ -78,7 +79,7 @@ public class DocumentController {
             content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     @ApiResponse(responseCode = "404", description = "Not found.",
             content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
-    public Mono<ResponseEntity<ActionResponseDto>> updateDocumentName(@RequestParam UUID userId,
+    public Mono<ResponseEntity<ActionResponseDto>> updateDocumentName(@AuthenticationPrincipal UUID userId,
                                                                       @PathVariable UUID id,
                                                                       @RequestParam String name) {
         return documentService.updateDocumentName(userId, id, name).map(ResponseEntity::ok);
@@ -91,7 +92,7 @@ public class DocumentController {
             content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     @ApiResponse(responseCode = "404", description = "Not found.",
             content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
-    public Mono<ResponseEntity<ActionResponseDto>> moveDocument(@RequestParam UUID userId,
+    public Mono<ResponseEntity<ActionResponseDto>> moveDocument(@AuthenticationPrincipal UUID userId,
                                                                 @PathVariable UUID id,
                                                                 @RequestParam UUID newFolderId) {
         return documentService.moveDocument(userId, id, newFolderId).map(ResponseEntity::ok);
@@ -104,7 +105,7 @@ public class DocumentController {
             content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     @ApiResponse(responseCode = "404", description = "Not found.",
             content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
-    public Mono<ResponseEntity<ActionResponseDto>> deleteDocument(@RequestParam UUID userId,
+    public Mono<ResponseEntity<ActionResponseDto>> deleteDocument(@AuthenticationPrincipal UUID userId,
                                                                   @PathVariable UUID id) {
         return documentService.deleteDocument(userId, id).map(ResponseEntity::ok);
     }

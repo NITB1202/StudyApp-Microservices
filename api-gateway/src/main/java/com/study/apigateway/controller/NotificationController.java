@@ -15,6 +15,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
 
@@ -30,7 +31,7 @@ public class NotificationController {
     @GetMapping
     @Operation(summary = "Get a list of notifications.")
     @ApiResponse(responseCode = "200", description = "Get successfully.")
-    public Mono<ResponseEntity<NotificationsResponseDto>> getNotifications(@RequestParam UUID userId,
+    public Mono<ResponseEntity<NotificationsResponseDto>> getNotifications(@AuthenticationPrincipal UUID userId,
                                                                            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime cursor,
                                                                            @RequestParam(defaultValue = "10") int size) {
         return notificationService.getNotifications(userId, cursor, size).map(ResponseEntity::ok);
@@ -39,7 +40,7 @@ public class NotificationController {
     @GetMapping("/count/unread")
     @Operation(summary = "Get unread notifications count.")
     @ApiResponse(responseCode = "200", description = "Get successfully.")
-    public Mono<ResponseEntity<UnreadNotificationCountResponseDto>> getUnreadNotificationCount(@RequestParam UUID userId) {
+    public Mono<ResponseEntity<UnreadNotificationCountResponseDto>> getUnreadNotificationCount(@AuthenticationPrincipal UUID userId) {
         return notificationService.getUnreadNotificationCount(userId).map(ResponseEntity::ok);
     }
 
@@ -53,7 +54,7 @@ public class NotificationController {
     @PostMapping("/mark/all")
     @Operation(summary = "Mark all notifications as read.")
     @ApiResponse(responseCode = "200", description = "Mark successfully.")
-    public Mono<ResponseEntity<ActionResponseDto>> markAllNotificationsAsRead(@RequestParam UUID userId) {
+    public Mono<ResponseEntity<ActionResponseDto>> markAllNotificationsAsRead(@AuthenticationPrincipal UUID userId) {
         return notificationService.markAllNotificationsAsRead(userId).map(ResponseEntity::ok);
     }
 
@@ -62,7 +63,7 @@ public class NotificationController {
     @ApiResponse(responseCode = "200", description = "Delete successfully.")
     @ApiResponse(responseCode = "400", description = "Invalid request body.",
             content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
-    public Mono<ResponseEntity<ActionResponseDto>> deleteNotifications(@RequestParam UUID userId,
+    public Mono<ResponseEntity<ActionResponseDto>> deleteNotifications(@AuthenticationPrincipal UUID userId,
                                                                        @Valid @RequestBody DeleteNotificationsRequestDto request) {
         return notificationService.deleteNotifications(userId, request).map(ResponseEntity::ok);
     }
@@ -70,7 +71,7 @@ public class NotificationController {
     @DeleteMapping("/all")
     @Operation(summary = "Delete all notifications.")
     @ApiResponse(responseCode = "200", description = "Delete successfully.")
-    public Mono<ResponseEntity<ActionResponseDto>> deleteAllNotifications(@RequestParam UUID userId) {
+    public Mono<ResponseEntity<ActionResponseDto>> deleteAllNotifications(@AuthenticationPrincipal UUID userId) {
         return notificationService.deleteAllNotifications(userId).map(ResponseEntity::ok);
     }
 }

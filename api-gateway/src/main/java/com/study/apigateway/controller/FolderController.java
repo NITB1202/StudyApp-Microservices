@@ -15,6 +15,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
 
@@ -32,7 +33,7 @@ public class FolderController {
     @ApiResponse(responseCode = "200", description = "Create successfully.")
     @ApiResponse(responseCode = "400", description = "Invalid request body.",
             content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
-    public Mono<ResponseEntity<FolderResponseDto>> createPersonalFolder(@RequestParam UUID userId,
+    public Mono<ResponseEntity<FolderResponseDto>> createPersonalFolder(@AuthenticationPrincipal UUID userId,
                                                                         @Valid @RequestBody CreateFolderRequestDto request) {
         return folderService.createPersonalFolder(userId, request).map(ResponseEntity::ok);
     }
@@ -51,7 +52,7 @@ public class FolderController {
     @ApiResponse(responseCode = "200", description = "Get successfully.")
     @ApiResponse(responseCode = "400", description = "Invalid request body.",
             content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
-    public Mono<ResponseEntity<FoldersResponseDto>> getPersonalFolders(@RequestParam UUID userId,
+    public Mono<ResponseEntity<FoldersResponseDto>> getPersonalFolders(@AuthenticationPrincipal UUID userId,
                                                                        @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime cursor,
                                                                        @RequestParam(defaultValue = "10") int size) {
         return folderService.getPersonalFolders(userId, cursor, size).map(ResponseEntity::ok);
@@ -62,7 +63,7 @@ public class FolderController {
     @ApiResponse(responseCode = "200", description = "Search successfully.")
     @ApiResponse(responseCode = "400", description = "Invalid request body.",
             content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
-    public Mono<ResponseEntity<FoldersResponseDto>> searchPersonalFolderByName(@RequestParam UUID userId,
+    public Mono<ResponseEntity<FoldersResponseDto>> searchPersonalFolderByName(@AuthenticationPrincipal UUID userId,
                                                                                @RequestParam String keyword,
                                                                                @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime cursor,
                                                                                @RequestParam(defaultValue = "10") int size) {
@@ -76,7 +77,7 @@ public class FolderController {
             content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     @ApiResponse(responseCode = "404", description = "Not found.",
             content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
-    public Mono<ResponseEntity<ActionResponseDto>> updateFolderName(@RequestParam UUID userId,
+    public Mono<ResponseEntity<ActionResponseDto>> updateFolderName(@AuthenticationPrincipal UUID userId,
                                                                     @PathVariable UUID id,
                                                                     @RequestParam String name) {
         return folderService.updateFolderName(userId, id, name).map(ResponseEntity::ok);
@@ -89,7 +90,7 @@ public class FolderController {
             content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     @ApiResponse(responseCode = "404", description = "Not found.",
             content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
-    public Mono<ResponseEntity<ActionResponseDto>> deleteFolder(@RequestParam UUID userId, @PathVariable UUID id) {
+    public Mono<ResponseEntity<ActionResponseDto>> deleteFolder(@AuthenticationPrincipal UUID userId, @PathVariable UUID id) {
         return folderService.deleteFolder(userId, id).map(ResponseEntity::ok);
     }
 }

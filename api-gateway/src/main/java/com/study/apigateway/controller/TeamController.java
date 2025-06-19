@@ -18,6 +18,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.codec.multipart.FilePart;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
 
@@ -34,7 +35,7 @@ public class TeamController {
     @ApiResponse(responseCode = "200", description = "Create successfully.")
     @ApiResponse(responseCode = "400", description = "Invalid request body.",
             content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
-    public Mono<ResponseEntity<TeamResponseDto>> createTeam(@RequestParam UUID userId,
+    public Mono<ResponseEntity<TeamResponseDto>> createTeam(@AuthenticationPrincipal UUID userId,
                                                             @Valid @RequestBody CreateTeamRequestDto request){
         return teamService.createTeam(userId, request).map(ResponseEntity::ok);
     }
@@ -62,7 +63,7 @@ public class TeamController {
     @ApiResponse(responseCode = "200", description = "Get successfully.")
     @ApiResponse(responseCode = "404", description = "Not found.",
             content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
-    public Mono<ResponseEntity<ListTeamResponseDto>> getUserTeams(@RequestParam UUID userId,
+    public Mono<ResponseEntity<ListTeamResponseDto>> getUserTeams(@AuthenticationPrincipal UUID userId,
                                                                   @RequestParam(required = false) String cursor,
                                                                   @RequestParam(defaultValue = "10") int size){
         return teamService.getUserTeams(userId, cursor,size).map(ResponseEntity::ok);
@@ -73,7 +74,7 @@ public class TeamController {
     @ApiResponse(responseCode = "200", description = "Search successfully.")
     @ApiResponse(responseCode = "404", description = "Not found.",
             content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
-    public Mono<ResponseEntity<ListTeamResponseDto>> searchTeams(@RequestParam UUID userId,
+    public Mono<ResponseEntity<ListTeamResponseDto>> searchTeams(@AuthenticationPrincipal UUID userId,
                                                                  @RequestParam String keyword,
                                                                  @RequestParam(required = false) String cursor,
                                                                  @RequestParam(defaultValue = "10") int size ){
@@ -88,7 +89,7 @@ public class TeamController {
     @ApiResponse(responseCode = "404", description = "Not found.",
             content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     public Mono<ResponseEntity<TeamResponseDto>> updateTeam(@PathVariable UUID teamId,
-                                                            @RequestParam UUID userId,
+                                                            @AuthenticationPrincipal UUID userId,
                                                             @Valid @RequestBody UpdateTeamRequestDto request){
         return teamService.updateTeam(userId, teamId, request).map(ResponseEntity::ok);
     }
@@ -99,7 +100,7 @@ public class TeamController {
     @ApiResponse(responseCode = "404", description = "Not found.",
             content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     public Mono<ResponseEntity<ActionResponseDto>> resetTeamCode(@PathVariable UUID teamId,
-                                                                 @RequestParam UUID userId) {
+                                                                 @AuthenticationPrincipal UUID userId) {
         return teamService.resetTeamCode(userId, teamId).map(ResponseEntity::ok);
     }
 
@@ -109,7 +110,7 @@ public class TeamController {
     @ApiResponse(responseCode = "404", description = "Not found.",
             content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     public Mono<ResponseEntity<ActionResponseDto>> deleteTeam(@PathVariable UUID teamId,
-                                                              @RequestParam UUID userId){
+                                                              @AuthenticationPrincipal UUID userId){
         return teamService.deleteTeam(teamId, userId).map(ResponseEntity::ok);
     }
 
@@ -120,7 +121,7 @@ public class TeamController {
             content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     @ApiResponse(responseCode = "404", description = "Not found.",
             content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
-    public Mono<ResponseEntity<ActionResponseDto>> uploadTeamAvatar(@RequestParam UUID userId,
+    public Mono<ResponseEntity<ActionResponseDto>> uploadTeamAvatar(@AuthenticationPrincipal UUID userId,
                                                                     @PathVariable UUID id,
                                                                     @RequestPart("file") FilePart file) {
         return teamService.uploadTeamAvatar(userId, id, file).map(ResponseEntity::ok);

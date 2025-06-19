@@ -11,6 +11,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
 
@@ -27,7 +28,7 @@ public class TaskController {
     @ApiResponse(responseCode = "200", description = "Add successfully.")
     @ApiResponse(responseCode = "400", description = "Invalid request body.",
             content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
-    public Mono<ResponseEntity<ActionResponseDto>> addTasksToPersonalPlan(@RequestParam UUID userId,
+    public Mono<ResponseEntity<ActionResponseDto>> addTasksToPersonalPlan(@AuthenticationPrincipal UUID userId,
                                                                           @Valid @RequestBody AddTasksToPersonalPlanRequestDto request) {
         return taskService.addTasksToPersonalPlan(userId, request).map(ResponseEntity::ok);
     }
@@ -37,7 +38,7 @@ public class TaskController {
     @ApiResponse(responseCode = "200", description = "Add successfully.")
     @ApiResponse(responseCode = "400", description = "Invalid request body.",
             content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
-    public Mono<ResponseEntity<ActionResponseDto>> addTasksToTeamPlan(@RequestParam UUID userId,
+    public Mono<ResponseEntity<ActionResponseDto>> addTasksToTeamPlan(@AuthenticationPrincipal UUID userId,
                                                                       @Valid @RequestBody AddTasksToTeamPlanRequestDto request) {
         return taskService.addTasksToTeamPlan(userId, request).map(ResponseEntity::ok);
     }
@@ -49,7 +50,7 @@ public class TaskController {
             content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     @ApiResponse(responseCode = "404", description = "Not found.",
             content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
-    public Mono<ResponseEntity<ActionResponseDto>> updateTasksStatus(@RequestParam UUID userId,
+    public Mono<ResponseEntity<ActionResponseDto>> updateTasksStatus(@AuthenticationPrincipal UUID userId,
                                                                      @Valid @RequestBody UpdateTasksStatusRequestDto request) {
         return taskService.updateTasksStatus(userId, request).map(ResponseEntity::ok);
     }
@@ -61,7 +62,7 @@ public class TaskController {
             content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     @ApiResponse(responseCode = "404", description = "Not found.",
             content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
-    public Mono<ResponseEntity<ActionResponseDto>> getTasksAssignee(@RequestParam UUID userId,
+    public Mono<ResponseEntity<ActionResponseDto>> getTasksAssignee(@AuthenticationPrincipal UUID userId,
                                                                     @Valid @RequestBody UpdateTasksAssigneeRequestDto request) {
         return taskService.updateTasksAssignee(userId, request).map(ResponseEntity::ok);
     }
@@ -71,7 +72,7 @@ public class TaskController {
     @ApiResponse(responseCode = "200", description = "Delete successfully.")
     @ApiResponse(responseCode = "404", description = "Not found.",
             content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
-    public Mono<ResponseEntity<ActionResponseDto>> deleteTasks(@RequestParam UUID userId,
+    public Mono<ResponseEntity<ActionResponseDto>> deleteTasks(@AuthenticationPrincipal UUID userId,
                                                                @Valid @RequestBody DeleteTasksRequestDto request) {
         return taskService.deleteTasks(userId, request).map(ResponseEntity::ok);
     }

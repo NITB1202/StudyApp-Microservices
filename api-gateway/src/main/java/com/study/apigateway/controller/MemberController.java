@@ -15,6 +15,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
 
@@ -31,7 +32,7 @@ public class MemberController {
     @ApiResponse(responseCode = "200", description = "Invite successfully.")
     @ApiResponse(responseCode = "404", description = "Not found.",
             content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
-    public Mono<ResponseEntity<ActionResponseDto>> createInvitation(@RequestParam UUID userId,
+    public Mono<ResponseEntity<ActionResponseDto>> createInvitation(@AuthenticationPrincipal UUID userId,
                                                                     @Valid @RequestBody CreateInvitationRequestDto request){
         return memberService.createInvitation(userId, request).map(ResponseEntity::ok);
     }
@@ -41,7 +42,7 @@ public class MemberController {
     @ApiResponse(responseCode = "200", description = "Join successfully.")
     @ApiResponse(responseCode = "404", description = "Not found.",
             content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
-    public Mono<ResponseEntity<ActionResponseDto>> joinTeam(@RequestParam UUID userId,
+    public Mono<ResponseEntity<ActionResponseDto>> joinTeam(@AuthenticationPrincipal UUID userId,
                                                             @RequestParam String teamCode){
         return memberService.joinTeam(userId, teamCode).map(ResponseEntity::ok);
     }
@@ -51,7 +52,7 @@ public class MemberController {
     @ApiResponse(responseCode = "200", description = "Get successfully.")
     @ApiResponse(responseCode = "404", description = "Not found.",
             content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
-    public Mono<ResponseEntity<TeamMemberProfileResponseDto>> getUserInTeam(@RequestParam UUID userId,
+    public Mono<ResponseEntity<TeamMemberProfileResponseDto>> getUserInTeam(@AuthenticationPrincipal UUID userId,
                                                                             @RequestParam UUID teamId){
         return memberService.getUserInTeam(userId, teamId).map(ResponseEntity::ok);
     }
@@ -82,7 +83,7 @@ public class MemberController {
             content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     @ApiResponse(responseCode = "404", description = "Not found.",
             content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
-    public Mono<ResponseEntity<ActionResponseDto>> updateTeamMemberRole(@RequestParam UUID userId,
+    public Mono<ResponseEntity<ActionResponseDto>> updateTeamMemberRole(@AuthenticationPrincipal UUID userId,
                                                                         @Valid @RequestBody UpdateMemberRoleRequestDto request){
         return memberService.updateTeamMemberRole(userId, request).map(ResponseEntity::ok);
     }
@@ -92,7 +93,7 @@ public class MemberController {
     @ApiResponse(responseCode = "200", description = "Delete successfully.")
     @ApiResponse(responseCode = "404", description = "Not found.",
             content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
-    public Mono<ResponseEntity<ActionResponseDto>> removeTeamMember(@RequestParam UUID userId,
+    public Mono<ResponseEntity<ActionResponseDto>> removeTeamMember(@AuthenticationPrincipal UUID userId,
                                                                     @Valid @RequestBody RemoveTeamMemberRequestDto request){
         return memberService.removeTeamMember(userId, request).map(ResponseEntity::ok);
     }
@@ -102,7 +103,7 @@ public class MemberController {
     @ApiResponse(responseCode = "200", description = "Leave successfully.")
     @ApiResponse(responseCode = "404", description = "Not found.",
             content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
-    public Mono<ResponseEntity<ActionResponseDto>> leaveTeam(@RequestParam UUID userId,
+    public Mono<ResponseEntity<ActionResponseDto>> leaveTeam(@AuthenticationPrincipal UUID userId,
                                                              @RequestParam UUID teamId){
         return memberService.leaveTeam(userId, teamId).map(ResponseEntity::ok);
     }

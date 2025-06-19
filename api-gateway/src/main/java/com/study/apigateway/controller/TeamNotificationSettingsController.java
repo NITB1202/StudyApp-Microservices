@@ -11,6 +11,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
 
@@ -27,7 +28,7 @@ public class TeamNotificationSettingsController {
     @ApiResponse(responseCode = "200", description = "Get successfully.")
     @ApiResponse(responseCode = "404", description = "Not found.",
             content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
-    public Mono<ResponseEntity<TeamNotificationSettingsResponseDto>> getTeamNotificationSettings(@RequestParam UUID userId, @PathVariable UUID teamId) {
+    public Mono<ResponseEntity<TeamNotificationSettingsResponseDto>> getTeamNotificationSettings(@AuthenticationPrincipal UUID userId, @PathVariable UUID teamId) {
         return settingsService.getTeamNotificationSettings(userId, teamId).map(ResponseEntity::ok);
     }
 
