@@ -200,6 +200,7 @@ services:
       DOCUMENT_SERVICE_DB_NAME: ${DOCUMENT_SERVICE_DB_NAME}
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      CLOUDINARY_URL: ${CLOUDINARY_URL}
     networks:
       - backend
 
@@ -305,6 +306,8 @@ services:
       AUTH_SERVICE_DB_NAME: ${AUTH_SERVICE_DB_NAME}
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      MAIL_USERNAME: ${MAIL_USERNAME}
+      MAIL_PASSWORD: ${MAIL_PASSWORD}
     networks:
       - backend
 
@@ -318,6 +321,7 @@ services:
       - eureka-server
     environment:
       SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE}
+      CLOUDINARY_URL: ${CLOUDINARY_URL}
     networks:
       - backend
 
