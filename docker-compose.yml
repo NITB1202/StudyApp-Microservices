@@ -19,6 +19,7 @@ services:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     volumes:
       - user-db-data:/var/lib/postgresql/data
+      - ./user-service/src/main/resources/database:/docker-entrypoint-initdb.d
     networks:
       - backend
 
@@ -81,6 +82,7 @@ services:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     volumes:
       - team-db-data:/var/lib/postgresql/data
+      - ./team-service/src/main/resources/database:/docker-entrypoint-initdb.d
     networks:
       - backend
 
@@ -114,6 +116,7 @@ services:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     volumes:
       - plan-db-data:/var/lib/postgresql/data
+      - ./plan-service/src/main/resources/database:/docker-entrypoint-initdb.d
     networks:
       - backend
 
@@ -147,6 +150,7 @@ services:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     volumes:
       - notification-db-data:/var/lib/postgresql/data
+      - ./notification-service/src/main/resources/database:/docker-entrypoint-initdb.d
     networks:
       - backend
 
@@ -181,6 +185,7 @@ services:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     volumes:
       - document-db-data:/var/lib/postgresql/data
+      - ./document-service/src/main/resources/database:/docker-entrypoint-initdb.d
     networks:
       - backend
 
@@ -215,6 +220,7 @@ services:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     volumes:
       - session-db-data:/var/lib/postgresql/data
+      - ./session-service/src/main/resources/database:/docker-entrypoint-initdb.d
     networks:
       - backend
 
@@ -246,6 +252,7 @@ services:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     volumes:
       - chat-db-data:/var/lib/postgresql/data
+      - ./chat-service/src/main/resources/database:/docker-entrypoint-initdb.d
     networks:
       - backend
 
@@ -289,6 +296,7 @@ services:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     volumes:
       - auth-db-data:/var/lib/postgresql/data
+      - ./auth-service/src/main/resources/database:/docker-entrypoint-initdb.d
     networks:
       - backend
 
