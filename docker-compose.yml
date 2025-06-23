@@ -2,6 +2,7 @@ services:
   eureka-server:
     build:
       context: ./server-registry
+    image: rialfield/eureka-server:latest
     container_name: server-registry
     ports:
       - "8761:8761"
@@ -26,6 +27,7 @@ services:
   user-service:
     build:
       context: ./user-service
+    image: rialfield/user-service:latest
     container_name: user-service
     depends_on:
       - user-db
@@ -89,6 +91,7 @@ services:
   team-service:
     build:
       context: ./team-service
+    image: rialfield/team-service:latest
     container_name: team-service
     depends_on:
       - zookeeper
@@ -123,6 +126,7 @@ services:
   plan-service:
     build:
       context: ./plan-service
+    image: rialfield/plan-service:latest
     container_name: plan-service
     depends_on:
       - zookeeper
@@ -157,6 +161,7 @@ services:
   notification-service:
     build:
       context: ./notification-service
+    image: rialfield/notification-service:latest
     container_name: notification-service
     depends_on:
       - zookeeper
@@ -192,6 +197,7 @@ services:
   document-service:
     build:
       context: ./document-service
+    image: rialfield/document-service:latest
     container_name: document-service
     depends_on:
       - zookeeper
@@ -227,6 +233,7 @@ services:
   session-service:
     build:
       context: ./session-service
+    image: rialfield/session-service:latest
     container_name: session-service
     depends_on:
       - session-db
@@ -259,6 +266,7 @@ services:
   chat-service:
     build:
       context: ./chat-service
+    image: rialfield/chat-service:latest
     container_name: chat-service
     depends_on:
       - chat-db
@@ -303,6 +311,7 @@ services:
   auth-service:
     build:
       context: ./auth-service
+    image: rialfield/auth-service:latest
     container_name: auth-service
     depends_on:
       - auth-db
@@ -322,6 +331,7 @@ services:
   api-gateway:
     build:
       context: ./api-gateway
+    image: rialfield/api-gateway:latest
     container_name: api-gateway
     ports:
       - "8080:8080"
