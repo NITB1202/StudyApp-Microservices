@@ -12,20 +12,27 @@ import java.util.UUID;
 public interface PlanRepository extends JpaRepository<Plan, UUID> {
     List<Plan> findByTeamId(UUID teamId);
     @Query("""
-        SELECT DISTINCT p
-        FROM Plan p
-        JOIN Task t ON t.planId = p.id
-        WHERE t.assigneeId = :userId
-        AND :date BETWEEN p.startAt AND p.endAt
-    """)
-    List<Plan> findAssignedPlansByUserIdAndDate(@Param("userId") UUID userId, @Param("date") LocalDateTime dateTime);
+    SELECT DISTINCT p
+    FROM Plan p
+    JOIN Task t ON t.planId = p.id
+    WHERE t.assigneeId = :userId
+    AND p.startAt <= :endDate
+    AND p.endAt >= :startDate
+""")
+    List<Plan> findAssignedPlansByUserIdAndInDate(@Param("userId") UUID userId,
+                                                  @Param("startDate") LocalDateTime startDate,
+                                                  @Param("endDate") LocalDateTime endDate);
+
     @Query("""
         SELECT p
         FROM Plan p
         WHERE p.teamId = :teamId
-        AND :date BETWEEN p.startAt AND p.endAt
+        AND p.startAt <= :endDate
+        AND p.endAt >= :startDate
     """)
-    List<Plan> findTeamPlansByTeamIdAndDate(@Param("teamId") UUID teamId, @Param("date") LocalDateTime dateTime);
+    List<Plan> findTeamPlansByTeamIdAndInDate(@Param("teamId") UUID teamId,
+                                            @Param("startDate") LocalDateTime startDate,
+                                            @Param("endDate") LocalDateTime endDate);
     @Query("""
         SELECT DISTINCT p
         FROM Plan p
