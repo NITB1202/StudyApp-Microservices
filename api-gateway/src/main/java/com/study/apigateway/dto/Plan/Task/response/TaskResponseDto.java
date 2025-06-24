@@ -19,4 +19,6 @@ public class TaskResponseDto {
     private UUID assigneeId;
 
     private String assigneeAvatarUrl;
+
+    private boolean isCompleted;
 }

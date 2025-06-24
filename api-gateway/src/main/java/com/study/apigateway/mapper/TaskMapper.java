@@ -35,6 +35,7 @@ public class TaskMapper {
                 .name(task.getName())
                 .assigneeId(UUID.fromString(task.getAssigneeId()))
                 .assigneeAvatarUrl(assignee.getAvatarUrl())
+                .isCompleted(task.getIsCompleted())
                 .build();
     }
 

@@ -31,8 +31,8 @@ public interface PlanRepository extends JpaRepository<Plan, UUID> {
         AND p.endAt >= :startDate
     """)
     List<Plan> findTeamPlansByTeamIdAndInDate(@Param("teamId") UUID teamId,
-                                            @Param("startDate") LocalDateTime startDate,
-                                            @Param("endDate") LocalDateTime endDate);
+                                              @Param("startDate") LocalDateTime startDate,
+                                              @Param("endDate") LocalDateTime endDate);
     @Query("""
         SELECT DISTINCT p
         FROM Plan p
