@@ -21,6 +21,7 @@ public class MessageMapper {
 
         return MessageResponseDto.builder()
                 .id(message.getId())
+                .userId(UUID.fromString(user.getId()))
                 .username(user.getUsername())
                 .avatarUrl(user.getAvatarUrl())
                 .content(content)
@@ -43,6 +44,7 @@ public class MessageMapper {
 
         return MessageResponse.newBuilder()
                 .setId(message.getId().toString())
+                .setUserId(user.getId())
                 .setUsername(user.getUsername())
                 .setAvatarUrl(user.getAvatarUrl())
                 .setContent(content)
