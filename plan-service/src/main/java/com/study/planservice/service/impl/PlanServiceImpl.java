@@ -66,21 +66,23 @@ public class PlanServiceImpl implements PlanService {
     @Override
     public List<Plan> getAssignedPlansOnDate(GetAssignedPlansOnDateRequest request) {
         LocalDate date = LocalDate.parse(request.getDate());
-        LocalDateTime dateTime = date.atStartOfDay();
+        LocalDateTime startOfDate = date.atStartOfDay();
+        LocalDateTime endOfDate = date.atTime(LocalTime.MAX);
 
         UUID userId = UUID.fromString(request.getUserId());
 
-        return planRepository.findAssignedPlansByUserIdAndDate(userId, dateTime);
+        return planRepository.findAssignedPlansByUserIdAndInDate(userId, startOfDate, endOfDate);
     }
 
     @Override
     public List<Plan> getTeamPlansOnDate(GetTeamPlansOnDateRequest request) {
         LocalDate date = LocalDate.parse(request.getDate());
-        LocalDateTime dateTime = date.atStartOfDay();
+        LocalDateTime startOfDate = date.atStartOfDay();
+        LocalDateTime endOfDate = date.atTime(LocalTime.MAX);
 
         UUID teamId = UUID.fromString(request.getTeamId());
 
-        return planRepository.findTeamPlansByTeamIdAndDate(teamId, dateTime);
+        return planRepository.findTeamPlansByTeamIdAndInDate(teamId, startOfDate, endOfDate);
     }
 
     @Override

@@ -305,6 +305,8 @@ services:
       context: ./chat-service
     image: rialfield/chat-service:latest
     container_name: chat-service
+    ports:
+      - "8086:8086"
     depends_on:
       - chat-db
       - eureka-server
@@ -317,6 +319,7 @@ services:
       CHAT_SERVICE_DB_NAME: ${CHAT_SERVICE_DB_NAME}
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      CLOUDINARY_URL: ${CLOUDINARY_URL}
       _JAVA_OPTIONS: "-Xms128m -Xmx256m"
     mem_limit: 250m
     networks:

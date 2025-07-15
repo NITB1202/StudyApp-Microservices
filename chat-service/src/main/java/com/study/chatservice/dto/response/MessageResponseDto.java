@@ -16,6 +16,8 @@ import java.util.UUID;
 public class MessageResponseDto {
     private UUID id;
 
+    private UUID userId;
+
     private String username;
 
     private String avatarUrl;

@@ -23,6 +23,7 @@ public class MessageMapper {
     public static MessageResponseDto toMessageResponseDto(MessageResponse message) {
         return MessageResponseDto.builder()
                 .id(UUID.fromString(message.getId()))
+                .userId(UUID.fromString(message.getUserId()))
                 .username(message.getUsername())
                 .avatarUrl(message.getAvatarUrl())
                 .content(message.getContent())
