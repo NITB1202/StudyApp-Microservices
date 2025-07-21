@@ -9,7 +9,7 @@
         <groupId>com.study</groupId>
         <artifactId>study-microservices</artifactId>
         <version>1.0.0-SNAPSHOT</version>
-        <relativePath>../pom.xml</relativePath>
+        <relativePath/>
     </parent>
 
     <artifactId>common</artifactId>
