@@ -17,10 +17,6 @@
     <name>common-library</name>
     <description>Shared components and utilities for StudyPal microservices</description>
 
-    <properties>
-        <os.detected.classifier>windows-x86_64</os.detected.classifier>
-    </properties>
-
     <dependencies>
         <!-- Starter -->
         <dependency>
@@ -142,8 +138,10 @@
                 <version>0.6.1</version>
                 <configuration>
                     <protoSourceRoot>${project.basedir}/src/main/proto</protoSourceRoot>
+                    <!--suppress UnresolvedMavenProperty -->
                     <protocArtifact>com.google.protobuf:protoc:3.21.12:exe:${os.detected.classifier}</protocArtifact>
                     <pluginId>grpc-java</pluginId>
+                    <!--suppress UnresolvedMavenProperty -->
                     <pluginArtifact>io.grpc:protoc-gen-grpc-java:1.56.0:exe:${os.detected.classifier}</pluginArtifact>
                 </configuration>
                 <executions>
