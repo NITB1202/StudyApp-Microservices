@@ -36,6 +36,9 @@ jobs:
             sudo apt-get install -y protobuf-compiler
             protoc --version
 
+      - name: Install parent POM only
+        run: mvn -N install
+
       - name: Build all modules from root
         run: mvn clean install -DskipTests
 
