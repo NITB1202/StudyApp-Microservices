@@ -29,6 +29,14 @@ jobs:
       - name: Login to DockerHub
         run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
 
+      #Build the common module first (no Docker image)
+      - name: Build common module
+        run: |
+          echo "Building common module..."
+          cd common
+          mvn clean install -DskipTests
+          cd ..
+
       #Clean the old build, create the .jar file, and skip the tests.
       #Build the images and push them all to DockerHub.
       - name: Build and push services
