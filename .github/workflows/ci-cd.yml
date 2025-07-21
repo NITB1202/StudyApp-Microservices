@@ -49,6 +49,8 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      #Copy .env and docker compose files.
+      #Stop the script if an error occurs.
       - name: SSH and Deploy
         uses: appleboy/ssh-action@master
         with:
@@ -56,10 +58,14 @@ jobs:
           username: ${{ secrets.VPS_USER }}
           key: ${{ secrets.VPS_PRIVATE_KEY }}
           script: |
+            set -e
+            mkdir -p /root/StudyPal
             cd /root/StudyPal
+
+            curl -o docker-compose.yml https://raw.githubusercontent.com/NITB1202/StudyApp-Microservices/main/docker-compose.yml
+            echo "${{ secrets.DOTENV_CONTENT }}" > .env
+            
             docker-compose pull
             docker-compose down
-            docker-compose up -d \
-              redis zookeeper kafka auth-db user-db eureka-server
-            docker-compose up -d --no-deps --force-recreate \
-              auth-service user-service api-gateway
+            docker-compose up -d redis zookeeper kafka auth-db user-db eureka-server
+            docker-compose up -d --no-deps --force-recreate auth-service user-service api-gateway
