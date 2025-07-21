@@ -1,0 +1,65 @@
+name: CI/CD for StudyPal
+
+on:
+  push:
+    branches: [main]
+
+env:
+  REGISTRY: docker.io/rialfield
+
+jobs:
+
+  build-and-push:
+    name: Build and push docker images
+    runs-on: ubuntu-latest
+
+    steps:
+      #Using the checkout GitHub Action (version 3), provided by GitHub, to pull the source code from the repository to the GitHub Actions runner.
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      #Using the setup-java GitHub Action (version 3) provided by GitHub to set up the Java environment for the workflow.
+      - name: Set up Java
+        uses: actions/setup-java@v3
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      #Log in to DockerHub using the access token.
+      - name: Login to DockerHub
+        run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
+
+      #Clean the old build, create the .jar file, and skip the tests.
+      #Build the images and push them all to DockerHub.
+      - name: Build and push services
+        run: |
+          SERVICES="server-registry user-service team-service plan-service notification-service document-service session-service chat-service auth-service api-gateway"
+          for service in $SERVICES; do
+            echo "Building $service"
+            cd $service
+            mvn clean package -DskipTests
+            docker build -t $REGISTRY/$service:latest .
+            docker push $REGISTRY/$service:latest
+            cd ..
+          done
+
+  deploy:
+    name: Deploy to VPS
+    needs: build-and-push
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: SSH and Deploy
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          key: ${{ secrets.VPS_PRIVATE_KEY }}
+          script: |
+            cd /root/StudyPal
+            docker-compose pull
+            docker-compose down
+            docker-compose up -d \
+              redis zookeeper kafka auth-db user-db eureka-server
+            docker-compose up -d --no-deps --force-recreate \
+              auth-service user-service api-gateway
