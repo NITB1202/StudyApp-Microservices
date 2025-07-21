@@ -36,19 +36,17 @@ jobs:
             sudo apt-get install -y protobuf-compiler
             protoc --version
 
-      #Clean the old build, create the .jar file, and skip the tests.
-      #Build the images and push them all to DockerHub.
+      - name: Build all modules from root
+        run: mvn clean install -DskipTests
+
       - name: Build and push services
         run: |
-          SERVICES="common server-registry user-service team-service plan-service notification-service document-service session-service chat-service auth-service api-gateway"
+          SERVICES="server-registry user-service team-service plan-service notification-service document-service session-service chat-service auth-service api-gateway"
           for service in $SERVICES; do
             echo "Building $service"
             cd $service
-            mvn clean install -DskipTests
-            if [ "$service" != "common" ]; then
-              docker build -t $REGISTRY/$service:latest .
-              docker push $REGISTRY/$service:latest
-            fi
+            docker build -t $REGISTRY/$service:latest .
+            docker push $REGISTRY/$service:latest
             cd ..
           done
 
