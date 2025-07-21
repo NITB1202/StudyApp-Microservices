@@ -29,25 +29,26 @@ jobs:
       - name: Login to DockerHub
         run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
 
-      #Build the common module first (no Docker image)
-      - name: Build common module
+      # Install protoc (Protocol Buffers compiler)
+      - name: Install protoc
         run: |
-          echo "Building common module..."
-          cd common
-          mvn clean install -DskipTests
-          cd ..
+            sudo apt-get update
+            sudo apt-get install -y protobuf-compiler
+            protoc --version
 
       #Clean the old build, create the .jar file, and skip the tests.
       #Build the images and push them all to DockerHub.
       - name: Build and push services
         run: |
-          SERVICES="server-registry user-service team-service plan-service notification-service document-service session-service chat-service auth-service api-gateway"
+          SERVICES="common server-registry user-service team-service plan-service notification-service document-service session-service chat-service auth-service api-gateway"
           for service in $SERVICES; do
             echo "Building $service"
             cd $service
-            mvn clean package -DskipTests
-            docker build -t $REGISTRY/$service:latest .
-            docker push $REGISTRY/$service:latest
+            mvn clean install -DskipTests
+            if [ "$service" != "common" ]; then
+              docker build -t $REGISTRY/$service:latest .
+              docker push $REGISTRY/$service:latest
+            fi
             cd ..
           done
 
