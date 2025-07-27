@@ -1,0 +1,198 @@
+services:
+  user-db:
+    image: postgres:15
+    restart: unless-stopped
+    container_name: user-db
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_DB: ${USER_SERVICE_DB_NAME}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    mem_limit: 250m
+    volumes:
+      - user-db-data:/var/lib/postgresql/data
+      - ./user-service/src/main/resources/database:/docker-entrypoint-initdb.d
+    networks:
+      - backend
+
+  zookeeper:
+    image: confluentinc/cp-zookeeper:7.2.1
+    restart: unless-stopped
+    container_name: zookeeper
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      JVMFLAGS: "-Xms128m -Xmx256m"
+    mem_limit: 250m
+    networks:
+      - backend
+
+  kafka:
+    image: confluentinc/cp-kafka:7.2.1
+    restart: unless-stopped
+    container_name: kafka
+    depends_on:
+      - zookeeper
+    ports:
+      - "9081:9081"
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9080,PLAINTEXT_LOCAL://localhost:9081
+      KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9080,PLAINTEXT_LOCAL://0.0.0.0:9081
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_LOCAL:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
+      KAFKA_HEAP_OPTS: "-Xms128m -Xmx256m"
+    mem_limit: 300m
+    networks:
+      - backend
+    command: >
+      bash -c "rm -rf /var/lib/kafka/data/* && /etc/confluent/docker/run"
+
+  redis:
+    image: redis:7.2
+    restart: unless-stopped
+    container_name: redis
+    ports:
+      - "6379:6379"
+    mem_limit: 150m
+    volumes:
+      - redis-data:/data
+    networks:
+      - backend
+
+  team-db:
+    image: postgres:15
+    restart: unless-stopped
+    container_name: team-db
+    ports:
+      - "5433:5432"
+    environment:
+      POSTGRES_DB: ${TEAM_SERVICE_DB_NAME}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    mem_limit: 200m
+    volumes:
+      - team-db-data:/var/lib/postgresql/data
+      - ./team-service/src/main/resources/database:/docker-entrypoint-initdb.d
+    networks:
+      - backend
+
+  plan-db:
+    image: postgres:15
+    restart: unless-stopped
+    container_name: plan-db
+    ports:
+      - "5434:5432"
+    environment:
+      POSTGRES_DB: ${PLAN_SERVICE_DB_NAME}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    mem_limit: 200m
+    volumes:
+      - plan-db-data:/var/lib/postgresql/data
+      - ./plan-service/src/main/resources/database:/docker-entrypoint-initdb.d
+    networks:
+      - backend
+
+  notification-db:
+    image: postgres:15
+    restart: unless-stopped
+    container_name: notification-db
+    ports:
+      - "5435:5432"
+    environment:
+      POSTGRES_DB: ${NOTIFICATION_SERVICE_DB_NAME}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    mem_limit: 200m
+    volumes:
+      - notification-db-data:/var/lib/postgresql/data
+      - ./notification-service/src/main/resources/database:/docker-entrypoint-initdb.d
+    networks:
+      - backend
+
+  document-db:
+    image: postgres:15
+    restart: unless-stopped
+    container_name: document-db
+    ports:
+      - "5436:5432"
+    environment:
+      POSTGRES_DB: ${DOCUMENT_SERVICE_DB_NAME}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    mem_limit: 200m
+    volumes:
+      - document-db-data:/var/lib/postgresql/data
+      - ./document-service/src/main/resources/database:/docker-entrypoint-initdb.d
+    networks:
+      - backend
+
+  session-db:
+    image: postgres:15
+    restart: unless-stopped
+    container_name: session-db
+    ports:
+      - "5437:5432"
+    environment:
+      POSTGRES_DB: ${SESSION_SERVICE_DB_NAME}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    mem_limit: 200m
+    volumes:
+      - session-db-data:/var/lib/postgresql/data
+      - ./session-service/src/main/resources/database:/docker-entrypoint-initdb.d
+    networks:
+      - backend
+
+  chat-db:
+    image: postgres:15
+    restart: unless-stopped
+    container_name: chat-db
+    ports:
+      - "5438:5432"
+    environment:
+      POSTGRES_DB: ${CHAT_SERVICE_DB_NAME}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    mem_limit: 200m
+    volumes:
+      - chat-db-data:/var/lib/postgresql/data
+      - ./chat-service/src/main/resources/database:/docker-entrypoint-initdb.d
+    networks:
+      - backend
+
+  auth-db:
+    image: postgres:15
+    restart: unless-stopped
+    container_name: auth-db
+    ports:
+      - "5439:5432"
+    environment:
+      POSTGRES_DB: ${AUTH_SERVICE_DB_NAME}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    mem_limit: 200m
+    volumes:
+      - auth-db-data:/var/lib/postgresql/data
+      - ./auth-service/src/main/resources/database:/docker-entrypoint-initdb.d
+    networks:
+      - backend
+
+volumes:
+  user-db-data:
+  team-db-data:
+  plan-db-data:
+  notification-db-data:
+  document-db-data:
+  session-db-data:
+  chat-db-data:
+  redis-data:
+  auth-db-data:
+
+networks:
+  backend:
+    driver: bridge

@@ -26,7 +26,6 @@ services:
     mem_limit: 250m
     volumes:
       - user-db-data:/var/lib/postgresql/data
-      - ./user-service/src/main/resources/database:/docker-entrypoint-initdb.d
     networks:
       - backend
 
@@ -84,8 +83,6 @@ services:
     mem_limit: 300m
     networks:
       - backend
-    command: >
-      bash -c "rm -rf /var/lib/kafka/data/* && /etc/confluent/docker/run"
 
   redis:
     image: redis:7.2
@@ -112,7 +109,6 @@ services:
     mem_limit: 200m
     volumes:
       - team-db-data:/var/lib/postgresql/data
-      - ./team-service/src/main/resources/database:/docker-entrypoint-initdb.d
     networks:
       - backend
 
@@ -151,7 +147,6 @@ services:
     mem_limit: 200m
     volumes:
       - plan-db-data:/var/lib/postgresql/data
-      - ./plan-service/src/main/resources/database:/docker-entrypoint-initdb.d
     networks:
       - backend
 
@@ -190,7 +185,6 @@ services:
     mem_limit: 200m
     volumes:
       - notification-db-data:/var/lib/postgresql/data
-      - ./notification-service/src/main/resources/database:/docker-entrypoint-initdb.d
     networks:
       - backend
 
@@ -230,7 +224,6 @@ services:
     mem_limit: 200m
     volumes:
       - document-db-data:/var/lib/postgresql/data
-      - ./document-service/src/main/resources/database:/docker-entrypoint-initdb.d
     networks:
       - backend
 
@@ -270,7 +263,6 @@ services:
     mem_limit: 200m
     volumes:
       - session-db-data:/var/lib/postgresql/data
-      - ./session-service/src/main/resources/database:/docker-entrypoint-initdb.d
     networks:
       - backend
 
@@ -308,7 +300,6 @@ services:
     mem_limit: 200m
     volumes:
       - chat-db-data:/var/lib/postgresql/data
-      - ./chat-service/src/main/resources/database:/docker-entrypoint-initdb.d
     networks:
       - backend
 
@@ -352,7 +343,6 @@ services:
     mem_limit: 200m
     volumes:
       - auth-db-data:/var/lib/postgresql/data
-      - ./auth-service/src/main/resources/database:/docker-entrypoint-initdb.d
     networks:
       - backend
 
