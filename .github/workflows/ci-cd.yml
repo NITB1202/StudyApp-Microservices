@@ -73,7 +73,7 @@ jobs:
             cd /root/StudyPal
 
             curl -o docker-compose.yml https://raw.githubusercontent.com/NITB1202/StudyApp-Microservices/main/docker-compose.yml
-            echo "${{ secrets.DOTENV_CONTENT }}" > .env
+            echo "${{ secrets.ENV_FILE }}" > .env
             
             docker compose pull
             docker compose down
